@@ -124,7 +124,8 @@ function parse(css) {
   return out
 }
 
-const [, , tfPath, outPath] = process.argv
+const [, , tfPath, outPath, ...flags] = process.argv
+const remainderPath = flags.includes('--remainder') ? flags[flags.indexOf('--remainder') + 1] : null
 if (!tfPath || !outPath) {
   console.error('usage: node tools/extract-css.mjs <tf/dashboard> <out dir>')
   process.exit(1)
@@ -211,6 +212,9 @@ const sheets = new Map() // component -> [chunk]
 const order = []
 let kept = 0
 let left = 0
+/** Every rule that stays with the app, in source order, so the app's
+ *  stylesheet after the split is generated rather than hand-edited. */
+const remainder = []
 
 /**
  * At-rules, which the first two passes dropped entirely.
@@ -245,15 +249,23 @@ for (const rule of parse(css)) {
     kept++
     continue
   }
+  if (rule.selector.startsWith('@font-face') || rule.selector.startsWith('@import')) {
+    remainder.push(chunk(rule))
+    left++
+    leftInside.push(chunk(sub))
+    continue
+  }
 
   if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports')) {
     const inner = parse(rule.body)
     const byTarget = new Map()
+    const leftInside = []
     for (const sub of inner) {
       const subNamed = [...(sub.selector.match(/\.[a-z][a-z0-9-]*/g) ?? [])].map((x) => x.slice(1))
       const subMine = subNamed.filter((c) => isPackage(c))
       if (subNamed.some((c) => appOnly.has(c) && !isPackage(c))) {
         left++
+        leftInside.push(chunk(sub))
         continue
       }
       // No class at all inside a query is `:root`, `body` or an element -- the
@@ -263,6 +275,7 @@ for (const rule of parse(css)) {
         subNamed.length === 0 ? 'base' : owners.length ? owners[owners.length - 1] : 'base'
       if (subNamed.length > 0 && subMine.length === 0) {
         left++
+        leftInside.push(chunk(sub))
         continue
       }
       if (!byTarget.has(target)) byTarget.set(target, [])
@@ -272,6 +285,10 @@ for (const rule of parse(css)) {
     for (const [target, chunks] of byTarget) {
       const body = chunks.join('\n\n').replace(/^/gm, '  ')
       assign(target, `${rule.comment ? `${rule.comment}\n` : ''}${rule.selector} {\n${body}\n}`)
+    }
+    if (leftInside.length) {
+      const body = leftInside.join('\n\n').replace(/^/gm, '  ')
+      remainder.push(`${rule.comment ? `${rule.comment}\n` : ''}${rule.selector} {\n${body}\n}`)
     }
     continue
   }
@@ -299,6 +316,7 @@ for (const rule of parse(css)) {
 
   if (mine.length === 0 || named.some((c) => appOnly.has(c) && !isPackage(c))) {
     left++
+    remainder.push(chunk(rule))
     continue
   }
 
@@ -341,6 +359,10 @@ function fileFor(name) {
   return name === 'base' ? 'base' : name.toLowerCase()
 }
 
+if (remainderPath) {
+  writeFileSync(resolve(remainderPath), `${remainder.join('\n\n')}\n`)
+  console.log(`app remainder: ${remainder.length} rules -> ${remainderPath}`)
+}
 console.log(`${kept} rules into ${sheets.size} sheets; ${left} left in the app`)
 for (const [name, chunks] of [...sheets].sort((a, b) => b[1].length - a[1].length)) {
   console.log(`  ${String(chunks.length).padStart(4)}  ${fileFor(name)}.css`)

@@ -15,14 +15,17 @@
  * state and a first run, which are exactly the moments a request is most likely
  * to fail.
  *
- *   node scripts/build-illustrations.mjs ../../../tf/dashboard/src/illustrations
+ *   node scripts/build-illustrations.mjs
  */
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const from = resolve(here, process.argv[2] ?? '../../../../tf/dashboard/src/illustrations')
+/* The package owns its art. The SVGs came from tf on 2026-09-04 and the
+   generator used to read them there; a package that depends on a sibling
+   checkout for its own drawings cannot be built from a clone. */
+const from = resolve(here, process.argv[2] ?? '../illustrations')
 
 const files = readdirSync(from)
   .filter((f) => f.endsWith('.svg'))

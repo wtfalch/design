@@ -55,6 +55,10 @@ export { default as Toggle } from './components/Toggle'
 export { default as Tooltip } from './components/Tooltip'
 export { default as Tour } from './components/Tour'
 export type { TourStop } from './components/Tour'
+/** The tour's memory. `forgetTour` is what onboarding calls so a config reset
+ *  replays the tour rather than leaving it suppressed by a browser that has
+ *  seen it. */
+export { forgetTour, markTourSeen, tourSeen } from './components/tourMarker'
 
 /** The art. Its own module because it is ~200 KB of inlined SVG — referenced
  *  only by `Illustration`, so a bundler that drops the component drops the art
