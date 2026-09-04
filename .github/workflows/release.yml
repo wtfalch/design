@@ -1,0 +1,44 @@
+name: Release
+
+# A tag publishes. `@wtfalch/auth` publishes by hand with no workflow; this
+# package will have many more releases than auth, and a release that fails
+# should be red in Actions rather than a tarball that never appeared.
+#
+# Nothing here deploys anything. It runs the same gates CI runs, then hands
+# the built package to npm with provenance, which ties the published tarball
+# to this commit and this workflow rather than to whoever held a token.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  id-token: write   # provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      # The tag is the version. A tag that disagrees with package.json is a
+      # release of the wrong thing, and this is where it stops.
+      - name: tag matches package.json
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG="$(node -p "require('./packages/design/package.json').version")"
+          [ "$TAG" = "$PKG" ] || { echo "tag v$TAG != package $PKG"; exit 1; }
+      - run: pnpm --filter @wtfalch/design publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

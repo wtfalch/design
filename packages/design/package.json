@@ -1,6 +1,6 @@
 {
   "name": "@wtfalch/design",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "The tf design system: themeable components on a fixed token vocabulary.",
   "repository": {
     "type": "git",

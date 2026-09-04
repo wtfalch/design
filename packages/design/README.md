@@ -125,6 +125,6 @@ theme on a light-mode laptop is not silently repainted.
 
 ## Status
 
-Pre-`0.1.0`. The vocabulary and the theme API are in place; components land as
-they are reviewed. See `plans/design-system-package.md` in the tf repo for the
-order.
+`0.1.0`. Every component is in, every one of the 68 gallery specimens is
+photographed in four themes, and the contrast and reduced-motion rules are
+tests rather than sentences. The first consumer is the app it came from.
