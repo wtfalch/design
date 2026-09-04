@@ -1,0 +1,218 @@
+/**
+ * The token vocabulary.
+ *
+ * This file is the contract. `styles.css` may only consume these; a theme may
+ * only supply values for them. Nothing else is themeable, and that is the
+ * point: the moment a theme can ship a selector, every theme becomes a fork of
+ * the stylesheet and no change to the app is safe again.
+ *
+ * What makes a theme expressive is not permission to write rules — it is a
+ * vocabulary wide enough that the thing you want to vary is a value. So this
+ * covers seven axes, not just colour: a theme can change how the app *moves*
+ * and how dense it is without touching a selector.
+ *
+ * Base values here are today's, exactly. Adding this file changed nothing on
+ * screen, which is how a 200-literal refactor stays reviewable.
+ *
+ * Keys are mirrored in `themes.ts` as `ThemeTokens`. Add one here, add it
+ * there — a token a theme cannot name is a token no theme can use.
+ */
+
+:root {
+  /* ---- colour ------------------------------------------------------- */
+  /* Low-chroma slate, and a muted teal.
+     Neither warm nor cold on purpose: a beige-leaning neutral reads cosy and a
+     navy-leaning one reads cold, and this is a tool somebody keeps open all
+     day. Teal sits between the two, and unlike a saturated blue it does not
+     compete with the text for attention.
+     Every pair below is measured rather than chosen -- see the block comment
+     above `--border-strong`. */
+  --bg: #12151a;
+  --panel: #191d24;
+  --panel-2: #222831;
+  --border: #262c36;
+  --text: #e4e8ee;
+  --muted: #98a1b0;
+  --accent: #4fb3a8;
+  --accent-dim: #2f6b66;
+  /* Status colours that survive a light background too. The old set was
+     dark-mode neon -- `#4ade80` on white is 1.74:1 -- and the light theme never
+     overrode them, so a `running` pill was unreadable on Paper. */
+  --good: #68c48c;
+  --warn: #d9a65a;
+  --bad: #e28680;
+  /* Information, as a colour of its own. `Callout`'s info tone used to borrow
+     the accent for its edge and take no fill, so on the two teal themes an
+     "information" box was a teal-edged box and William read it as "isn't
+     information blue?" (2026-09-03). It is now: blue, and the fourth status
+     colour beside good, warn and bad. */
+  --info: #74b3ff;
+  /* Text that sits *on* the accent. Was hardcoded `#fff`, which made a primary
+     button vanish under any pale accent — white on near-white. */
+  /* Near-black, because the accent is light enough to need it. White on the old
+     `#5b9dff` was 2.72:1 -- the primary button, the single most important
+     control in the app, failed the body-text minimum by a wide margin. */
+  --on-accent: #06181a;
+
+  /* ---- surface ------------------------------------------------------ */
+  /* Consumed as `background:`, never `background-color:`, so a theme may hand
+     it a gradient or an image rather than only a colour. */
+  --app-bg: var(--bg);
+  /* A slot. Inert unless a theme fills it — see `body::before` in styles.css.
+     This is how a theme gets a grain, a vignette or a wash without shipping a
+     rule to create the layer. */
+  --app-overlay: none;
+  --app-overlay-opacity: 0;
+  /* Elevation as a scale rather than one shadow. Black is right on a dark UI
+     and muddy on a light one, so this has to be a theme's decision. */
+  --shadow-1: 0 6px 20px rgba(0, 0, 0, 0.22);
+  --shadow-2: 0 8px 28px rgba(0, 0, 0, 0.28);
+  --shadow-3: 0 10px 34px rgba(0, 0, 0, 0.3);
+  --scrim: rgba(0, 0, 0, 0.45);
+
+  /* ---- typography --------------------------------------------------- */
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --font-size: 14px;
+  /* The scale, because there was not one.
+     `styles.css` carried eleven distinct sizes -- 10, 10.5, 11, 12, 13, 14, 15,
+     16, 17, 18, 19 -- and used `--font-size` exactly once. Eleven sizes is not a
+     hierarchy, it is eleven separate decisions, and it is most of why the app
+     felt uneven: two labels doing the same job would differ by a pixel for no
+     reason anybody could state.
+     Six steps, and every one of them earns its place: `xs` for the meter row and
+     mono chips, `sm` for hints, base for body, then three heading steps. A theme
+     can move the whole scale by moving `--font-size`, because they are all
+     relative to it.
+
+     `calc` off the token rather than `rem`, which is relative to the *root*
+     element and not to this -- `--font-size` is set on `body`, so a rem scale
+     would have silently resolved against the browser's 16px and every step
+     would have been wrong by a pixel and a half. */
+  /* `2xs` exists so the scale never has to round *up*. The first pass mapped
+     10px and 10.5px onto 11px and 15px onto 16px, and the app visibly grew --
+     a scale that inflates is not a scale, it is a resize. */
+  --text-2xs: calc(var(--font-size) * 0.714);
+  --text-xs: calc(var(--font-size) * 0.786);
+  --text-sm: calc(var(--font-size) * 0.857);
+  --text-base: var(--font-size);
+  --text-md: calc(var(--font-size) * 1.143);
+  --text-lg: calc(var(--font-size) * 1.286);
+  --text-xl: calc(var(--font-size) * 1.429);
+  --line-height: 1.5;
+  --tracking: 0;
+  --weight: 400;
+  --weight-strong: 600;
+
+  /* ---- shape -------------------------------------------------------- */
+  /* There were fifteen distinct radii and a `--radius` token used nine times
+     while literal `6px` appeared twelve. Four steps and a pill is the whole
+     range anything here actually needed. */
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+  --border-width: 1px;
+  /* Two jobs, two tokens.
+     `--border` was drawing both the hairline between two rows and the outline
+     of every input, select and button. Those have different requirements: a
+     divider is decoration and has no contrast minimum, while a control's
+     boundary is what tells you it is a control -- WCAG 1.4.11 wants 3:1 for
+     that. One token could satisfy either but not both, and it was set for the
+     divider, so every input in the app outlined itself at 1.26:1.
+     Solved for the threshold rather than picked: this is the first step on the
+     neutral ramp that clears 3:1 against `--panel`. */
+  --border-strong: #5f6a7a;
+
+  /* The checkmark, once. Drawn as a mask so whatever wears it supplies its own
+     colour -- the choice row's tick and the select's are the same shape and
+     should not be two paths that drift. */
+  --tick-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m5 13 4 4 10-10' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  /* ---- density ------------------------------------------------------ */
+  /* One scale. `--density` multiplies the structural gaps — the grid, the
+     modals, the settings panes — so a theme can be roomy or tight without
+     restating every padding in the stylesheet. */
+  --density: 1;
+
+  /* One scale, in fours, for padding and margin and gap alike.
+     There were twenty-four distinct spacing values in `styles.css` -- every
+     integer from 1 to 16, then 18, 20, 22, 24, 26, 28, 40, 60 -- against
+     twenty-six uses of a token. That is not a rhythm, it is two hundred and
+     twenty-five separate decisions, and it is why two rows doing the same job
+     sat a pixel apart.
+     Fours because the app's smallest real gap is 4px and everything above it
+     was already trying to be a multiple of four and missing: 6 and 10 and 14
+     are what you write when there is no scale to reach for.
+     `--density` multiplies the structural steps, so a theme can be roomy or
+     tight without restating a single padding. */
+  --space-1: calc(4px * var(--density));
+  --space-2: calc(8px * var(--density));
+  --space-3: calc(12px * var(--density));
+  --space-4: calc(16px * var(--density));
+  --space-5: calc(20px * var(--density));
+  --space-6: calc(24px * var(--density));
+  --space-8: calc(32px * var(--density));
+  --space-10: calc(40px * var(--density));
+  --space-15: calc(60px * var(--density));
+
+  /* Below the scale, and deliberately outside it: a 1px or 2px offset is not
+     spacing, it is optical alignment -- nudging a glyph off a baseline, or a
+     mark off a cap height. Rounding those up to 4px would move things that were
+     placed by eye. */
+  --nudge: 2px;
+
+
+  /* ---- motion ------------------------------------------------------- */
+  /* Four durations existed, written four ways — `0.12s` and `120ms` were the
+     same value spelled differently. A theme sets the character here: calm at
+     320ms ease-out, or snappy at 90ms.
+     `--dur-drag` is read from JavaScript by the tile-reorder FLIP animation,
+     which is the one piece of motion CSS cannot reach. */
+  --dur-fast: 120ms;
+  --dur-md: 200ms;
+  --dur-slow: 300ms;
+  --dur-drag: 180ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: ease-out;
+
+  /* ---- interaction -------------------------------------------------- */
+  --hover-lift: 0px;
+  --hover-scale: 1;
+  /* Read by every `:active` rule in `styles.css` -- reserved since the
+     vocabulary was written, used since 2026-09-03. Small: a control that
+     visibly shrinks under the pointer reads as a toy. Reduced motion puts it
+     back to 1 below. */
+  --press-scale: 0.985;
+  /* How much darker a control goes while pressed: the share of `--text` mixed
+     into its hover colour. One number, so a button, a row and a tab press
+     the same amount. */
+  --press-ink: 9%;
+  /* The accent itself, not a pale tint of it. `--accent-dim` was 1.90:1 against
+     the panel, so the ring marking the focused control was fainter than the
+     control. */
+  --focus-ring: 0 0 0 2px var(--accent);
+
+  /* ---- fixed -------------------------------------------------------- */
+  /* Not themeable: geometry other things are measured against. The panel head
+     is pinned so a head without a cog — the studio's preview — is the same
+     height as one with, and the applet gets the same remainder in both. */
+  --tile-control: 34px;
+}
+
+/* Motion is an accessibility setting before it is a style, so this outranks
+   every theme. Declared here rather than in `styles.css` because it is part of
+   the vocabulary's contract: a theme may set the durations, it may not decide
+   whether they apply. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0s;
+    --dur-md: 0s;
+    --dur-slow: 0s;
+    --dur-drag: 0s;
+    --hover-lift: 0px;
+    --hover-scale: 1;
+    --press-scale: 1;
+  }
+}

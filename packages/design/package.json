@@ -1,0 +1,49 @@
+{
+  "name": "@wtfalch/design",
+  "version": "0.0.0",
+  "description": "The tf design system: themeable components on a fixed token vocabulary.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wtfalch/design",
+    "directory": "packages/design"
+  },
+  "license": "MIT",
+  "type": "module",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./themes": {
+      "types": "./dist/themes.d.ts",
+      "default": "./dist/themes.js"
+    },
+    "./tokens.css": "./dist/tokens.css",
+    "./styles.css": "./dist/styles/index.css"
+  },
+  "sideEffects": ["*.css"],
+  "engines": { "node": ">=22.0.0" },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
+    "prepack": "pnpm build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "react-aria-components": "^1.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.6"
+  }
+}
