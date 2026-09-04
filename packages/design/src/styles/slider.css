@@ -1,0 +1,220 @@
+/* slider ----------------------------------------------------------------- */
+/* A number from a range -- `Slider.tsx` says when one is the right control.
+   The row is laid out like a switch row: words on the left, the control on the
+   right, the hint under the label so a long one does not push the knob off its
+   line.
+
+   The control is drawn as the other controls are: the box is a select's box
+   -- `--control` on `--border-strong`, `--radius` corners, the same height as
+   a button beside it -- filled with accent up to the value, with the value
+   printed inside at the right where a select prints its word and a slim bar
+   for the knob. A hairline with a dot on it was a different family from
+   everything else on the row. The native range is invisible and laid over the
+   box, so the keyboard, the focus and the announcement are still its own. */
+.slider-row {
+  display: flex;
+  align-items: center;
+  /* Wraps: the control is a fixed ~330px and the words beside it deserve a
+     column, not a sliver. Under about 600px the knob goes onto its own line
+     under the words rather than squeezing them to four per line. */
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.slider-row.is-disabled { opacity: 0.55; }
+
+.slider-body { flex: 1 1 260px; min-width: 0; display: grid; gap: 1px; }
+
+.set-row > .slider-row { flex: 1; min-width: 0; padding-block: 0; }
+
+.slider-label { color: var(--text); }
+
+.slider-hint { font-size: var(--text-sm); color: var(--muted); }
+
+/* The box, with the value printed inside it at the right where a select
+   prints its word, and under the box the two ends of the range in its
+   corners, so they read as its scale rather than as two more numbers on
+   the row. */
+.slider-control {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas: "box box" "min max";
+  row-gap: var(--space-1);
+  width: min(var(--slider-w, 150px), 100%);
+  flex: none;
+  margin-left: auto;
+}
+
+/* The three sizes every control takes, and the same three boxes: `sm` is
+   `.size-sm`'s padding and type, `md` `.size-md`'s, `lg` `.size-lg`'s -- so
+   a slider beside a button or a select of the same size is the same height.
+   The width scales with them, since that is what a slider mostly is. */
+.slider-sm { --slider-w: 120px; }
+
+.slider-sm .slider-box {
+  --slider-h: calc(1em * var(--line-height, 1.5) + var(--space-1) * 2 + 2px);
+  font-size: var(--text-xs);
+}
+
+.slider-sm .slider-value { font-size: var(--text-xs); padding: 0 var(--space-3); }
+
+.slider-sm .slider-hint { font-size: var(--text-xs); }
+
+.slider-md { --slider-w: 150px; }
+
+.slider-lg { --slider-w: 180px; }
+
+.slider-lg .slider-box {
+  --slider-h: calc(1em * var(--line-height, 1.5) + var(--space-3) * 2 + 2px);
+  font-size: var(--text-md);
+}
+
+.slider-end { font-size: var(--text-xs); color: var(--muted); }
+
+.slider-end:first-child { grid-area: min; justify-self: start; }
+
+.slider-end:last-child { grid-area: max; justify-self: end; }
+
+/* The box: the select's box, and the fill *is* the reading. The track runs
+   the whole width, so at the maximum the box is full and at the minimum it
+   is empty -- a fill that stopped short of either end read as a control
+   that would not go all the way. The readout sits over the right end where
+   a select prints its word and never moves. The knob is there for the hand:
+   hidden until the pointer is over the box or the keyboard has it, because
+   a white block parked in the fill was a second thing to read when the fill
+   already said it. Sizes are one variable, so the knob is the box's height
+   by arithmetic rather than by eye. */
+.slider-box {
+  grid-area: box;
+  display: flex;
+  position: relative;
+  /* The size scale's `md`: the same padding and type as a button or a
+     select with no size asked for. `sm` and `lg` below are the scale's too. */
+  --slider-h: calc(1em * var(--line-height, 1.5) + var(--space-2) * 2 + 2px);
+  --slider-knob-w: 12px;
+  font-size: var(--text-base);
+  /* The box's border colour, which the knob borrows so the two agree on
+     hover and on focus rather than one lighting up beside the other. */
+  --slider-edge: var(--border-strong);
+  height: var(--slider-h);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--control);
+  overflow: hidden;
+  transition: border-color var(--dur-fast);
+}
+
+/* The ring is for the keyboard. `:focus-within` lit it on a click too,
+   because the click focuses the input -- and a ring left behind a click is
+   what the buttons' `:focus-visible` rule exists to avoid. `:has()` reaches
+   the input's own `:focus-visible`, which the browser only sets for keyboard
+   focus. */
+.slider-box:hover, .slider-box:has(.slider:focus-visible) { --slider-edge: var(--accent); border-color: var(--slider-edge); }
+
+.slider-box:has(.slider:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.slider-row.is-disabled .slider-box:hover { --slider-edge: var(--border-strong); border-color: var(--slider-edge); }
+
+/* Filled to the fraction of the whole width. The knob travels the width
+   minus itself, so its centre and the fill's edge part by up to half a knob
+   -- always inside the knob, so the edge is never seen beside it -- and in
+   return the fill reaches both ends of the box. `--slider-f` is 0..1, set
+   per render, because CSS cannot read a range's value. */
+/* The fill's ink is the accent, mixed towards `--bad` by however far the
+   value is into the range the caller marked as a risk (`--slider-risk`,
+   0% to 100%). Set per render, so the colour moves with the knob rather
+   than flipping at a line. */
+.slider-track {
+  flex: 1; min-width: 0; position: relative;
+  --slider-f: 0;
+  --slider-risk: 0%;
+  --slider-ink: color-mix(in srgb, var(--bad) var(--slider-risk), var(--accent));
+  background: linear-gradient(to right,
+    color-mix(in srgb, var(--slider-ink) 28%, var(--control)) calc(100% * var(--slider-f)),
+    transparent 0);
+}
+
+/* Over the right end of the track, above the knob: when the knob is shown
+   and the value is high the two meet, and the number is read off the knob's
+   face rather than the knob hiding it. No pointer, so the input beneath
+   takes the drag. A step further in from the edge than a select's word,
+   for the same reason. */
+.slider-value {
+  position: absolute; right: 0; top: 0; bottom: 0; z-index: 1;
+  display: flex; align-items: center; padding: 0 var(--space-4);
+  font-size: var(--text-sm); color: var(--text); pointer-events: none;
+}
+
+/* The native input is stretched over the track and drawn nowhere but the
+   knob, so the keyboard, the focus and the announcement are still its own.
+   Written with the type as well as the class to outrank the generic `input`
+   rule, which outlines every field and recolours it on hover and focus. */
+input[type='range'].slider,
+input[type='range'].slider:hover,
+input[type='range'].slider:focus,
+input[type='range'].slider:focus-visible {
+  position: absolute; inset: 0;
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 100%; margin: 0; padding: 0;
+  border: 0; border-radius: 0; box-shadow: none; outline: none;
+  background: transparent; cursor: pointer;
+}
+
+/* Disabled: no hand, no knob, and no second dimming -- the row is already
+   at 0.55, and the generic `input:disabled` would stack 0.45 on top of it.
+   Written with the type and the class to outrank both that rule and the
+   hover rules below. */
+input[type='range'].slider:disabled { cursor: not-allowed; opacity: 1; }
+
+input[type='range'].slider:disabled::-webkit-slider-thumb { opacity: 0; }
+
+input[type='range'].slider:disabled::-moz-range-thumb { opacity: 0; }
+
+/* The knob is a handle the full height of the box's inside: a button's face
+   on a button's border with a hair of shadow. Invisible until the pointer is
+   over the box, the drag is under way, or the keyboard has the input --
+   the fill is the reading; the knob is where to grab it. */
+.slider::-webkit-slider-runnable-track {
+  height: calc(var(--slider-h) - 2px); background: transparent;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: var(--slider-knob-w); height: calc(var(--slider-h) - 2px); margin-top: 0;
+  /* The box's inner radius, so the knob's corners sit inside the box's
+     corners at either end instead of poking a square edge past a round one. */
+  border-radius: calc(var(--radius) - 1px);
+  background: var(--panel); border: 1px solid var(--slider-edge);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transition: opacity var(--dur-fast), border-color var(--dur-fast);
+}
+
+.slider-box:hover .slider::-webkit-slider-thumb,
+.slider:active::-webkit-slider-thumb,
+.slider:focus-visible::-webkit-slider-thumb { opacity: 1; }
+
+.slider::-moz-range-track { height: calc(var(--slider-h) - 2px); background: transparent; }
+
+.slider::-moz-range-thumb {
+  width: var(--slider-knob-w); height: calc(var(--slider-h) - 2px);
+  border-radius: calc(var(--radius) - 1px);
+  background: var(--panel); border: 1px solid var(--slider-edge);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transition: opacity var(--dur-fast), border-color var(--dur-fast);
+}
+
+.slider-box:hover .slider::-moz-range-thumb,
+.slider:active::-moz-range-thumb,
+.slider:focus-visible::-moz-range-thumb { opacity: 1; }
+
+.slider:focus-visible::-webkit-slider-thumb, .slider:focus-visible::-moz-range-thumb { outline: none; }
+
+/* A settings row sets its controls in the small type and nothing else: the
+   padding is the size scale's. This used to shrink the padding as well, for
+   buttons only, so a button in a row stood 25px beside a 35px select and no
+   size class could ask for the select's height. Type from the row, box from
+   the scale, and the two line up; an explicit `size-*` still wins. */
+:where(.set-row) button, :where(.set-row) .slider-box { font-size: var(--text-xs); }

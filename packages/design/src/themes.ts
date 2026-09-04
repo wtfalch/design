@@ -69,6 +69,11 @@ export interface ThemeTokens {
    *  a vignette or a wash without shipping a rule to create the layer. */
   '--app-overlay': string
   '--app-overlay-opacity': string
+  /** The surface a control sits on. Derived from the panel tones by default,
+   *  and settable, the same bargain `--app-bg` makes. */
+  '--control': string
+  /** The paper an illustration is drawn on; its ink takes `currentColor`. */
+  '--illo-paper': string
   '--shadow-1': string
   '--shadow-2': string
   '--shadow-3': string
@@ -188,6 +193,8 @@ export const TOKEN_KEYS = [
   '--app-bg',
   '--app-overlay',
   '--app-overlay-opacity',
+  '--control',
+  '--illo-paper',
   '--shadow-1',
   '--shadow-2',
   '--shadow-3',

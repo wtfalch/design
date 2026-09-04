@@ -19,7 +19,7 @@ import { createReadStream, existsSync, statSync } from 'node:fs'
 import { createServer } from 'node:http'
 import { extname, join, normalize, resolve } from 'node:path'
 
-const root = resolve(process.env.GALLERY_DIST ?? 'dist')
+const root = resolve(process.env.GALLERY_DIST ?? '../gallery/dist')
 const port = Number(process.env.GALLERY_PORT ?? 5199)
 
 if (!existsSync(join(root, 'design.html'))) {

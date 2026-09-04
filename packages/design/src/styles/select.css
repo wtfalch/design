@@ -1,0 +1,165 @@
+/* How big a control is, asked for rather than inherited.
+   Four sizes existed and every one of them came from a descendant selector:
+   `.set-row button` was 11px in 3px of padding, `.approval-actions button` was
+   12px in 5px, `.mcp-tool button` repeated the first exactly. So a button's size
+   was a fact about where it had been put, not about what it was -- moving one
+   resized it, and asking for a large button inside a settings row was not
+   possible at all. There is already a comment further down this file complaining
+   about precisely that.
+   One scale, for buttons, inputs and selects alike, because a row holding a
+   button beside an input wants them the same height and that was previously
+   arranged by hand each time. */
+/* Full width, for the one action a card or a step is about. Not a size: a
+   `block` button is the same height as any other, it just stops being a thing
+   you have to aim at. */
+button.block { display: flex; width: 100%; }
+
+/* The default is `size-md`, spelled once for every control.
+   The paragraph above promised one scale for buttons, inputs and selects, and
+   the next line broke it: inputs padded 8px top and bottom, buttons 4px, so an
+   input was eight pixels taller than the button beside it and no row of the two
+   could line up. The download modal's search box against its Search button was
+   the version you could see from across the room. */
+button,
+input,
+textarea,
+select,
+.sel-control { padding: var(--space-2) var(--space-3); }
+
+/* Centred on the whole block -- the caption and the sentence together -- rather
+   than aligned to either end of it. `.field-row` pins to the bottom, which is
+   right for a field beside a button and wrong beside two lines of prose. */
+.card-inline > .sel { align-self: center; }
+
+/* The custom select's control is a button and presses as one; its items are
+   the list's, and the active item is the keyboard's -- a click on one lands
+   on the item, not on a press. */
+.sel-item:active { background: color-mix(in srgb, var(--text) var(--press-ink), var(--panel-2)); }
+
+/* (the controls size themselves now; the width workaround that lived here is
+   gone with the base rule that replaced it) */
+
+/* The select, drawn by us.
+   A native `<select>` styles down to its closed state and no further -- the
+   open list is the operating system's, in its font, at its size, in its
+   colours. That is the part you actually read: thirty model ids with their
+   capability tags, on a white sheet in the middle of a dark app. So the list is
+   ours now, and these are its clothes. The behaviour lives in `Select.tsx`,
+   which owes the keyboard everything the native element gave away for free. */
+.sel { position: relative; display: inline-block; }
+
+/* The subject of its pane rather than a field in it: full width and a size up.
+   That was `.select-field.block` on the native element, and it carried the
+   reason with it -- model ids are long (`qwen2.5-coder:32b-instruct-q4_K_M`) and
+   at the narrow size they truncated mid-name. */
+.sel.block { display: block; width: 100%; }
+
+.sel.block .sel-control { padding: var(--space-2) var(--space-3); font-weight: 500; }
+
+/* Not full width otherwise: a select as wide as its row, holding one short
+   word, reads as an input somebody forgot to fill in. */
+.sel:not(.block) .sel-control { width: auto; max-width: 320px; }
+
+.sel-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  text-align: left;
+  /* Not `--panel`: a control sits on a panel and has to be distinguishable from
+     it, which is what `--control` is for. */
+  background: var(--control);
+}
+
+.sel-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.sel-caret { flex: none; opacity: 0.6; transition: transform var(--dur-fast) var(--ease); }
+
+.sel.open .sel-caret { transform: rotate(180deg); }
+
+.sel.open .sel-control { border-color: var(--accent); }
+
+.sel-list {
+  /* `fixed`, and in `document.body`: an ancestor that scrolls or hides its
+     overflow would otherwise clip it, which in this app means every settings
+     pane. Position comes from the button's measured rectangle. */
+  position: fixed;
+  z-index: 60;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1);
+  /* The same room while the list is scrolled as it has at rest. Padding at
+     the top of a scroll container scrolls away with the content, so the row
+     `scrollIntoView({block: 'nearest'})` brings up ended flush against the
+     border and read as clipped rather than as one of a set -- and this list
+     opens scrolled to whatever is chosen, so that was the ordinary state.
+     `scroll-padding` insets what counts as "in view", so it stops short by
+     the same four the sides have. */
+  scroll-padding-block: var(--space-1);
+  list-style: none;
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: var(--shadow-2);
+}
+
+.sel-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.sel-item-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* Hover and keyboard land on the same row, because they are the same idea --
+   two highlights for one cursor is how a list starts lying about where Enter
+   will go. */
+.sel-item[data-active='true'] { background: var(--panel-2); }
+
+.sel-item.on { color: var(--accent); }
+
+.sel-item.off { opacity: 0.45; cursor: not-allowed; }
+
+/* The tick marks the chosen row. Colour alone would not: a list where the only
+   difference is a hue is a list you cannot read past. */
+.sel-tick { flex: none; opacity: 0; }
+
+.sel-item.on .sel-tick { opacity: 1; }
+
+/* The icon on a speaker's row in the open list -- `Select`'s `aside`. Last in
+   the row and flush with its padding: it is a column of buttons down the right
+   of the list, which is where a list's controls belong. It sat between the
+   label and the tick for an afternoon, which put it a tick's width short of
+   the edge and reading as neither aligned nor attached to the name (William,
+   2026-09-04: "why is the icon not all the way right"). 20px square, so it has
+   a hit area without making the row taller than the text in it.
+
+   Drawn at text weight rather than at half a muted one. It was `opacity: 0.5`
+   on `--muted`, on the argument that eleven visible buttons is a busy list; at
+   that weight it read as decoration and nobody would have pressed it, which is
+   worse than busy. Accent under the pointer, which is the only state it has. */
+.sel-hear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+}
+
+.sel-hear:hover { color: var(--accent); }
+
+.field-bad input,
+.field-bad textarea,
+.field-bad .sel-control { border-color: var(--bad); }
+
+.field > input,
+.field > textarea,
+.field > .sel { width: 100%; }

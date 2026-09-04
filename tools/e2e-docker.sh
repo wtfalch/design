@@ -28,10 +28,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # the host over `host.docker.internal` and checked reachability from the host --
 # which proves nothing about the container, and duly passed while the container
 # got a 403 from Vite's host check on all 204 shots.
-DIST="${GALLERY_DIST:-${ROOT}/../tf/dashboard/dist}"
+DIST="${GALLERY_DIST:-${ROOT}/gallery/dist}"
 if [ ! -f "${DIST}/design.html" ]; then
   echo "No design.html under ${DIST}" >&2
-  echo "Build it:  cd ../tf/dashboard && npm run build" >&2
+  echo "Build it:  pnpm --filter @wtfalch/design build && pnpm --filter @wtfalch/design-gallery build" >&2
   echo "Or point GALLERY_DIST at a built gallery." >&2
   exit 1
 fi

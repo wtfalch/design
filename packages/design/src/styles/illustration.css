@@ -1,0 +1,25 @@
+/* illustrations -------------------------------------------------------- */
+
+/* Open Peeps, two colours, wearing whatever the theme is.
+   The drawings are black line on white fill and nothing else, which is the only
+   reason they can live in an app with four palettes: `ink` becomes the current
+   text colour and `paper` becomes the surface behind it, so one file covers
+   Night, Paper and both halves of System. Give the wrapper a `color` and
+   the figure follows it -- `.muted` for a quiet empty state, `--accent` for the
+   one thing on screen worth looking at. */
+.illo {
+  display: inline-block;
+  /* Height is the given dimension and the width comes from the drawing, so a
+     row of figures lines up on the floor rather than on a box. */
+  line-height: 0;
+  color: inherit;
+}
+
+.illo svg { height: 100%; width: auto; display: block; }
+
+.illo .ink { fill: currentColor; }
+
+/* The surface the figure is drawn on, which is the panel it sits in unless a
+   caller says otherwise. Not `transparent`: these have overlapping shapes, and
+   a shirt that lets the arm behind it show through reads as a hole. */
+.illo .paper { fill: var(--illo-paper); }

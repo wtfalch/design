@@ -1,0 +1,260 @@
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* A name and the pills that qualify it, on one line, where the name is the only
+   part allowed to run out of room.
+   `truncate` on the container ellipsised the *pills* off the end instead --
+   a 62-character model name took the row and the tags saying what it can do
+   vanished, which is the one thing on the row that cannot be guessed from the
+   rest. So the name truncates and the pills keep their width: `min-width: 0`
+   because a flex item will not shrink below its content otherwise, and
+   `flex: none` on the pills because shrinking a badge only clips its text. */
+.named { display: flex; align-items: center; min-width: 0; }
+
+.named > .truncate { min-width: 0; flex: 0 1 auto; }
+
+.named > .pill { flex: none; }
+
+/* The row's hit target is a button and would press on its own inside the
+   row that is already pressing; it keeps the row's colour and does nothing. */
+.row-hit:active:not(:disabled) { background: none; transform: none; border-color: transparent; }
+
+.set-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  /* 7px top and bottom put the text almost on the rule beneath it -- a divider
+     is meant to separate two rows, and at that spacing it reads as underlining
+     the one above. */
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+/* The last *row*, not the last div.
+   `:last-of-type` matches by element type, so a `.set-actions` div after the
+   rows meant the final row was no longer last-of-type: it kept its bottom
+   border, the actions bar drew its own top border, and every settings pane
+   ended in two parallel lines a few pixels apart. */
+.set-row:not(:has(~ .set-row)) { border-bottom: none; }
+
+/* rows ----------------------------------------------------------------- */
+
+/* The list of things. `.set-row` still draws one row -- thirty-eight callers
+   build that by hand and will for a while -- and these are what `Rows` adds on
+   top: a container that knows what a row is, and named slots so the layout is
+   not retyped per caller. */
+.rows { display: block; }
+
+/* The divider between rows and none after the last. Asking the container
+   rather than the DOM: `:last-of-type` matched by element type, so anything
+   rendered after the list left the final row with a border and the pane ended
+   in two parallel lines.
+   
+   Excluded from the `pick` look, where the border is the box rather than a
+   divider: dropping the bottom edge there left the last row open along the
+   foot, which reads as a rendering fault rather than as a list ending. */
+.rows:not(.rows-pick) > .rows-row:last-child { border-bottom: none; }
+
+/* A list you pick from, rather than a list you read.
+   
+   The ruled version reads as a table: five records with hairlines between them,
+   which is right for downloads and wrong for "which of these am I talking to".
+   Boxes with air between them read as alternatives, and the one that is chosen
+   can then say so with a border rather than only with a pill.
+   
+   The divider goes with it — two ways of separating rows at once is one too
+   many, and the border already does it. */
+.rows-pick { display: grid; gap: var(--space-2); }
+
+.rows-pick > .rows-row {
+  /* The containing block for the stretched hit area below, and for anything
+     else a row draws in its own corners. Without it `inset: 0` resolves against
+     whatever is positioned further up -- the pane -- so every row's hit area
+     covered the whole list and the last one drawn won every click. Clicking
+     one card selected a different model. */
+  position: relative;
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  /* Roomier than a list row. These are cards you choose between, and the
+     chosen one carries a second line of controls under it -- at `--space-3`
+     the whole block read as tight the moment anything appeared in it. */
+  padding: var(--space-4);
+  background: var(--panel);
+  transition: border-color var(--dur-fast) var(--ease),
+              background var(--dur-fast) var(--ease);
+}
+
+/* Only where there is something to pick. A row without `row-hit` is not a
+   choice, and lighting it up on hover promises something that does not happen. */
+.rows-pick > .rows-row:has(.row-hit):hover {
+  border-color: var(--accent);
+  background: var(--panel-2);
+}
+
+.rows-pick > .rows-row:has(.row-hit:focus-visible) {
+  border-color: var(--accent);
+  box-shadow: var(--focus-ring);
+}
+
+/* The whole card is the hit area, not just the words in it.
+   
+   `.row-hit` is a button wrapping the name and the meta line, so the rest of
+   the card -- the empty middle, the space around the controls -- did nothing
+   when clicked. A card that looks like one target and behaves like two is a
+   card people click twice.
+   
+   Stretched from the button rather than by wrapping the row in one: a button
+   containing a `<select>` and a gear is nested interactive content, which is
+   invalid and which keyboards and screen readers handle badly. The pseudo
+   element covers the card; everything that is itself interactive is lifted
+   above it and keeps its own clicks. */
+.rows-pick > .rows-row > .row-hit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.rows-pick > .rows-row > *:not(.row-hit) { position: relative; z-index: 1; }
+
+/* And the button's own contents sit above its overlay.
+   
+   Without this the sheet covered the row's own name and tags, so the capability
+   tooltips stopped opening: the pointer landed on the overlay and `:hover`
+   never reached the mark. Clicking still works from up here -- these are inside
+   the button, so a click on them is a click on it. */
+.rows-pick > .rows-row > .row-hit > * { position: relative; z-index: 1; }
+
+/* Loading, said by the card rather than by a word in the corner.
+   
+   The state used to be ` · loading…` appended to the size line, which is the
+   quietest place on the row and reads as a fact about the file rather than as
+   something happening now. */
+.rows-pick > .rows-row.is-loading {
+  border-color: var(--accent);
+  animation: tf-pulse 1.4s ease-in-out infinite;
+}
+
+/* And nothing else can be chosen while it happens: picking a second model
+   mid-load queues a second load, which is how a machine ends up swapping two
+   sets of weights it cannot hold at once. */
+.rows-pick > .rows-row.is-waiting { opacity: 0.5; }
+
+.rows-pick > .rows-row.is-waiting .row-hit { cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The border still says which one, without the breathing. */
+  .rows-pick > .rows-row.is-loading { animation: none; }
+}
+
+/* The chosen one, drawn exactly as a chosen `.choice` is -- same tint, same
+   border, same ring and tick in the corner.
+   
+   It carried an "in use" pill instead, which said the same thing a second time
+   in a list where every other row's pills describe what the model *can do*. One
+   pill among them meaning something else entirely is the odd one out.
+   
+   No tick. `colour is never the only signal` still holds, and what holds it is
+   the row's content rather than a mark: the chosen model is the only one
+   showing its options, so it differs in what it contains and not merely in
+   what colour it is. A checkbox on top of that would be a third way of saying
+   the same thing, and this list is a single choice rather than a set of them
+   anyway. */
+.rows-pick > .rows-row.is-picked {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel));
+}
+
+/* Nothing squeezes the name any more: the controls are on their own line.
+   
+   Worth recording what was tried first, because it looked reasonable and was
+   not. Two selects took 385px of a 514px row, leaving the name 40px -- so the
+   fix was a `min-width` floor on the subject, then flex rules on the name
+   inside it. Each one moved the overflow somewhere else, and the last pushed
+   the name clean outside the card. The row was simply carrying more than a row
+   holds; a second line is the answer, not better arithmetic. */
+.rows-pick .row-subject { min-width: 0; }
+
+/* A reading that belongs to the row above it, under rather than beside.
+   
+   `Row`'s `below` is a sibling of the row, so on its own it would sit outside
+   the picked row's box and read as belonging to the next one. Pulled up into
+   it: same tint, same border, and the row's own bottom corners squared off so
+   the two read as one block. */
+.rows-pick > .rows-row.is-picked:has(+ .row-readout) {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+  /* Closes the grid gap. `.rows-pick` puts `--space-2` between every child, and
+     the readout is a child -- so eight pixels of card showed through between
+     the row and its own reading, drawn edge to edge like a divider somebody had
+     left in. The two are one block; the gap belongs between blocks. */
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.rows-pick > .rows-row.is-picked:has(.row-hit):hover {
+  background: color-mix(in srgb, var(--accent) 13%, var(--panel));
+}
+
+/* A label over a run of rows, when one list holds two kinds of thing.
+   
+   Not an `h4`: those are card titles here, and a sub-heading at card-title
+   weight competes with the card it is inside. */
+.rows-split {
+  margin: var(--space-4) 0 var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-strong);
+  color: var(--muted);
+}
+
+.rows-split:first-of-type { margin-top: var(--space-2); }
+
+.rows-empty { padding: var(--space-3) 0; }
+
+/* The name, the pills and the line underneath. `min-width: 0` is the whole
+   reason this is a class: a flex item will not shrink below its content, so
+   without it the name pushes the pills off the end -- and the pills are the
+   half you cannot guess. */
+.row-subject { flex: 1; min-width: 0; }
+
+/* The line under the name needs air between them.
+   
+   It had none -- measured at 0.0px, name baseline to hint cap -- so a model row
+   read as one four-line paragraph rather than a name with a footnote, and a
+   list of them read as a wall. Four pixels is enough: they are still one row,
+   which is why this is a nudge off the scale's bottom step and not a gap. */
+.row-subject > .set-hint { margin-top: var(--space-1); }
+
+/* The aligned column. `margin-left: auto` rather than a grid, because the rows
+   are flex and a size that varies by two characters does not need a track. */
+.row-trail { flex: none; margin-left: auto; white-space: nowrap; }
+
+.rows-row.rows-top { align-items: flex-start; }
+
+.rows-row.rows-bad .truncate { color: var(--bad); }
+
+/* A row that does something. A button, not a div with a handler: the keyboard
+   and the focus ring come free and cannot be forgotten. It is unstyled because
+   it is not a button to look at -- it is the row's hit area. */
+.row-hit {
+  flex: 1;
+  min-width: 0;
+  /* Row, not column. The button wraps the subject *and* the trailing column,
+     and stacking them put the timestamp on its own line under the name --
+     which is the one thing `trail` exists to stop. */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.row-hit:hover .truncate { color: var(--accent); }
+
+.row-hit:focus-visible { outline: none; box-shadow: var(--focus-ring); }

@@ -1,0 +1,150 @@
+import { type ReactNode, useState } from 'react'
+import Field from './Field'
+
+/**
+ * The bottom of a settings panel, where the things that cannot be undone live.
+ *
+ * One bordered section with its actions divided inside it, rather than a box
+ * per action. Three tiles of red furniture stacked down a pane read as three
+ * warnings; one section with three things in it reads as a place — which is
+ * the point, because a place is somewhere you have to go.
+ *
+ * The same shape as the one in valet, and deliberately: these are the same
+ * decision in two products, and a person who has learned to be careful in one
+ * should not have to learn it again in the other.
+ *
+ * What differs is what a confirmation costs. Typing a name is the right price
+ * for something with no undo and the wrong one for something with an obvious
+ * undo — so the section says up front which of its actions are which, and each
+ * asks for what it is worth.
+ */
+export default function DangerZone({
+  /** Which of these can be taken back, said before anything is pressed. */
+  note,
+  children,
+}: {
+  note: string
+  children: ReactNode
+}) {
+  return (
+    <section className="danger-zone">
+      <div className="danger-zone-head">
+        <h3>Danger zone</h3>
+        <p className="set-hint">{note}</p>
+      </div>
+      {children}
+    </section>
+  )
+}
+
+/**
+ * One thing that can be done here, and what it costs.
+ *
+ * `confirm` is the whole of the difference between them:
+ *
+ * - `click` — a second press, for something with a way back. The button says
+ *   what it will do rather than "Are you sure?", because a person reading
+ *   "Remove" twice has read what it removes.
+ * - `type` — the name, for something with no way back. A second click in the
+ *   same place as the first is a reflex; writing the thing out is the only
+ *   confirmation that requires having read what it is.
+ */
+export function DangerAction({
+  heading,
+  body,
+  /** Not destructive at all — rename, edit. No confirmation, no red. */
+  tone = 'destructive',
+  confirm = 'click',
+  /** What must be typed, when `confirm` is `type`. */
+  match,
+  label,
+  busyLabel,
+  busy = false,
+  disabled = false,
+  onConfirm,
+  /** Rendered instead of the controls, saying why this cannot be done. */
+  unavailable,
+}: {
+  heading: string
+  body: ReactNode
+  tone?: 'destructive' | 'plain'
+  confirm?: 'click' | 'type' | 'none'
+  match?: string
+  label: string
+  busyLabel?: string
+  busy?: boolean
+  disabled?: boolean
+  onConfirm: () => void
+  unavailable?: ReactNode
+}) {
+  const [asking, setAsking] = useState(false)
+  const [typed, setTyped] = useState('')
+
+  return (
+    <div className={`danger-act${tone === 'plain' ? ' plain' : ''}`}>
+      <h4>{heading}</h4>
+      <div className="set-hint">{body}</div>
+
+      {unavailable ? (
+        <div className="set-hint danger-unavailable">{unavailable}</div>
+      ) : confirm === 'type' ? (
+        <>
+          <div className="row danger-row field-row">
+            <Field
+              label="Confirm"
+              hint={
+                <>
+                  Type <code className="mono danger-name">{match}</code> to confirm.
+                </>
+              }
+            >
+              {(f) => (
+                <input
+                  {...f}
+                  className="mono"
+                  value={typed}
+                  disabled={disabled || busy}
+                  autoComplete="off"
+                  spellCheck={false}
+                  onChange={(e) => setTyped(e.target.value)}
+                />
+              )}
+            </Field>
+            <button type="button"
+              className="danger"
+              disabled={disabled || busy || typed.trim() !== match}
+              onClick={onConfirm}
+            >
+              {busy ? (busyLabel ?? '…') : label}
+            </button>
+          </div>
+        </>
+      ) : confirm === 'none' ? (
+        <div className="row danger-row">
+          <button type="button"
+            className={tone === 'plain' ? 'primary' : 'danger'}
+            disabled={disabled || busy}
+            onClick={onConfirm}
+          >
+            {busy ? (busyLabel ?? '…') : label}
+          </button>
+        </div>
+      ) : asking ? (
+        <div className="row danger-row">
+          <button type="button" className="danger" disabled={disabled || busy} onClick={onConfirm}>
+            {busy ? (busyLabel ?? '…') : label}
+          </button>
+          <button type="button" disabled={disabled || busy} onClick={() => setAsking(false)}>
+            Cancel
+          </button>
+        </div>
+      ) : (
+        <div className="row danger-row">
+          <button type="button" className="danger" disabled={disabled || busy} onClick={() => setAsking(true)}>
+            {label}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}

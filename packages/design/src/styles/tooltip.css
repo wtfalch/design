@@ -1,0 +1,101 @@
+/* A callout: something worth knowing, with nothing to answer. Distinct from a
+   `?`, which is an offer to read more, and from a banner, which is a problem.
+   The mark is a round `i` rather than an emoji so it takes the theme's colours
+   and stays the same size as the text beside it. */
+/* An info-toned `.callout`, spelled the old way. Identical to it now rather than
+   nearly identical to it, which is the whole point of the consolidation: the
+
+/* The `?` beside a setting, and the box it shows on hover. Built like the
+   status dot's tooltip and for the same reasons: `title` waits a second and a
+   half, renders newlines however it likes, and cannot be styled. */
+.explain {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  /* The heading it follows is tracked out, which leaves the last letter's
+     spacing sitting between them and reads as none at all. */
+  margin-left: var(--space-2);
+  cursor: help;
+  /* Headings here are uppercase and tracked out, and one of these sits inside
+     a heading. */
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+
+.explain-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 16px;
+  text-align: center;
+}
+
+.explain:hover .explain-mark,
+.explain:focus-visible .explain-mark { color: var(--text); border-color: var(--accent); }
+
+.explain-tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  /* Sized by what is in it, capped where a line stops being readable.
+     
+     It was a flat `width: 300px`, which is right for the paragraph a `?` mark
+     opens and absurd for the two words a capability mark opens -- "reads
+     images" got the same 300px box as a four-line explanation, so the tip
+     looked like a panel that had failed to fill. `max-content` hugs the short
+     ones; the cap still wraps the long ones at a readable measure. */
+  width: max-content;
+  max-width: min(300px, 60vw);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-3px);
+  transition: opacity var(--dur-fast), transform var(--dur-fast), visibility var(--dur-fast);
+  z-index: 45;
+}
+
+/* Which way it grows. A mark at the right edge of a row has room to its left
+   and none to its right; one beside a heading is the other way round, and got
+   its first words cut off by the settings rail before this existed. */
+.explain-right .explain-tip { left: -6px; }
+
+.explain-left .explain-tip { right: -6px; }
+
+/* Out of layout entirely while closed, not merely invisible.
+   
+   It was `visibility: hidden`, which hides a box and keeps it in the scrollable
+   overflow. Four 300px tips anchored near the right edge of the file-access
+   tiles therefore gave the Permissions pane a horizontal scrollbar for content
+   nobody could see -- found by hiding one class at a time until the 69px went
+   away, having first blamed the `.sr-only` labels, which were innocent.
+   
+   `allow-discrete` keeps the fade: `display` is a discrete property, and
+   without this the tip would appear and vanish with no transition at all. */
+.explain-tip {
+  display: none;
+  transition-behavior: allow-discrete;
+}
+
+/* Open while the pointer is inside the box as well as on the mark -- one that
+   vanishes as you move towards it cannot be read. */
+.explain:hover .explain-tip,
+.explain:focus-within .explain-tip {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.explain-tip strong { color: var(--text); font-weight: 600; }

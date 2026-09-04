@@ -1,0 +1,303 @@
+/**
+ * The gallery's own chrome, and only its own chrome.
+ *
+ * Every rule here is prefixed `spec-`. Nothing in this file may style a
+ * specimen: the whole value of the page is that what you are looking at is the
+ * app's CSS, and one helpful `button { margin: 4px }` here would make it a
+ * drawing of the app instead. The rail, the stage and the token grid are the
+ * furniture around the exhibits.
+ *
+ * Built from the same tokens, so the furniture themes with everything else --
+ * a gallery that stays dark while its specimens go light is a gallery you
+ * cannot read.
+ */
+
+.spec-app {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--app-bg);
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------- the rail */
+
+.spec-rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border-right: var(--border-width) solid var(--border);
+  background: var(--panel);
+}
+
+.spec-brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.spec-controls {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-2);
+  border-bottom: var(--border-width) solid var(--border);
+}
+.spec-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* No width workaround any more: the checkbox sizes itself. */
+
+.spec-nav { display: grid; gap: var(--space-3); }
+/* A button, not a link: it selects rather than navigates, and the global
+   button rule would otherwise give each one a box and a border. */
+.spec-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-2);
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+.spec-link:hover:not(:disabled) { background: var(--panel-2); border-color: transparent; }
+.spec-link.on { background: var(--panel-2); color: var(--accent); }
+.spec-link.on .set-hint { color: var(--accent); opacity: 0.7; }
+
+/* ---------------------------------------------------------------- the pane */
+
+.spec-main {
+  padding: var(--space-4);
+  max-width: 880px;
+}
+/* For looking at something that needs room -- a card, a modal, a long row. */
+.spec-wide .spec-main { max-width: none; }
+
+.spec-section { margin-bottom: calc(var(--space-4) * 2); }
+.spec-main h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-strong);
+}
+.spec-blurb {
+  margin: 0 0 var(--space-3);
+  max-width: 62ch;
+  color: var(--muted);
+}
+
+.spec-item {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+  padding: var(--space-3) 0;
+  border-top: var(--border-width) solid var(--border);
+}
+/* Stacked when there is no room for two columns, which is also what the rail
+   costs on a laptop. */
+@media (max-width: 900px) {
+  .spec-item { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+}
+
+.spec-label { padding-top: 2px; }
+
+/* The exhibit sits on the app's panel surface rather than the page's, because
+   most of these are drawn to be on a panel and judging them against the wrong
+   background is judging the wrong thing. The surface and nothing else: it had
+   a border, and a border around an exhibit reads as part of it -- a slider
+   looked like a slider in a box. */
+.spec-stage {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  min-width: 0;
+  /* Not `overflow-x: auto`, which was the whole reason a select showed one row
+     of three and a tooltip never appeared: any overflow value but `visible`
+     makes an element a clipping context, and half of what is on display here is
+     a popup that has to escape one. */
+  overflow: visible;
+}
+
+/* Laid out by the gallery, not by the app: a row of buttons in the app is
+   inside something that spaces them, and here there is nothing. */
+.spec-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* -------------------------------------------------------------- the tokens */
+
+.spec-token-group { margin-bottom: var(--space-4); }
+.spec-token-group h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: var(--weight-strong);
+}
+.spec-tokens {
+  display: grid;
+  /* Wider than before. A shadow is `0 10px 34px rgba(0,0,0,.3)` and a font stack
+     is six names -- at 260px those ran out of the card and off the side of the
+     page. */
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-2);
+}
+.spec-token {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  min-width: 0;
+}
+/* One column for every demo, so a page of them lines up rather than jittering
+   with each one's natural width. */
+/* Fixed width and clipped: a font stack rendered at its natural width ran
+   straight over the name beside it. */
+.spec-demo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  overflow: hidden;
+}
+.spec-token-body { min-width: 0; display: grid; }
+.spec-token-name { overflow: hidden; text-overflow: ellipsis; }
+.spec-token-value {
+  color: var(--muted);
+  font-size: var(--text-2xs);
+  overflow-wrap: anywhere;
+}
+
+.spec-chip {
+  width: 46px; height: 26px;
+  border-radius: var(--radius-sm);
+  /* Its own outline, or a swatch the colour of the panel is invisible on the
+     panel -- which is exactly the value worth being able to see. */
+  border: var(--border-width) solid var(--border);
+}
+.spec-demo-radius {
+  width: 34px; height: 34px;
+  background: var(--panel-2);
+  border: var(--border-width) solid var(--border-strong);
+}
+.spec-demo-bar { height: 10px; background: var(--accent); border-radius: 2px; min-width: 1px; }
+.spec-demo-shadow {
+  width: 34px; height: 24px;
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+}
+/* Travels on hover, so a duration and an easing can be watched rather than
+   read. */
+.spec-demo-motion {
+  position: relative;
+  width: 54px; height: 14px;
+  border-radius: var(--radius-pill);
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.spec-demo-motion i {
+  position: absolute; top: 3px; left: 3px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  transition-property: transform;
+}
+.spec-token:hover .spec-demo-motion i { transform: translateX(35px); }
+.spec-demo-type { color: var(--text); white-space: nowrap; font-size: var(--text-sm); }
+.spec-demo-lines { color: var(--text); font-size: var(--text-2xs); text-align: center; }
+.spec-demo-plain { color: var(--muted); font-size: var(--text-2xs); }
+
+/* The icon sheet. A grid, because the point of the page is comparing weights
+   and optical sizes across the whole set at once. */
+.spec-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: var(--space-2);
+}
+.spec-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.spec-icon .set-hint { overflow-wrap: anywhere; }
+
+/* The figures, at a size where you can tell two of them apart. Wide columns
+   because these are people rather than icons: at chip size they are all a
+   dark blob with a haircut. */
+.spec-peeps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: var(--space-4);
+}
+.spec-peeps figure {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-2);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.spec-peeps figcaption { font-size: var(--text-2xs); color: var(--muted); }
+
+/* Stacked, the way a step shows them. */
+.spec-cards { display: grid; gap: var(--space-3); max-width: 460px; }
+.spec-cards .card { margin-bottom: 0; }
+
+/* ---------------------------------------------------------------- specimen */
+
+/* One variant on its own page, for the camera. See `Specimen.tsx`.
+
+   The width is fixed and stated here rather than left to the viewport, because
+   a screenshot baseline is a promise about a rendering and the two things that
+   move a rendering without anybody editing it are the window and the fonts.
+   The container settles the first; the CI image settles the second. 720px is
+   the gallery's own stage at its default rail width, so a specimen shot
+   matches what the rail shows. */
+.spec-solo {
+  padding: var(--space-6);
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.spec-solo .spec-stage { width: 720px; max-width: 100%; }
+
+/* Bare: no label, no padding around the stage. Everything in the frame is the
+   component, so a diff is never a caption that moved. */
+.spec-bare { padding: 0; gap: 0; }
+
+/* A specimen that does not exist must be *visible* in the image. An empty page
+   screenshots perfectly well and its baseline passes forever, so a typo in a
+   manifest would read as a component that renders nothing at all. */
+.spec-missing {
+  padding: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--bad);
+  border: var(--border-width) solid var(--bad);
+  border-radius: var(--radius);
+}

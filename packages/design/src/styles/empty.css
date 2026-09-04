@@ -1,0 +1,47 @@
+/* `Empty`: a list with nothing in it.
+   
+   Quieter than `.empty`, which is a whole-screen state at `--space-10`. These
+   sit inside a card that already has a heading and a description, so the same
+   padding would leave a card that is mostly air about nothing.
+   
+   Dashed rather than solid: a solid border reads as a thing, and the point of
+   this box is that there is no thing. It marks out where the list will be. */
+.nothing {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-5) var(--space-4);
+  border: var(--border-width) dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.nothing-mark { color: var(--muted); line-height: 0; }
+
+/* The same box with a figure in it, for a whole surface rather than a slot in
+   a card. Two things change and both follow from the size: the dashed outline
+   goes, because an outline marks out where a list will be and a window-sized
+   dashed rectangle reads as a layout that failed rather than a view with
+   nothing on it; and the box centres itself in whatever it was dropped into,
+   which is what makes it land in the middle of an empty dashboard rather than
+   under the header. */
+.nothing-surface {
+  border: none;
+  padding: var(--space-10) var(--space-4);
+  gap: var(--space-3);
+  margin: auto;
+}
+
+/* `currentColor` reaches the figure through the two rules the illustrations
+   ship with, so the colour is set here and the drawing follows it -- the same
+   grey as the sentence under it, in every theme.
+   Two classes, not one: `.illo` sets `color: inherit` further down this file,
+   which beats a single-class rule written earlier and drew the figure in full
+   text black beside a muted sentence. */
+.nothing-surface .nothing-figure { color: var(--muted); }
+
+/* `--text-sm`, not the `--text-xs` these lines used to be: it is a sentence
+   somebody is meant to read, not a caption qualifying something else. */
+.nothing-said { margin: 0; color: var(--muted); font-size: var(--text-sm); line-height: 1.5; max-width: 46ch; }
+
+.nothing-act { margin-top: var(--space-1); }

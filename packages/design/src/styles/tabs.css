@@ -1,0 +1,92 @@
+/* ---------------------------------------------------------------- tabs */
+.tabs { position: relative; display: flex; gap: var(--space-1); }
+
+.tab {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  color: var(--muted);
+  padding: var(--space-2) var(--space-3);
+  /* The strip's own line is drawn once, below; this is the piece of it each tab
+     paints over when it is the current one. */
+  box-shadow: inset 0 -2px 0 transparent;
+}
+
+.tab:hover:not(:disabled) { color: var(--text); background: var(--panel-2); border-color: transparent; }
+
+.tab.on { color: var(--accent); box-shadow: inset 0 -2px 0 var(--accent); }
+
+.tab-badge { margin-left: var(--space-2); color: var(--muted); font-size: var(--text-xs); }
+
+.tab.on .tab-badge { color: var(--accent); opacity: 0.75; }
+
+/* A rail down the side of a pane rather than a strip across the top. Same
+   component, same keyboard; the current one is marked by a filled row instead
+   of a line under it, because there is no bottom edge to draw on. */
+.tabs-vertical {
+  flex-direction: column;
+  gap: 2px;
+  align-items: stretch;
+  padding: var(--space-3) var(--space-2) var(--space-3) var(--space-3);
+  border-right: var(--border-width) solid var(--border);
+  overflow-y: auto;
+}
+
+.tabs-vertical .tab {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-2);
+  border-radius: var(--radius);
+  box-shadow: none;
+  border: var(--border-width) solid transparent;
+}
+
+.tabs-vertical .tab:hover:not(:disabled) { background: var(--panel-2); }
+
+.tabs-vertical .tab.on {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: var(--accent-dim);
+  box-shadow: none;
+}
+
+.tabs-vertical .tab-label { display: block; font-size: var(--text-sm); color: var(--text); }
+
+.tabs-vertical .tab.on .tab-label { color: var(--accent); }
+
+.tab-hint {
+  display: block;
+  margin-top: 1px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+/* A heading above a run of tabs. Set apart from the run above by space, not
+   a rule -- the rail already has one edge -- and the tabs under it step in
+   by the label's own padding so the label reads as theirs. */
+.tabs-vertical .tab-group {
+  display: block;
+  padding: var(--space-4) var(--space-2) var(--space-1);
+}
+
+.tabs-vertical .tab-group:first-child { padding-top: var(--space-2); }
+
+.tab-group-label { display: block; font-size: var(--text-sm); font-weight: 600; color: var(--text); }
+
+.tabs-vertical .tab.in-group { padding-left: var(--space-5); }
+
+/* No line under a vertical strip -- its edge is the border on the right. */
+.tabs-vertical .tabs-rule { display: none; }
+
+.tabs-rule {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: var(--border-width);
+  background: var(--border);
+}
+
+.tabs-vertical .tab:active:not(:disabled) { border-color: transparent; }

@@ -1,0 +1,134 @@
+/**
+ * A window over the app, and the behaviour every one of them was missing.
+ *
+ * There are eight of these -- Settings, FirstRun, ViewSettings, DownloadModal,
+ * ModelSettings, AppletSettings, AppletReview, the studio -- and all eight were
+ * built by hand from `.backdrop` and `.modal`. Not one of them trapped focus.
+ *
+ * **That is not a detail.** Everything behind a modal is still in the tab
+ * order: still focusable, still clickable by a keyboard, and completely
+ * invisible under the scrim. Tab past the last button in Settings and you are
+ * somewhere on the dashboard you cannot see, operating controls you cannot
+ * read. Shift-Tab from the first does the same going the other way. The mouse
+ * never finds this, which is why it survived eight implementations.
+ *
+ * So: focus moves in, is kept in, and goes back where it came from when the
+ * window closes -- to the button that opened it, not to the top of the page.
+ * `role="dialog"` and `aria-modal` say the same thing to a screen reader, which
+ * otherwise reads the page underneath as though it were still there.
+ *
+ * **This is the workspace shape.** A title, a body, optionally a footer, sized
+ * to its content. `Dialog` is the narrow two-answer version and is built on
+ * this -- same trap, same restore, stricter about the scrim, because for "may
+ * this applet write to your files" a stray click on the background is a way of
+ * answering by accident.
+ */
+
+import { useCallback, useRef } from 'react'
+import { createPortal } from 'react-dom'
+import Icon from './Icon'
+
+/* The trap is the same obligation wherever it applies, and the studio needs it
+   without being shaped like this, so it lives in a hook rather than here. */
+import { useTrapFocus } from '../hooks/useTrapFocus'
+
+export default function Modal({
+  title,
+  description,
+  subtitle,
+  head,
+  children,
+  footer,
+  footerClass,
+  onClose,
+  closeDisabled = false,
+  width,
+  bodyClass,
+  className,
+  dismissOnScrim = true,
+  closeButton = true,
+  labelledBy,
+}: {
+  /** The window's name. Rendered as the heading and announced on open. */
+  title?: React.ReactNode
+  /** A line under the title, saying what the window is for. The same slot
+   *  `Card` has, for the same reason: a heading names a thing and a sentence
+   *  says why you are looking at it, and every window that wanted one was
+   *  putting it in the body where it read as the first item of content. */
+  description?: React.ReactNode
+  /** Beside the title -- what this window is about, usually an id or a path. */
+  subtitle?: React.ReactNode
+  /** Extra controls in the header, before the close button. */
+  head?: React.ReactNode
+  children: React.ReactNode
+  footer?: React.ReactNode
+  footerClass?: string
+  /** Escape, the close button, and the scrim all call this. Omit it and the
+   *  window cannot be dismissed -- which is right for onboarding and wrong for
+   *  everything else. */
+  onClose?: () => void
+  /** While something is saving, closing would abandon it mid-flight. */
+  closeDisabled?: boolean
+  width?: string
+  /** For a body that is not a single column -- Settings' rail and pane. */
+  bodyClass?: string
+  className?: string
+  /** The scrim is the easiest thing on screen to hit by accident. True keeps
+   *  today's behaviour for the workspaces; `Dialog` turns it off. */
+  dismissOnScrim?: boolean
+  /** A question answers itself with its own buttons; a ✕ beside them is a third
+   *  answer that means nothing. Workspaces keep it. */
+  closeButton?: boolean
+  /** When the window titles itself inside `children` rather than using
+   *  `title`. */
+  labelledBy?: string
+}) {
+  const box = useRef<HTMLDivElement>(null)
+  const headingId = useRef(`modal-${Math.random().toString(36).slice(2, 8)}`)
+
+  const close = useCallback(() => {
+    if (!closeDisabled) onClose?.()
+  }, [closeDisabled, onClose])
+
+  const onKeyDown = useTrapFocus(box, { onEscape: onClose ? close : undefined })
+
+  return createPortal(
+    <div
+      className="backdrop"
+      onMouseDown={(e) => {
+        if (e.target !== e.currentTarget) return
+        if (dismissOnScrim) close()
+      }}
+    >
+      <div
+        ref={box}
+        className={`modal${className ? ` ${className}` : ''}`}
+        style={width ? { width } : undefined}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={labelledBy ?? (title ? headingId.current : undefined)}
+        tabIndex={-1}
+        onKeyDown={onKeyDown}
+      >
+        {(title || head || (onClose && closeButton)) && (
+          <header className="modal-head">
+            {title && <strong id={headingId.current}>{title}</strong>}
+            {subtitle}
+            {head}
+            {onClose && closeButton && (
+              <button type="button" className="x" onClick={close} disabled={closeDisabled} aria-label="Close">
+                <Icon name="close" size={16} />
+              </button>
+            )}
+          </header>
+        )}
+        {description && <p className="modal-desc">{description}</p>}
+        <div className={`modal-body${bodyClass ? ` ${bodyClass}` : ''}`}>{children}</div>
+        {footer && (
+          <footer className={`set-actions${footerClass ? ` ${footerClass}` : ''}`}>{footer}</footer>
+        )}
+      </div>
+    </div>,
+    document.body,
+  )
+}

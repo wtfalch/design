@@ -114,6 +114,16 @@
   --radius-lg: 12px;
   --radius-pill: 999px;
   --border-width: 1px;
+  /* The surface a control sits on: an input, a select, a button that is not
+     the primary one. Derived from the two panel tones rather than stated, so a
+     theme that moves the panels moves the controls with them -- but themeable,
+     because a theme may want a control to read as inset or raised against a
+     panel it chose. Same bargain as `--app-bg`.
+     It lived on `:root` in `styles.css` and was used seven times, which made it
+     a token in every respect except being in the vocabulary a theme can name.
+     The audit that found it was looking for something else. */
+  --control: color-mix(in srgb, var(--panel-2) 62%, var(--panel));
+
   /* Two jobs, two tokens.
      `--border` was drawing both the hairline between two rows and the outline
      of every input, select and button. Those have different requirements: a
@@ -124,6 +134,15 @@
      Solved for the threshold rather than picked: this is the first step on the
      neutral ramp that clears 3:1 against `--panel`. */
   --border-strong: #5f6a7a;
+
+  /* The paper an illustration is drawn on -- the white fill in an Open Peeps
+     figure, as opposed to the ink, which takes `currentColor`. Defaults to the
+     panel so a figure sits on its surface without being told.
+     It was a slot in every respect but the one that matters: used as
+     `var(--illo-paper, var(--panel))` and declared nowhere, so it rendered
+     correctly and no theme could fill it. A slot the vocabulary does not
+     contain is themeable only in appearance. */
+  --illo-paper: var(--panel);
 
   /* The checkmark, once. Drawn as a mask so whatever wears it supplies its own
      colour -- the choice row's tick and the select's are the same shape and

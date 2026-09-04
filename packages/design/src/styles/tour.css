@@ -1,0 +1,61 @@
+/* tour ----------------------------------------------------------------- */
+
+/* The layer sits over everything and catches nothing: the scrim is painted by
+   the hole's shadow, so there is no full-screen element to swallow a click. */
+.tour { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
+
+/* The control the tour is currently pointing at.
+   
+   Much of this chrome is invisible until you touch it -- `.view-add` lives at
+   `opacity: 0` until `.topbar:hover` -- so the spotlight cut its hole round a
+   button nobody could see and the card explained a blank space.
+
+   `!important` on purpose, and this is the case it is for: the tour cannot know
+   what every control does at rest, and the alternative is naming each one here
+   and watching that list drift from the rules that hide them. One declaration
+   that outranks whatever the resting state is beats an enumeration that goes
+   stale. It is scoped to a class only ever present on one element at a time. */
+.tour-target {
+  opacity: 1 !important;
+  color: var(--text) !important;
+}
+
+/* The spotlight. An enormous spread shadow dims the whole window except the
+   rectangle it is drawn on, which needs no clip path and no arithmetic. */
+.tour-hole {
+  position: fixed;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 0 9999px var(--scrim), 0 0 0 2px var(--accent);
+  transition: top var(--dur-md) var(--ease), left var(--dur-md) var(--ease),
+              width var(--dur-md) var(--ease), height var(--dur-md) var(--ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* It still moves between stops -- it has to, that is the point -- it just
+       arrives rather than travels. */
+  .tour-hole { transition: none; }
+}
+
+.tour-card {
+  position: fixed;
+  width: 340px;
+  max-width: calc(100vw - var(--space-8));
+  pointer-events: auto;
+  background: var(--panel);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.tour-card:focus { outline: none; }
+
+.tour-title { font-size: var(--text-base); }
+
+.tour-body { margin: 0; color: var(--muted); font-size: var(--text-sm); line-height: 1.5; }
+
+.tour-actions { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-2); }
+
+.tour-count { color: var(--muted); font-size: var(--text-xs); }

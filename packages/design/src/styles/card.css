@@ -1,0 +1,125 @@
+.card {
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+/* Header, when there is one. The title and the line under it were retyped at
+   every call site and no two agreed on the gap between them. */
+.card-head { display: flex; align-items: flex-start; gap: var(--space-3); }
+
+.card-head:not(:last-child) { margin-bottom: var(--space-3); }
+
+.card-headings { min-width: 0; flex: 1; }
+
+/* The card owns the space between the things it holds. Without this a callout
+   and the button under it sit edge to edge, and every caller has to remember a
+   margin on whichever child happens to be second. */
+.card-body { display: grid; gap: var(--space-3); }
+
+/* The card's own control, on the card's padding rather than indented into its
+   body. Centred against the whole heading block, not against the title -- a
+   switch aligned to the first line drifts upward the moment the description
+   runs to two. */
+.card-action { flex: none; align-self: center; display: flex; align-items: center; }
+
+/* A row inside a card that lines up with the header rather than indenting past
+   it: same left edge as the title, same right edge as the action. Its label is
+   a quiet caption, not a second heading -- the card already has one, and two
+   things in bold on one card read as two cards. */
+/* Further off the description than the card's own gap. A row that continues
+   the header's column needs to read as a separate statement, and at the body
+   gap it looked like a fourth line of the paragraph above it. */
+.card-inline { align-items: center; margin-top: var(--space-3); }
+
+/* Indented to the title's left edge, past the icon. Starting at the card's
+   padding put it under the icon instead of under the words it belongs with,
+   which reads as a different column of content. */
+.card:has(.card-icon) .card-inline { padding-left: calc(var(--card-icon) + var(--space-3)); }
+
+/* Its own line, above the sentence it introduces. */
+.card-inline-label {
+  display: block;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.card-title { display: block; font-size: var(--text-base); }
+
+.card-desc { margin-top: var(--space-1); color: var(--muted); font-size: var(--text-sm); line-height: 1.5; }
+
+/* Decoration, so it is quieter than the words it sits beside and never the
+   thing the eye lands on first. */
+/* One number, because the header's indent is derived from it: a row that lines
+   up with the title has to know how wide the icon column is, and two copies of
+   34px drift the moment one changes. */
+.card { --card-icon: 34px; }
+
+.card-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--card-icon);
+  height: var(--card-icon);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  color: var(--muted);
+}
+
+/* A card that is itself the choice. Reset first, because it is a `<button>`
+   now and inherits a control's padding and centring. */
+button.card {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  padding: var(--space-3);
+}
+
+/* Variants, because a card is doing four jobs and looked like one.
+   A search result you can act on, a thing already installed, something that
+   went wrong, and a heading with rows under it are not the same object, and
+   drawing them identically means the eye has to read every one to sort them. */
+
+/* Selectable: it responds before you commit, the way the choice row does. */
+.card-pick { cursor: pointer; transition: border-color var(--dur-fast) var(--ease),
+             background var(--dur-fast) var(--ease); }
+
+.card-pick:hover { border-color: var(--accent); background: var(--panel-2); }
+
+/* Current. The left edge rather than a fill, so a list of twenty with one
+   marked does not become a list with one shouting. */
+.card-on {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* Something went wrong with this one specifically -- a failed download, a model
+   that would not load -- as against a callout about the page as a whole. */
+.card-bad {
+  border-color: color-mix(in srgb, var(--bad) 35%, var(--border));
+  background: color-mix(in srgb, var(--bad) 6%, var(--panel));
+}
+
+/* `.callout-warn`'s mix, on a card. A warning callout that grew rows became a
+   card so the rows sit inside the colour rather than under it; the numbers
+   are the callout's so the two read as one tone. */
+.card-warn {
+  border-color: color-mix(in srgb, var(--warn) 40%, var(--border));
+  /* More of the colour than the callout carries: a card is mostly ground,
+     and at the callout's 10% the tint read as a border with nothing behind
+     it. */
+  background: color-mix(in srgb, var(--warn) 18%, var(--panel));
+}
+
+/* Quiet: for a card that is a container rather than a thing, where the border
+   is doing grouping and should not compete with what it groups. */
+.card-flat { background: transparent; border-color: var(--border); }
+
+.modal-body .card { background: var(--panel-2); }

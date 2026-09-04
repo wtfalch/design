@@ -1,0 +1,42 @@
+/* progress ----------------------------------------------------------- */
+
+/* The bar sat 4px under its own label and flush against whatever was above
+   the whole block, so a download row read as four lines of text with a rule
+   drawn through the last one. The label is a caption for the bar and stays
+   close to it; the block as a whole is a separate statement from the row it
+   follows. */
+.progress { display: grid; gap: var(--space-1); }
+
+.card > .progress { margin-top: var(--space-3); }
+
+.progress-head { display: flex; align-items: baseline; gap: var(--space-2); font-size: var(--text-sm); }
+
+.progress-detail { color: var(--muted); font-size: var(--text-xs); }
+
+.bar { height: 6px; background: var(--panel-2); border-radius: var(--radius-pill); overflow: hidden; }
+
+.bar > i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+  transition: width var(--dur-md) var(--ease-out);
+}
+
+.bar-good > i { background: var(--good); }
+
+.bar-bad > i { background: var(--bad); }
+
+/* Working, size unknown.
+   A fetch that has not read `content-length` yet drew an empty track, which is
+   the same picture as stalled. This travels instead: it says "something is
+   happening" without claiming to know how much of it is left. */
+.bar-indeterminate > i {
+  width: 35%;
+  animation: tf-bar 1.2s var(--ease) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Still distinguishable from empty, and from full. */
+  .bar-indeterminate > i { animation: none; width: 100%; opacity: 0.35; }
+}

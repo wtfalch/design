@@ -1,0 +1,790 @@
+/* Light, only under the `system` theme. This used to override `:root`
+   unconditionally, so choosing a dark theme on a light-mode laptop got
+   silently repainted. Every other theme states its own palette. */
+@media (prefers-color-scheme: light) {
+  :root[data-theme='system'] {
+      --bg: #f3f5f7;
+      --panel: #ffffff;
+      --panel-2: #e9edf1;
+      --border: #e4e8ec;
+      --border-strong: #8792a1;
+      --text: #191d23;
+      --muted: #5d6773;
+      --accent: #0e7872;
+      --accent-dim: #7fbdb8;
+      --on-accent: #ffffff;
+      /* Overridden here, which the old light theme never did: the base set is
+         tuned for a dark panel, and `#4ade80` on white is 1.74:1. */
+      --good: #1c7a4a;
+      --warn: #8a6216;
+      --bad: #b3312c;
+      --info: #2f7fe6;
+      --shadow-1: 0 4px 14px rgba(16, 24, 40, 0.08);
+      --shadow-2: 0 8px 24px rgba(16, 24, 40, 0.10);
+      --shadow-3: 0 12px 32px rgba(16, 24, 40, 0.12);
+      --scrim: rgba(16, 24, 40, 0.32);
+    }
+}
+
+/* Derived from the two surfaces every theme already defines, so a theme gets a
+   control colour without knowing this exists. */
+/* Pseudo-elements too. `*` does not match them, and `box-sizing` is not
+   inherited, so every `::before` and `::after` in the app was quietly
+   content-box. That is invisible until one of them has a border: the checkbox
+   ring (`.choice::after`, 16px + 1px each side) and the tick that is supposed
+   to sit inside it (`.choice::before`, 16px flat) were given the same `top` and
+   `right` and came out two pixels different in size -- so the tick sat up and
+   to the right of the ring it was meant to be centred in, by exactly one
+   pixel each way. */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  /* `background`, not `background-color`: a theme may hand this a gradient or
+     an image, and `background-color` would refuse both. */
+  background: var(--app-bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  letter-spacing: var(--tracking);
+  font-weight: var(--weight);
+  min-height: 100vh;
+}
+
+/* The overlay slot. Always present, inert until a theme fills it -- which is
+   how a theme gets a grain, a wash or a vignette without shipping a rule to
+   create the layer it needs. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--app-overlay);
+  opacity: var(--app-overlay-opacity);
+}
+
+.app { position: relative; z-index: 1; }
+
+/* Controls -----------------------------------------------------------------
+   One definition for everything you can press, type in, or open. They differ
+   in what they do, not in how they look or how they answer a pointer.
+   That last part is why this is one block and not four. The states used to be
+   written per element: buttons got a hover border, fields did not; fields got
+   a focus border, buttons did not; buttons dimmed when disabled, fields stayed
+   solid. So a select sat inert under the cursor beside a picker that lit up,
+   and read as disabled rather than as a different kind of control.
+   `--control` is `--panel-2` mixed toward `--panel`: the surface every theme
+   already defines for controls, lightened because these sit on white cards
+   where the flat grey reads as recessed rather than as something to use. It is
+   derived rather than declared -- a new token would have to be added to every
+   theme in `themes.ts`, and a theme that missed it would lose its controls. */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: var(--text);
+  background: var(--control);
+  /* `--border-strong`, not `--border`: this rule is what outlines every input,
+     select, textarea and button, and an outline you cannot see is a control you
+     cannot find. Dividers keep the quiet one. */
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+}
+
+/* The two differences, both deliberate: a button's box is padding around a
+   word and is the size of that word; a field's holds a line of text and fills
+   what it is given. */
+/* A button lays its contents out, which it did not before.
+   An `<svg>` is an inline box, so it sat on the text baseline -- a glyph
+   drawn to a 24-unit grid with its optical centre in the middle ends up a
+   couple of pixels low against the cap height beside it. Nothing was wrong with
+   the icon; the button simply had no opinion about how to arrange two things.
+   `inline-flex` and a gap gives it one, and the gap replaces the space
+   character people were putting between an icon and its label. */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+
+/* A button that stays pressed. `aria-pressed`, not a checkbox: a tick box
+   collects an answer and applies it on save, and this narrows the list under
+   you as you press it. It sits in a row of Selects and has to be the same
+   control height and the same shape as they are -- a 17px tick box beside three
+   38px dropdowns reads as something left over rather than as the fourth filter.
+
+   Several places already drew this by hand as `.chat-bar-btn.on`. This is the
+   same look, said once, on a plain button. */
+button[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+
+button[aria-pressed='true']:hover:not(:disabled) { border-color: var(--accent); }
+
+/* The glyph never shrinks: in a narrow row flexbox would take it from the icon
+   before the text, and half an icon is not a smaller icon. */
+button > svg { flex: none; }
+
+.size-sm { font-size: var(--text-xs); padding: var(--space-1) var(--space-2); }
+
+.size-md { font-size: var(--text-base); padding: var(--space-2) var(--space-3); }
+
+.size-lg { font-size: var(--text-md); padding: var(--space-3) var(--space-4); }
+
+/* Square, for the icon-only ones: equal padding or the glyph sits off-centre. */
+.icon-btn.size-sm { padding: var(--space-1); }
+
+.icon-btn.size-md { padding: var(--space-2); }
+
+.icon-btn.size-lg { padding: var(--space-3); }
+
+input, textarea, select { width: 100%; }
+
+/* Never by the drag handle.
+   How tall a box is is a decision this app makes -- the composer grows with
+   what you type and shrinks when you send, the studio's editor fills its pane
+   -- and a corner somebody can drag fights whichever code owns that height.
+   Three rules said `resize: vertical` and the rest said `none`, which is the
+   same disagreement written twice. */
+textarea { resize: none; }
+
+button:hover:not(:disabled),
+input:hover:not(:disabled),
+textarea:hover:not(:disabled),
+select:hover:not(:disabled) { border-color: var(--accent); }
+
+/* `:focus-visible` on the button so a click does not leave a ring behind it,
+   `:focus` on the fields because a focused field is a place you are typing and
+   should say so however you got there. */
+button:focus-visible,
+input:focus,
+textarea:focus,
+select:focus { outline: none; border-color: var(--accent); }
+
+/* The checkbox, drawn rather than inherited.
+   The native one is the platform's, which means it is a different shape, a
+   different blue and a different size on every machine tf runs on -- the one
+   control in the app that refused to join the design system. It is also the
+   only form control that can be replaced in pure CSS: unlike a select, whose
+   dropdown belongs to the OS, a checkbox is a box and a tick.
+   Which matters here more than usual, because the chat applet is plain HTML in
+   a sandboxed frame with no React and no bundler. A CSS answer is the only kind
+   both halves of the app can share.
+   This also ends a duplication: `width: auto; margin: 0; flex: none` appeared
+   four times in this file, each one working around the global
+   `input { width: 100% }` that would otherwise stretch a checkbox across its
+   row. Sized here once, so there is nothing left to work around. */
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  padding: 0;
+  display: inline-grid;
+  place-content: center;
+  border: var(--border-width) solid var(--border-strong);
+  background: var(--panel);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+              border-color var(--dur-fast) var(--ease);
+}
+
+input[type='checkbox'] { border-radius: var(--radius-sm); }
+
+input[type='radio'] { border-radius: var(--radius-pill); }
+
+/* The tick and the dot, scaled from nothing so the change is visible rather
+   than instantaneous -- "instant state changes" being the anti-pattern the
+   control most often commits. */
+input[type='checkbox']::before,
+input[type='radio']::before {
+  content: '';
+  transform: scale(0);
+  transition: transform var(--dur-fast) var(--ease);
+  background: var(--on-accent);
+}
+
+input[type='checkbox']::before {
+  width: 11px;
+  height: 11px;
+  /* A tick as a clip path rather than a glyph: a character would be the
+     platform's font, which is the thing this rule exists to escape. */
+  clip-path: polygon(14% 46%, 0 60%, 39% 100%, 100% 22%, 86% 8%, 39% 72%);
+}
+
+input[type='radio']::before {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+}
+
+input[type='checkbox']:checked,
+input[type='radio']:checked,
+input[type='checkbox']:indeterminate {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+input[type='checkbox']:checked::before,
+input[type='radio']:checked::before { transform: scale(1); }
+
+/* Neither on nor off, which the settings panes need for a group half-ticked. */
+input[type='checkbox']:indeterminate::before {
+  transform: scale(1);
+  width: 9px;
+  height: 2px;
+  clip-path: none;
+  border-radius: 1px;
+}
+
+input[type='checkbox']:hover:not(:disabled),
+input[type='radio']:hover:not(:disabled) { border-color: var(--accent); }
+
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+input[type='checkbox']:disabled,
+input[type='radio']:disabled { cursor: not-allowed; background: var(--panel-2); }
+
+button:disabled,
+input:disabled,
+textarea:disabled,
+select:disabled { opacity: 0.45; cursor: not-allowed; }
+
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+/* A disabled primary is not a faded primary.
+   `opacity: .45` was the whole of it, and a coloured fill at 45% is still a
+   coloured fill: the one button you cannot press stayed the most prominent
+   thing on the panel. That got worse when onboarding started holding people at
+   a disabled Next. So it gives up the fill entirely and becomes the shape of a
+   disabled control -- the opacity then has nothing left to do. */
+button.primary:disabled {
+  background: var(--panel-2);
+  border-color: var(--border);
+  color: var(--muted);
+  opacity: 1;
+}
+
+/* Working, which is not the same as disabled.
+   Both were spelled `disabled` with a changed label, so a 160 MB download and a
+   button you may never press looked identical -- for two minutes, with nothing
+   moving. This keeps the accent, because something *is* happening, and puts a
+   line under it that travels.
+   `aria-busy` rather than a class: the attribute is what a screen reader reads,
+   and styling the thing that carries the meaning is how they stay in step. */
+button[aria-busy='true'] {
+  position: relative;
+  overflow: hidden;
+  cursor: progress;
+}
+
+/* Busy is unpressable *and* undimmed, which needs saying because the two rules
+   above pull opposite ways. A download that has started cannot be started
+   again, so the button is genuinely `disabled` -- but `:disabled` is drawn to
+   say "not for you", and a primary one gives up its fill entirely. Applied to
+   something that is working, that reads as a control that failed and went
+   grey. So a busy button keeps every colour it had and takes only the loss of
+   the cursor and the press; the travelling line is what says why. */
+button[aria-busy='true']:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+
+button.primary[aria-busy='true']:disabled {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+
+button[aria-busy='true']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 40%;
+  background: currentColor;
+  opacity: 0.55;
+  animation: tf-busy 1.1s var(--ease) infinite;
+}
+
+@keyframes tf-busy {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+/* Motion is an accessibility setting first. Without it the bar sits still at
+   the leading edge, which still says "this one is working" without moving. */
+@media (prefers-reduced-motion: reduce) {
+  button[aria-busy='true']::after { animation: none; width: 100%; opacity: 0.35; }
+}
+
+/* Four kinds, four appearances.
+   `ghost` had no rule at all -- it was a default button with a class that did
+   nothing, so two of the four were the same control with two names. And
+   `danger` was a default button that turned red *on hover*, which is the one
+   moment it is too late to be told: you learn an action is destructive by
+   pointing at it. Both now say what they are before you touch them. */
+
+/* Quiet: no border, no fill. For the action beside the action -- Cancel next to
+   Save -- where a bordered box competes with the thing it is next to. */
+button.ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+button.ghost:hover:not(:disabled) {
+  background: var(--panel-2);
+  border-color: transparent;
+  color: var(--text);
+}
+
+/* layout ------------------------------------------------------------- */
+
+/* Full width, and a flex column so the conversation fills the space exactly --
+   equal padding top and bottom, with no magic viewport arithmetic. */
+.app {
+  padding: var(--space-4) var(--space-6);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The desktop window on macOS draws its three buttons over the page
+   (`titleBarStyle: hiddenInset`), and they landed on top of the mark: the
+   buttons at y 13..25, the mark starting at y 25, measured. Three answers
+   were tried on 2026-09-02. The mark beside the buttons on one row (#163):
+   a wordmark competing with the traffic lights for the corner, not wanted.
+   A strip for the buttons with the mark under it (#164): 36px spent on a
+   band holding three buttons, then two clusters of small things stacked in
+   the corner -- the fix for a collision, not a layout. This is the third:
+   **no mark in the desktop window.** The Dock has the icon, the corner
+   belongs to the buttons, and the header is a Mac toolbar on one row --
+   title centred on the whole width, controls right -- which is what Finder,
+   Notes, Linear and Raycast do. The mark keeps every job it is not
+   redundant in: a browser tab, a Windows or Linux window, where there are
+   no buttons to yield to. `--traffic-lights` is the room the header leaves
+   for them on the left; the buttons themselves are put on this row's centre
+   line by `trafficLightPosition` in `desktop/main.js`.
+
+   Then a fourth answer, the one kept: the mark is in the header after all,
+   at the far right, on every platform (#170). No corner to fight over --
+   the right one has no buttons anywhere -- and the app has its name in its
+   own frame, which "no mark" (#168) had quietly taken away.
+
+   And with nothing on the left, nothing needs lining up with the buttons.
+   #170 brought them down onto the header's centre line, and that read as
+   air above them; they are back where macOS draws them, the page keeps its
+   padding, and the left of the bar is the empty half of the pair that
+   centres the title -- so no padding is reserved for them either, or the
+   title would sit 28px off centre. `html.mac-desktop` stays on the root for
+   whatever next needs to know. */
+/* The wordmark, and the same mark the app icon carries: `Brand.tsx` draws the
+   path `desktop/build/icon.html` draws, and `test/brandMark.test.ts` holds
+   them to one string. It was "TF" set in the system font at -0.14em, matching
+   an icon that did the same; both are now one drawn line, and the tracking
+   arithmetic that used to live here went with the letters.
+   The height comes off the type scale rather than being a pixel: 1.5 times
+   `--text-md` is the line box the old wordmark occupied, so the header did not
+   change height when the letters became a drawing, and a theme that scales
+   the type scales the brand with it. `width: auto` lets the viewBox set the
+   aspect.
+   `--good` because it is the palette's one green and every theme already
+   overrides it for its own ground -- Paper's is the deep green that survives
+   a light panel. The mark is not a status pill, but it is the same green, and
+   a second green token would be a second decision to keep in step. */
+.brand {
+  display: block;
+  height: calc(var(--text-md) * 1.5);
+  width: auto;
+  color: var(--good);
+  /* The cog turns about its own centre, which is the ink box's. */
+  transform-origin: center;
+}
+
+@keyframes brand-turn { to { transform: rotate(360deg); } }
+
+@keyframes tf-callout-clock {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* (The bordered head bar that used to live here is gone. It was a second
+   `.card-head` -- same name, different thing -- and the only place it was ever
+   used was the gallery page documenting it. A card that holds rows now takes
+   `title` like any other, and the header the component draws is the one
+   header.) */
+.row { display: flex; align-items: center; gap: var(--space-3); }
+
+.grow { flex: 1; min-width: 0; }
+
+.mono { font-family: var(--font-mono); font-size: var(--text-sm); }
+
+.empty { color: var(--muted); text-align: center; padding: var(--space-10) 0; }
+
+/* A word attached to a thing.
+   One grey was doing three unrelated jobs. "10.62 GB" is a *measurement*, an
+   inert fact you look up when you want it. "reads images" is a *capability*,
+   one of a set you scan across. "sign-in expired" is a *state*, and the only
+   one of the three that should ever pull the eye. Drawn identically, the
+   measurement shouted as loudly as the expired sign-in and the capabilities
+   did not read as a set at all -- a row of five identical grey chips where
+   two were sizes and three were things the model can do.
+
+   So: weight follows urgency. Quiet is borderless, the chip is the default,
+   and only a state gets colour. */
+.pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-lg);
+  /* Ink at low alpha, not a named surface -- the same lesson the skeleton
+     taught. `background: var(--panel-2)` and `border: var(--border)` are
+     invisible the moment a chip lands on a `--panel-2` surface, which is
+     exactly what `.modal-body .card` is: every capability tag in the download
+     list rendered as bare text on an identically coloured box. A translucent
+     fill is a step from whatever is behind it, on every surface, without the
+     chip knowing what that is. */
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: var(--text);
+}
+
+/* A fact, not a badge. Numbers and transports have no state to report and were
+   never worth a box; this leaves them legible and out of the way. */
+.pill-quiet {
+  border-color: transparent;
+  background: none;
+  color: var(--muted);
+}
+
+/* The four states, named as `.callout` names them so one vocabulary covers the
+   app. Tinted rather than outlined: a border alone at this size is two pixels
+   of colour, which is not enough to survive being read past.
+
+   The tint mixes into `--panel`, not `--panel-2`. On a dark theme either works;
+   on a light one, mixing a mid-dark tone into the *darker* surface moves the
+   background towards the text and drops the label to 3.9:1. Ten per cent of the
+   tone in the lighter surface holds ≥4.65:1 in every theme, in both
+   schemes -- measured, not guessed. */
+.pill-info { color: var(--accent); border-color: var(--accent-dim); background: color-mix(in srgb, var(--accent) 10%, var(--panel)); }
+
+.pill-good { color: var(--good); border-color: color-mix(in srgb, var(--good) 45%, var(--border)); background: color-mix(in srgb, var(--good) 10%, var(--panel)); }
+
+.pill-warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, var(--border)); background: color-mix(in srgb, var(--warn) 10%, var(--panel)); }
+
+.pill-bad { color: var(--bad);  border-color: color-mix(in srgb, var(--bad) 45%, var(--border));  background: color-mix(in srgb, var(--bad) 10%, var(--panel)); }
+
+/* A pill following a name needs the gap outside its own border. Leading
+   whitespace inside the span puts it under the pill's background instead,
+   which reads as the badge touching the word it qualifies. */
+.row-pill { margin-left: var(--space-2); vertical-align: baseline; }
+
+/* The tile's only control. Dim until hovered: it is chrome on someone's app. */
+.icon-btn {
+  display: inline-flex; align-items: center; padding: var(--space-1);
+  background: none; border: 0; color: var(--muted); opacity: 0.6; cursor: pointer;
+}
+
+.icon-btn:hover { opacity: 1; color: var(--text); }
+
+@keyframes tf-bar {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(320%); }
+}
+
+@keyframes tf-toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes tf-toast-out {
+  to { opacity: 0; transform: translateY(4px); }
+}
+
+/* Square, so it reads as an icon beside the picker rather than a second
+   button competing with it. */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tile-control, 34px);
+  height: var(--tile-control, 34px);
+  padding: 0;
+  flex: none;
+  color: var(--muted);
+  background: var(--panel);
+}
+
+.icon-btn:hover:not(:disabled) { color: var(--text); }
+
+/* skeleton pulse ------------------------------------------------------ */
+@keyframes tf-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.65; }
+}
+
+/* pressed ---------------------------------------------------------------- */
+/* Every control that answers a hover answers a press. There was one `:active`
+   in this sheet (the panel grip) against fifty-six `:hover`s, so a button
+   changed colour under the pointer and then nothing happened when it was
+   pushed -- the click landed, and the control did not say so. The rule is one
+   rule: a pressed control is its hover state with `--press-ink` of the text
+   colour mixed in, scaled by `--press-scale`, and it changes at once -- no
+   transition on the way down, because a press is an event, not a state
+   somebody eases into. Hover states stay where they are; these sit beside
+   them and derive from them, so a theme that moves a hover colour moves the
+   press with it. `:not(:disabled)` throughout, as the hovers are: a disabled
+   control does not respond, and the base rule already says so. */
+
+/* `:where(button)` so this carries no specificity of its own: a component's
+   press rule below -- a card, a tab, a rail item, all of them buttons --
+   wins by coming later, instead of every one having to restate `button`. */
+:where(button):active:not(:disabled) {
+  background: color-mix(in srgb, var(--text) var(--press-ink), var(--control));
+  border-color: var(--accent);
+  transform: scale(var(--press-scale));
+  transition: none;
+}
+
+button.primary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--text) var(--press-ink), var(--accent));
+  border-color: color-mix(in srgb, var(--text) var(--press-ink), var(--accent));
+}
+
+button.ghost:active:not(:disabled) {
+  background: color-mix(in srgb, var(--text) var(--press-ink), var(--panel-2));
+  border-color: transparent;
+}
+
+button[aria-pressed='true']:active:not(:disabled) {
+  background: color-mix(in srgb, var(--accent) 18%, var(--panel));
+}
+
+/* Inputs are not pressed, they are focused; the base rule's `button` list
+   would otherwise catch the search box beside the Search button. */
+input:active, textarea:active, select:active { transform: none; }
+
+/* rendered markdown --------------------------------------------------- */
+.md > *:first-child { margin-top: 0; }
+
+.md > *:last-child { margin-bottom: 0; }
+
+.md p { margin: 0 0 var(--space-2); }
+
+.md h1, .md h2, .md h3, .md h4 {
+  margin: var(--space-4) 0 var(--space-2);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.md h1 { font-size: var(--text-lg); }
+
+.md h2 { font-size: var(--text-md); }
+
+.md h3 { font-size: var(--text-base); }
+
+.md h4 { font-size: var(--text-base); }
+
+.md ul, .md ol { margin: 0 0 var(--space-2); padding-left: var(--space-5); }
+
+.md li { margin: var(--space-1) 0; }
+
+.md code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1px var(--space-1);
+}
+
+.md pre {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3) var(--space-3);
+  overflow-x: auto;
+  margin: 0 0 var(--space-2);
+}
+
+.md pre code { background: none; border: none; padding: 0; font-size: var(--text-sm); }
+
+.md blockquote {
+  margin: 0 0 var(--space-2);
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--border);
+  color: var(--muted);
+}
+
+.md table { border-collapse: collapse; margin: 0 0 var(--space-2); display: block; overflow-x: auto; }
+
+.md th, .md td { border: 1px solid var(--border); padding: var(--space-1) var(--space-2); text-align: left; }
+
+.md th { background: var(--panel-2); font-weight: 600; }
+
+.md a { color: var(--accent); }
+
+.md hr { border: none; border-top: 1px solid var(--border); margin: var(--space-3) 0; }
+
+/* settings ------------------------------------------------------------ */
+.set { margin-bottom: var(--space-5); }
+
+/* `.card-title`, in a stylesheet. Small-caps muted 12px next to a card whose
+   title is 16px text made the same heading look like two different ranks. */
+.set h4 { margin: 0; font-size: var(--text-base); color: var(--text); }
+
+/* A second heading in the same card starts a new subject and needs the gap to
+   say so. Merging the model parameters into one card put "Context window"
+   directly under the picker it is not about, with nothing between them. */
+.set h4:not(:first-child) { margin-top: var(--space-4); }
+
+.set-hint { font-size: var(--text-xs); color: var(--muted); line-height: 1.45; }
+
+/* The description under a section heading, spaced once here rather than at
+   every call site.
+   
+   Seventeen of these carried `style={{ marginBottom: 'var(--space-2)' }}`,
+   which is the same declaration written seventeen times and seventeen chances
+   to write a different one -- the same element already appeared with space-1,
+   space-3 and space-4 elsewhere for no reason anybody recorded. A structural
+   relationship belongs in the stylesheet; a genuine exception can still say so
+   inline and now reads as the exception it is. */
+/* `.card-desc`: the sentence under a title, at the size the card gives it. */
+.set h4 + .set-hint {
+  margin-top: var(--space-1);
+  margin-bottom: var(--space-3);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+@keyframes tf-throb {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* A copy that no longer holds the same file. Not a failure -- two copies of one
+   template are allowed to diverge, and this is only saying that they have. */
+.set-hint.drifted { color: var(--warn); }
+
+/* What an applet drew, read back. A tree rather than prose, so it is left as
+   preformatted text and given a ceiling -- a busy applet is a hundred lines and
+   this sits inside a settings pane. */
+.drawn {
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-2);
+  max-height: 220px;
+  overflow: auto;
+  font-size: var(--text-xs);
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+}
+
+/* One applet, alone on the page, at `/applet/<id>`. Fills the window: there is
+   no grid here to decide a height, and a screenshot of an applet letterboxed
+   inside a page is mostly not the applet. */
+.bare { height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+
+.bare > * { flex: 1; min-height: 0; }
+
+/* A round is in flight. On the button that asks for one, because that is where
+   you are looking when you have just pressed it -- and not in the foot, which
+   would flicker every thirty seconds on a tile that is working perfectly. */
+@keyframes tf-spin { to { transform: rotate(360deg); } }
+
+@keyframes dock-working {
+  0%, 100% { opacity: .15; transform: scale(1); }
+  50% { opacity: .55; transform: scale(1.1); }
+}
+
+/* Working, as one rotating mark.
+   It was three dots bouncing in sequence, and the sequence was the problem: the
+   dashboard polls `/api/models` every five seconds, React re-renders, the node
+   is replaced and every CSS animation on it restarts from frame zero. A bounce
+   caught mid-phase and thrown back to the start is visible every time -- which
+   is what "it resets every five and a half seconds" was.
+   A rotation has no perceptible beginning, so the same restart is invisible.
+   The animation is not made more robust; the shape is made indifferent to it. */
+.spin {
+  display: inline-block;
+  animation: tf-spin 900ms linear infinite;
+}
+
+@keyframes tf-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Still says "working" -- it just says it without moving. */
+  .spin { animation: none; opacity: 0.6; }
+}
+
+@keyframes tf-bounce {
+  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+/* The top bar carries the title, the views and the way into settings. Nothing
+   that belongs to a conversation lives here any more, so it can breathe. */
+.topbar .grow { flex: 1; min-width: 0; }
+
+/* Back on the left, Next on the right, with the gap between them doing the
+   separating -- so the button that goes forward is in the same place on both
+   pages instead of sliding when Back appears. */
+.first-run-actions { align-items: center; }
+
+/* A question is not a workspace.
+   `.modal` is sized for Settings -- 760px wide and pinned near the top of the
+   screen, because eleven panes of preferences need the room and want to start
+   where the eye already is. A two-button question inherited all of that and
+   became a wide grey band across the top of the page: the shape said "here is
+   somewhere to work", the content said "answer this and go". */
+.dialog {
+  width: min(440px, 100%);
+  /* `auto` on the block axis beats the backdrop's `flex-start`, so the short
+     one centres and the tall one still starts at the top. */
+  margin-block: auto;
+  box-shadow: var(--shadow-3);
+}
+
+@keyframes listening-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+
+/* table ---------------------------------------------------------------- */
+
+/* For the visually-hidden-but-announced case: a table's `<caption>`, a column
+   heading that would be noise on screen. `display: none` and `visibility:
+   hidden` both remove it from the accessibility tree as well, which is the
+   opposite of what this is for. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes tf-skel {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}

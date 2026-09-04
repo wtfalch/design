@@ -1,0 +1,14 @@
+.tf-dots { display: inline-flex; gap: var(--space-1); }
+
+.tf-dots i {
+  width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+  animation: tf-bounce 1.1s ease-in-out infinite;
+}
+
+.tf-dots i:nth-child(2) { animation-delay: 0.15s; }
+
+.tf-dots i:nth-child(3) { animation-delay: 0.3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tf-dots i { animation: none; opacity: 0.6; }
+}

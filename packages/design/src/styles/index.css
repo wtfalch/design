@@ -1,0 +1,32 @@
+/* The cascade, written down.
+ *
+ * Two rules of equal specificity are decided by which came last, so this
+ * order is behaviour rather than tidiness. It follows the order the rules
+ * appeared in the stylesheet they were lifted from; `base.css` is first
+ * because it holds the reset and the shared utilities everything else
+ * assumes.
+ *
+ * `scripts/copy-css.mjs` flattens these into one file at build time.
+ */
+@import './base.css';
+@import './select.css';
+@import './dangerzone.css';
+@import './callout.css';
+@import './card.css';
+@import './toggle.css';
+@import './skeleton.css';
+@import './rows.css';
+@import './empty.css';
+@import './progress.css';
+@import './tabs.css';
+@import './toast.css';
+@import './modal.css';
+@import './slider.css';
+@import './checkbox.css';
+@import './table.css';
+@import './brand.css';
+@import './sizegrid.css';
+@import './tooltip.css';
+@import './illustration.css';
+@import './field.css';
+@import './tour.css';

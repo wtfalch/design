@@ -1,0 +1,54 @@
+/* fields --------------------------------------------------------------- */
+
+/* Label, description, input, error -- in the order they are wanted. The
+   description is read before typing, so it goes above; the error is the reply
+   to what was typed, so it goes after. */
+.field { display: grid; gap: var(--space-1); }
+
+.field-stack-layout { /* the default: label, description, control, error */ }
+
+.field-row-layout > .field-label { grid-column: 1; }
+
+.field-row-layout > .field-hint,
+.field-row-layout > .field-error { grid-column: 1; }
+
+.field-row-layout > :not(.field-label):not(.field-hint):not(.field-error) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+}
+
+.field-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-strong);
+  color: var(--text);
+}
+
+/* Not red. The asterisk marks which fields are required; colouring it the same
+   as a failure says something has already gone wrong with every one of them. */
+.field-required { color: var(--muted); }
+
+.field-hint,
+.field-error { margin: 0; font-size: var(--text-sm); line-height: 1.45; }
+
+.field-hint { color: var(--muted); }
+
+/* Never colour alone: the field is outlined, the input is `aria-invalid`, and
+   the message says what happened in words. Red is the third signal, not the
+   only one. */
+.field-error { color: var(--bad); }
+
+.field-bad input:focus,
+.field-bad textarea:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 30%, transparent); }
+
+/* The field owns its width; the control fills it. Otherwise a label sits over
+   an input half its length and the pair reads as two unrelated things. */
+/* A field beside a button. The field takes the space and the button keeps its
+   size, and they line up on the input rather than on the box -- the label and
+   description above it would otherwise push the button down with them. */
+/* Fields stacked down a form. Wider than the gap inside one field, so the
+   label of the next belongs to the input under it rather than to the error
+   above it. */
+.field-stack { display: grid; gap: var(--space-4); }
+
+.field-row > .field { flex: 1; min-width: 0; }

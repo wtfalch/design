@@ -1,0 +1,54 @@
+.muted { color: var(--muted); }
+
+.pulse-block {
+  display: inline-block;
+  height: 8px;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  animation: tf-pulse 1.4s ease-in-out infinite;
+  vertical-align: middle;
+}
+
+/* skeletons ------------------------------------------------------------ */
+
+/* Ink at low alpha, not a named surface.
+   The port kept chef's `surface` prop and its `--panel-2` default, and the
+   first place it went was a card inside a modal -- where `.modal-body .card` is
+   *also* `--panel-2`. Six invisible skeletons on an identical background. Any
+   scheme that names the colour has that failure in it: the caller has to know
+   what it is being drawn on, and gets it wrong the first time a surface moves.
+
+   `currentColor` at low alpha cannot be wrong. It is the text colour of
+   wherever it lands, so it is dark on a light theme and light on a dark one,
+   and it is a step from its background on every surface in the app without
+   anybody choosing. `surface` survives as a strength, which is what callers
+   actually wanted from it. */
+.skel {
+  display: block;
+  background: color-mix(in srgb, currentColor 13%, transparent);
+  /* Never collapses to nothing: a zero-height skeleton is an invisible promise
+     about layout, which is the one thing it cannot be. */
+  min-height: 2px;
+}
+
+/* On the page behind a panel, where there is less contrast to work with. */
+.skel-on-elevated { background: color-mix(in srgb, currentColor 20%, transparent); }
+
+.skel-rectangular { border-radius: 0; }
+
+.skel-rounded { border-radius: var(--radius); }
+
+.skel-circular { border-radius: var(--radius-pill); flex: none; }
+
+/* A paragraph, not a bar. Real text ends mid-line, so the last one is short --
+   a stack of equal-length bars reads as a table waiting to load. */
+.skel-lines { display: grid; gap: var(--space-2); }
+
+/* Breathing rather than sliding. A sweep travelling across a skeleton implies
+   progress from left to right, and nothing here knows how far along it is. */
+.skel-pulse { animation: tf-skel calc(var(--dur-slow) * 3) var(--ease) infinite alternate; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Still distinguishable from a real block of colour, and still still. */
+  .skel-pulse { animation: none; opacity: 0.8; }
+}

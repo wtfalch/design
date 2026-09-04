@@ -20,3 +20,30 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+
+  visual:
+    runs-on: ubuntu-latest
+    # The same image the baselines were made in, on purpose: `--font` is
+    # `-apple-system`, so a runner with different fonts disagrees with every
+    # committed image at once and the run says nothing about the change.
+    container:
+      image: mcr.microsoft.com/playwright:v1.62.1-noble
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @wtfalch/design build
+      - run: pnpm --filter @wtfalch/design-gallery build
+      - run: pnpm --filter @wtfalch/design-e2e exec playwright test
+      - uses: actions/upload-artifact@v4
+        # The diff PNGs are in here. A visual failure nobody can look at gets
+        # its baselines updated unread, which is the same as having no suite.
+        if: failure()
+        with:
+          name: playwright-report
+          path: gallery-e2e/playwright-report
+          retention-days: 7

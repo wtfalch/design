@@ -1,0 +1,41 @@
+/* ---------------------------------------------------------------- toasts */
+.toasts {
+  position: fixed;
+  z-index: 90;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: var(--space-2);
+  /* The stack does not take the pointer; each toast does. Otherwise an
+     invisible column down the middle of the app eats clicks. */
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 260px;
+  max-width: min(460px, 90vw);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: var(--shadow-2);
+  font-size: var(--text-sm);
+  animation: tf-toast-in var(--dur-md) var(--ease);
+}
+
+.toast-good { border-left: 2px solid var(--good); }
+
+.toast-bad { border-left: 2px solid var(--bad); }
+
+.toast-info { border-left: 2px solid var(--accent); }
+
+.toast.leaving { animation: tf-toast-out var(--dur-fast) var(--ease) forwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .toast, .toast.leaving { animation: none; }
+}

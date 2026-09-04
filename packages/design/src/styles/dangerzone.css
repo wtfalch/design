@@ -1,0 +1,111 @@
+/* Destructive, and legible as such standing still. */
+button.danger {
+  color: var(--bad);
+  border-color: color-mix(in srgb, var(--bad) 45%, var(--border-strong));
+}
+
+button.danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--bad) 12%, var(--panel));
+  border-color: var(--bad);
+  color: var(--bad);
+}
+
+button.danger:active:not(:disabled) {
+  background: color-mix(in srgb, var(--bad) 20%, var(--panel));
+  border-color: var(--bad);
+}
+
+/* Three fields on one line, and their inputs on one line too.
+   
+   `Field` puts the description *above* the control, which is the house rule and
+   right -- but only `Arguments` has one here, so as a flex row the other two
+   inputs floated a description's height above it and the row read as broken.
+   Aligned to the end instead: the labels sit where their text needs them and
+   the three boxes share a baseline, which is the edge the eye actually follows.
+   
+   A grid rather than flex, so `Arguments` gets the room it needs by declaration
+   instead of by an inline pixel width on each of its neighbours. */
+.mcp-local .field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+/* How an applet's polling is going, said the same way on every tile. Muted
+   when it is going fine -- this is a fact you glance at, not one you are being
+   told. */
+/* A notch under `.set-hint`'s 11px. This is the smallest thing on a tile and
+   the least often read -- at 11px it competed with the applet's own text. */
+/* The danger zone ------------------------------------------------------------
+
+   One bordered section with its actions divided inside it, rather than a box
+   per action: three tiles of red furniture stacked down a pane read as three
+   warnings, and one section with three things in it reads as a place. A place
+   is somewhere you have to go, which is the whole idea.
+
+   Tinted rather than filled. These are still settings, and a red panel in a
+   settings modal reads as an error that has already happened — the border and
+   the headings are enough to say "stop and read this one".
+
+   The same shape as valet's, so that being careful is learned once. */
+.danger-zone {
+  border: 1px solid color-mix(in srgb, var(--bad) 35%, var(--border));
+  background: color-mix(in srgb, var(--bad) 5%, var(--panel));
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.danger-zone-head h3 {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--bad);
+  letter-spacing: 0.01em;
+}
+
+.danger-zone-head .set-hint { margin-top: 2px; }
+
+/* Divided by a rule rather than boxed. The first one needs no rule: it is
+   already under the heading. */
+.danger-act { padding-top: var(--space-3); margin-top: var(--space-3); border-top: 1px solid color-mix(in srgb, var(--bad) 18%, var(--border)); }
+
+.danger-act > h4 { margin: 0 0 2px; font-size: var(--text-sm); color: var(--bad); }
+
+.danger-act.plain > h4 { color: var(--text); }
+
+.danger-act > .set-hint + .set-hint { margin-top: var(--space-1); }
+
+.danger-row { margin-top: var(--space-2); gap: var(--space-2); align-items: center; }
+
+.danger-row > input { min-width: 0; }
+
+/* The name to type, quoted rather than described -- it is a string to copy. */
+.danger-name {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  padding: 1px var(--space-1);
+  border-radius: 4px;
+}
+
+.danger-unavailable { margin-top: var(--space-2); opacity: 0.85; }
+
+/* Label beside the control, for a settings pane: a column of names on the left
+   and their controls on the right reads as a list of what is set, where the
+   same rows stacked read as a form waiting to be filled in. The description
+   and the error stay under the label, in the same column, so a long
+   explanation does not push the control off its row. */
+.field-row-layout {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: var(--space-3);
+}
+
+.field-row { align-items: flex-end; gap: var(--space-2); }
+
+.field-row > button { flex: none; }
+
+/* Two forms one under the other, whose buttons say different words -- "Add"
+   and "Block". Sized to their text they came out different widths, and two
+   controls in the same column at the same indent that do not line up read as
+   an accident rather than as a pair. */
+.field-row > button { min-width: 9ch; }

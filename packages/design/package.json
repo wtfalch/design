@@ -23,7 +23,9 @@
     "./styles.css": "./dist/styles/index.css"
   },
   "sideEffects": ["*.css"],
-  "engines": { "node": ">=22.0.0" },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
     "prepack": "pnpm build",
@@ -35,6 +37,8 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
+    "dompurify": "^3.4.13",
+    "marked": "^18.0.9",
     "react-aria-components": "^1.21.0"
   },
   "devDependencies": {

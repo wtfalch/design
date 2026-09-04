@@ -1,0 +1,151 @@
+.card-action .switch-row { padding: 0; gap: var(--space-2); }
+
+.card-action .switch-row .switch-body { flex: none; }
+
+/* model handover marker ----------------------------------------------- */
+.switch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.switch::before, .switch::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* A switch, because it takes effect as it moves. A tick box is the shape of an
+   answer you are going to submit, and there is nothing here to submit.
+   Its own width, which is also what keeps it clear of the trap `.set-row`,
+   `.mcp-tool` and `.applet-review-row` each document: the controls block sizes
+   every `input` to `width: 100%`, and a checkbox left to inherit that stretches
+   across the row, squeezes its label to nothing, and draws itself at the left
+   of its own oversized rectangle. */
+/* The row a switch lives in. The whole row is the label, so the words are the
+   hit area too -- a 30x18 target on its own is under every minimum there is,
+   and reaching for the text is what people do regardless. */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  cursor: pointer;
+}
+
+.switch-row.is-disabled { cursor: default; opacity: 0.55; }
+
+.switch-body { flex: 1; min-width: 0; display: grid; gap: 1px; }
+
+/* Sized to its words, for a switch that sits in a row of other controls rather
+   than owning a row of its own. `flex: 1` there would push the label away from
+   the switch by the whole width of the bar. */
+.row > .switch-row { flex: none; padding-block: 0; }
+
+.row > .switch-row .switch-body { flex: none; }
+
+/* The opposite case: a switch that *is* the row, with something small beside it
+   -- a tooltip, a state word. `.set-row` wraps, so a switch that does not grow
+   pushes whatever follows onto a line of its own, which is how the file-access
+   tooltip ended up orphaned under it. */
+.set-row > .switch-row { flex: 1; min-width: 0; padding-block: 0; }
+
+.switch-label { color: var(--text); }
+
+.switch-hint { font-size: var(--text-sm); color: var(--muted); }
+
+.switch-said { flex: none; font-size: var(--text-xs); color: var(--muted); }
+
+/* Three sizes, the same names every other control uses. The switch scales with
+   the row: a 30x18 track beside 12px text is a different control from the same
+   track beside 16px text. */
+.switch-sm { gap: var(--space-2); padding: var(--space-1) 0; font-size: var(--text-sm); }
+
+.switch-sm .switch-hint { font-size: var(--text-xs); }
+
+.switch-sm input[type='checkbox'].toggle { width: 26px; height: 16px; }
+
+.switch-sm input[type='checkbox'].toggle::after { width: 10px; height: 10px; }
+
+.switch-sm input[type='checkbox'].toggle:checked::after { left: calc(100% - 12px); }
+
+.switch-lg { gap: var(--space-4); padding: var(--space-3) 0; font-size: var(--text-md); }
+
+.switch-lg input[type='checkbox'].toggle { width: 38px; height: 22px; }
+
+.switch-lg input[type='checkbox'].toggle::after { width: 16px; height: 16px; }
+
+.switch-lg input[type='checkbox'].toggle:checked::after { left: calc(100% - 18px); }
+
+/* `input[type='checkbox']` is an attribute selector plus a type -- 0-1-1 --
+   and `.toggle` is a class, 0-1-0. So the tick-box base outranked this no
+   matter which came last in the file, and the switch rendered as a 17px
+   rounded square with a checkmark in it. Matching the base's shape is the fix;
+   `!important` would have been the other one, and the wrong one. */
+input[type='checkbox'].toggle {
+  appearance: none; -webkit-appearance: none;
+  position: relative; flex: none; cursor: pointer;
+  display: block;
+  width: 30px; height: 18px; margin: 0; padding: 0;
+  border-radius: 999px;
+  background: var(--toggle-off); border: 1px solid var(--toggle-off);
+  --toggle-off: var(--border);
+  transition: background var(--dur-fast), border-color var(--dur-fast);
+}
+
+/* The card version. On a `--panel-2` card -- the permissions cards in
+   onboarding -- the `--border` track is five points from the ground and the
+   switch vanished, knob and all. So a toggle on a card is drawn for that
+   surface: a track with half of `--muted` in it, and a knob with an edge so
+   it reads as a knob on the darker track. By placement rather than a prop,
+   so a toggle put on a card cannot be left in the wrong version. */
+.card input[type='checkbox'].toggle {
+  --toggle-off: color-mix(in srgb, var(--muted) 50%, var(--border));
+}
+
+.card .toggle::after {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--muted) 30%, transparent), 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+
+.card input[type='checkbox'].toggle:checked::after { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18); }
+
+/* The knob, not the tick. The base draws a checkmark through `::before`, which
+   a switch has no use for. */
+input[type='checkbox'].toggle::before { content: none; }
+
+.toggle::after {
+  content: ''; position: absolute; top: 50%; left: 2px;
+  transform: translateY(-50%);
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--panel);
+  transition: left var(--dur-fast);
+}
+
+/* Accent rather than green. Green reads as "this is the safe one", and the
+   safe one here is off -- the switch should not editorialise about which way
+   you ought to have it. */
+input[type='checkbox'].toggle:checked { background: var(--accent); border-color: var(--accent); }
+
+.toggle:checked::after { left: calc(100% - 14px); }
+
+input[type='checkbox'].toggle:disabled { opacity: .5; cursor: default; background: var(--toggle-off); }
+
+input[type='checkbox'].toggle:checked:disabled { background: var(--accent); border-color: var(--accent); }
+
+.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* A toggle's knob widens while held, the way a switch does under a thumb,
+   and snaps to its side on release. A tick box and a radio darken. */
+.toggle:active:not(:disabled)::after { width: 16px; transition: width var(--dur-fast); }
+
+.toggle:checked:active:not(:disabled)::after { left: calc(100% - 18px); }
+
+input[type='checkbox']:active:not(:disabled):not(.toggle),
+input[type='radio']:active:not(:disabled) {
+  background: color-mix(in srgb, var(--text) var(--press-ink), var(--control));
+  transform: none;
+}

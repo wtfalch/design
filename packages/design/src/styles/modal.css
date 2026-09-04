@@ -1,0 +1,118 @@
+/* modal --------------------------------------------------------------- */
+
+/* `hidden` needs saying out loud here. The browser's own `[hidden]` rule is a
+   `display: none` that any `display` in a stylesheet outranks -- so a hidden
+   backdrop with `display: flex` on it stays exactly where it was, over the top
+   of everything. Minimising the studio depends on this line. */
+.backdrop[hidden] { display: none; }
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--space-15) var(--space-5);
+  z-index: 50;
+}
+
+/* The box is where focus lands when the window opens, not something you tab
+   to -- it is `tabIndex={-1}` and exists so a screen reader starts inside the
+   dialog rather than behind it. Chrome draws its own `:focus-visible` ring on
+   it anyway, which puts a bright outline around the entire window and offers to
+   activate something that does not do anything. The trap and `aria-modal` are
+   what communicate here; the ring belongs on the controls inside. */
+.modal:focus,
+.modal:focus-visible { outline: none; }
+
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: min(760px, 100%);
+}
+
+/* Settings is wider than the others: the rail carries group headings with a
+   hint each and indented tabs under them, and a pane beside it that draws
+   cards with a control on the right -- 760 gave one or the other room. */
+.modal.modal-settings { width: min(880px, 100%); }
+
+.modal {
+  /* The window, less the backdrop's padding at each end -- `--space-15` is 60px
+     and there are two of them, above and below.
+
+     It was a flat `120px`, which was that sum written out by hand, and
+     `.first-run` subtracted `56px` for the same gap. Three numbers for one
+     measurement: onboarding sat 60 from the top and four pixels *past* the
+     bottom, and nothing would have moved them together.
+
+     `dvh`, not `vh`: on a phone `100vh` is the window with the browser chrome
+     retracted, which is not the height the page has when it opens. */
+  max-height: calc(100dvh - var(--space-15) - var(--space-15));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Head, body and actions, separated by space rather than by rules.
+   A line above the title and another above the buttons boxed the content into a
+   compartment inside a box that already had a border -- three horizontal rules
+   in a panel eight lines tall. The head and the foot are still their own
+   sections; they are just spaced apart instead of ruled off.
+   The body keeps a rule *while it scrolls*, because there the line is doing
+   something a gap cannot: saying content continues past the edge. */
+.modal-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+}
+
+.modal-head strong { font-size: var(--text-base); }
+
+/* Under the title, on the header's padding rather than the body's, so it reads
+   as part of the heading rather than as the first line of content. */
+.modal-desc {
+  margin: 0;
+  padding: 0 var(--space-4) var(--space-3);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
+.modal-body { padding: var(--space-2) var(--space-4) var(--space-3); overflow-y: auto; }
+
+/* Always the top right corner, whatever else is in the header.
+   Nothing used to push it there: `.modal-head` is a flex row and every caller
+   happened to put `grow` on its own title. `Modal` renders the title, so a
+   window that passes only a title -- the download one -- had its close button
+   sitting against the last letter of the heading, which read as part of the
+   words rather than as the way out. */
+.modal-head > .x { margin-left: auto; }
+
+/* Actions pinned under the pane rather than after the last section, so they do
+   not move as sections of different heights are chosen. */
+.set-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--border-width) solid var(--border);
+}
+
+/* Inside the modal, not floating under it.
+   As a direct child of `.modal` this had the rows' margin and none of the
+   modal's padding, so the buttons sat in a strip of panel with a rule above
+   them and nothing around them -- they read as being outside the thing they
+   belong to. */
+.modal > .set-actions {
+  margin-top: 0;
+  padding: var(--space-2) var(--space-4) var(--space-3);
+  border-top: none;
+}
+
+.dialog .modal-body { color: var(--muted); }

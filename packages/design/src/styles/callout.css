@@ -1,0 +1,138 @@
+/* One shape for everything that tells you something.
+   `.banner` and `.callout` were the same box drawn twice: a bordered, rounded,
+   12px panel with a tint. They differed in padding by a pixel in each direction
+   -- 10/14 against 11/13, a distinction nobody chose and nobody could see -- and
+   in how they marked tone, one tinting its whole background and the other
+   growing a coloured left edge. Two answers to one question meant every new
+   message was a coin toss, and the app read as though two people had built it.
+   So: one `.callout`, and the tone is a modifier. `.banner` and `.callout` are
+   kept as aliases below because they are spelled across a dozen files and a
+   rename is a separate change from a consolidation. */
+.callout {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-3);
+  border: var(--border-width) solid var(--border);
+  border-left: 2px solid var(--muted);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--text);
+}
+
+/* The tones. Each is the same two moves -- tint the surface, colour the edge --
+   so a new one is two lines and cannot drift into a new shape. */
+.callout-info {
+  border-left-color: var(--info);
+  background: color-mix(in srgb, var(--info) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--info) 30%, var(--border));
+}
+
+.callout-bad {
+  border-left-color: var(--bad);
+  background: color-mix(in srgb, var(--bad) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--bad) 30%, var(--border));
+}
+
+.callout-good {
+  border-left-color: var(--good);
+  background: color-mix(in srgb, var(--good) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--good) 30%, var(--border));
+}
+
+.callout-warn {
+  border-left-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--warn) 30%, var(--border));
+}
+
+/* A callout that leaves on its own.
+   Room at the bottom for the bar, and `position: relative` so the bar can sit
+   on the border rather than inside the text. */
+.callout-timed { position: relative; padding-bottom: var(--space-5); overflow: hidden; }
+
+/* The countdown. Drawn as a shrinking bar rather than a number: nobody wants to
+   read a clock, they want to know whether they have time. Animated width rather
+   than a transition, so it starts the moment it is painted. */
+.callout-clock {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  transform-origin: left;
+  background: currentColor;
+  opacity: 0.5;
+  animation: tf-callout-clock linear forwards;
+}
+
+/* Held while the pointer is on it. A message that expires while you are reading
+   it was never shown. */
+.callout-clock.is-held { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The timer still runs -- this is about motion, not about the message
+       staying. A static bar says the same thing without sliding. */
+  .callout-clock { animation: none; opacity: 0.25; }
+}
+
+/* A callout arriving is a change in the page, not a thing that was always
+   there. It grows into its own height so the rows under it are pushed down
+   rather than replaced -- the difference between "something appeared" and
+   "the page you were reading is now a different page". `grid-template-rows`
+   from 0fr to 1fr is what animates a height nobody measured.
+
+   The margin is on the wrapper, so a callout that has not arrived takes no
+   space at all: `margin-bottom` on the callout itself would leave a gap where
+   an absent message would have been. */
+.callout-enter {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--dur-md) var(--ease),
+              margin-bottom var(--dur-md) var(--ease),
+              opacity var(--dur-md) var(--ease);
+  opacity: 0;
+  margin-bottom: 0;
+}
+
+.callout-enter > * { overflow: hidden; min-height: 0; }
+
+.callout-enter.is-in { grid-template-rows: 1fr; opacity: 1; margin-bottom: var(--space-4); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Still arrives, just without the push. */
+  .callout-enter { transition: none; }
+}
+
+/* The mark, when there is one. Optional on purpose: most callouts are a sentence
+   and an icon beside every sentence is noise.
+
+   It used to be a letter somebody typed into a ring -- `i`, `!`, `✓` -- which
+   is the operating system's font drawing a glyph beside an app that has an icon
+   set for exactly this. The ring went with it: a circle around a warning
+   triangle is two shapes saying one thing. */
+.callout-mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  opacity: 0.9;
+}
+
+/* Held-back history when a local conversation would cross to a hosted model.
+   Deliberately loud: the cost of missing it is uploading work that was kept
+   local on purpose. */
+.callout.carried { border-color: var(--bad); }
+
+/* A save that worked but is worth a word. Red would say it did not happen. */
+.callout:not([class*='callout-']) {
+  border-color: var(--border);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.callout button { flex: none; }

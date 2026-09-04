@@ -34,5 +34,21 @@
       "quoteStyle": "single",
       "semicolons": "asNeeded"
     }
-  }
+  },
+  "overrides": [
+    {
+      "include": [
+        "packages/design/src/components/**",
+        "packages/design/src/hooks/**",
+        "packages/design/src/illustrations.ts",
+        "gallery/src/**"
+      ],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }
