@@ -224,14 +224,21 @@
    every theme. Declared here rather than in `styles.css` because it is part of
    the vocabulary's contract: a theme may set the durations, it may not decide
    whether they apply. */
+/* `!important`, and it is the one place in the vocabulary that carries it.
+   A theme is applied as inline styles on the root, and an inline declaration
+   beats a stylesheet rule -- so a theme that set `--dur-md: 260ms` kept it
+   under `prefers-reduced-motion: reduce`, measured, and the three built-ins
+   only ever passed because none of them sets a duration. "Outranks every
+   theme" has to be true of a theme written by somebody who never read this
+   file, and the cascade is the only thing that can make it so. */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --dur-fast: 0s;
-    --dur-md: 0s;
-    --dur-slow: 0s;
-    --dur-drag: 0s;
-    --hover-lift: 0px;
-    --hover-scale: 1;
-    --press-scale: 1;
+    --dur-fast: 0s !important;
+    --dur-md: 0s !important;
+    --dur-slow: 0s !important;
+    --dur-drag: 0s !important;
+    --hover-lift: 0px !important;
+    --hover-scale: 1 !important;
+    --press-scale: 1 !important;
   }
 }

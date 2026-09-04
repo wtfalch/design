@@ -111,9 +111,14 @@ describe('reduced motion', () => {
     const durations = [...declared].filter((k) => k.startsWith('--dur-'))
     expect(durations.length).toBeGreaterThan(0)
     for (const key of durations) {
-      expect(block, `${key} must be collapsed under reduced motion`).toMatch(
-        new RegExp(`${key}\\s*:\\s*0s`),
-      )
+      /* `!important`, because a theme lands as inline styles on the root and an
+         inline declaration beats a plain rule. Without it a theme that sets a
+         duration keeps it under reduced motion -- measured on the `brand`
+         fixture, whose `--dur-md: 260ms` survived. */
+      expect(
+        block,
+        `${key} must be collapsed under reduced motion, and outrank an inline theme`,
+      ).toMatch(new RegExp(`${key}\\s*:\\s*0s\\s*!important`))
     }
   })
 
