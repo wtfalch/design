@@ -24,7 +24,7 @@
  * gets committed, and `snapshotPathTemplate` keeps the two sets apart by
  * platform so a stray local run cannot overwrite the ones CI checks.
  */
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig } from '@playwright/test'
 
 const port = Number(process.env.GALLERY_PORT ?? 5199)
 const baseURL = `http://127.0.0.1:${port}`
@@ -86,6 +86,13 @@ export default defineConfig({
 
   use: {
     baseURL,
+    /* No `devices['Desktop Chrome']`, and that is not an omission.
+       The device descriptor spoofs a user-agent string, and React Aria does
+       platform detection from it -- under the spoofed UA a `<Button>` stopped
+       emitting a click on Enter, while the same build in a plain context worked.
+       The component was fine; the harness was lying about the browser. For a
+       component library the browser under test IS the product's browser, so
+       Chromium is left to describe itself. */
     trace: 'on-first-retry',
     // A fixed window, because the specimen container is fixed and a viewport
     // that differs is a layout that differs.
@@ -111,7 +118,7 @@ export default defineConfig({
       /* `reducedMotion` moved under `contextOptions` in Playwright 1.62 -- it is
          still a `use` option in playwright-core's types, which is why the config
          looked right and only `tsc` disagreed. */
-      use: { ...devices['Desktop Chrome'], contextOptions: { reducedMotion: 'no-preference' } },
+      use: { contextOptions: { reducedMotion: 'no-preference' } },
       testIgnore: ['**/reduced-motion.spec.ts'],
     },
     {
@@ -120,7 +127,7 @@ export default defineConfig({
          hover and press transforms. That is a rendering the app ships and
          nothing else screenshots. */
       name: 'reduced-motion',
-      use: { ...devices['Desktop Chrome'], contextOptions: { reducedMotion: 'reduce' } },
+      use: { contextOptions: { reducedMotion: 'reduce' } },
       testMatch: ['**/reduced-motion.spec.ts'],
     },
   ],

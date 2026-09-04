@@ -50,36 +50,25 @@ test.describe('Button', () => {
     expect(painted, `focused button painted no ring: ${JSON.stringify(ring)}`).toBe(true)
   })
 
-  test('Enter and Space both press it', async ({ page }) => {
-    await page.goto(specimenUrl(BUTTONS, 'system'))
-    await themeApplied(page, 'system')
-
-    /* A `<div onClick>` passes a click test and fails this one, which is the
-       reason the rule is written as "a div has no keyboard" rather than "use a
-       button". Both keys, because a native button answers to both and a
-       hand-rolled one usually answers to Enter alone. */
+  test('Enter and Space both activate it', async ({ page }) => {
+    /* Activation is asserted through what the button *does* -- the dialog
+       specimen's trigger opens a dialog -- rather than by counting `click`
+       events on it.
+       Counting clicks was the first attempt and it was testing the wrong
+       thing: React Aria raises `onPress`, and whether a native `click` also
+       fires turned out to vary with browser-context options. That made the test
+       a measurement of Playwright's configuration rather than of the component.
+       What a person needs is that pressing the key does the thing. */
     for (const key of ['Enter', 'Space']) {
-      const pressed = await page.evaluate((k) => {
-        const el = document.querySelector('.spec-stage button') as HTMLElement
-        let count = 0
-        el.addEventListener('click', () => count++, { once: true })
-        el.focus()
-        const opts = { key: k === 'Space' ? ' ' : k, code: k, bubbles: true }
-        el.dispatchEvent(new KeyboardEvent('keydown', opts))
-        el.dispatchEvent(new KeyboardEvent('keyup', opts))
-        return count
-      }, key)
-      // The browser synthesises the click for a real `<button>`; dispatching a
-      // synthetic key event does not. So this asserts the element IS a button
-      // rather than counting handler calls.
-      expect(pressed, `${key} on a real button`).toBeGreaterThanOrEqual(0)
-    }
+      await page.goto(specimenUrl({ c: 'dialog', v: 'Default' }, 'system'))
+      await themeApplied(page, 'system')
 
-    const tag = await page
-      .locator('.spec-stage button')
-      .first()
-      .evaluate((el) => el.tagName)
-    expect(tag, 'must be a real <button>, which is what makes Enter and Space free').toBe('BUTTON')
+      const trigger = page.getByRole('button', { name: 'Ask something' })
+      await trigger.focus()
+      await page.keyboard.press(key)
+
+      await expect(page.getByRole('dialog'), `${key} did not activate the button`).toBeVisible()
+    }
   })
 
   test('defaults to type="button", so it cannot submit a form it is dropped into', async ({
