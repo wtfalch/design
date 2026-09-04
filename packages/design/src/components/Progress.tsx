@@ -50,6 +50,7 @@ export default function Progress({
           {detail && <span className="progress-detail mono">{detail}</span>}
         </div>
       )}
+      {/* biome-ignore lint/a11y/useFocusableInteractive: a progressbar is not interactive; there is nothing to focus and nothing to press. */}
       <div
         className={`bar bar-${tone}${indeterminate ? ' bar-indeterminate' : ''}`}
         role="progressbar"

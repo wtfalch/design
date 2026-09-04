@@ -29,6 +29,7 @@ const TOKENS_PAGE = '__tokens'
 
 function useTokens(theme: string) {
   const [values, setValues] = useState<[string, string][]>([])
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `theme` is the trigger -- the values are re-read after each theme is applied, not derived from the name.
   useEffect(() => {
     // After the theme has been applied, not before: these are computed values,
     // and reading them in the same tick returns the previous theme's.
@@ -243,7 +244,8 @@ export default function Gallery() {
 
         <nav className="spec-nav">
           {sorted.map((c) => (
-            <button type="button"
+            <button
+              type="button"
               key={c.id}
               className={`spec-link${c.id === current ? ' on' : ''}`}
               onClick={() => go(c.id)}
@@ -252,7 +254,8 @@ export default function Gallery() {
               <span className="set-hint">{c.variants.length}</span>
             </button>
           ))}
-          <button type="button"
+          <button
+            type="button"
             className={`spec-link${current === TOKENS_PAGE ? ' on' : ''}`}
             onClick={() => go(TOKENS_PAGE)}
           >

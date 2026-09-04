@@ -701,3 +701,30 @@ test.describe('Toast', () => {
     await expect(page.getByRole('region', { name: /notification/ })).toBeVisible()
   })
 })
+
+test.describe('Rows and Table', () => {
+  test('a list of rows has a name, and a clickable row is a real button', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'rows', v: 'Clickable' }, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.getByRole('list')).toHaveCount(1)
+    /* "A <div onClick> has no keyboard." Row's onClick renders a <button>
+       for exactly this reason, so Tab reaches it and Enter presses it. */
+    await page.keyboard.press('Tab')
+    const hit = page.locator('.row-hit').first()
+    await expect(hit).toBeFocused()
+    expect(await hit.evaluate((el) => el.tagName)).toBe('BUTTON')
+  })
+
+  test('a table is a real table, read across as well as down', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'table', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    const table = page.getByRole('table')
+    await expect(table).toHaveCount(1)
+    await expect(table.locator('caption'), 'named by its caption').toHaveCount(1)
+    await expect(table.locator('thead th[scope="col"]').first()).toBeVisible()
+    /* The first cell of a row is its name, so it is a header for the row --
+       what lets a screen reader say "pillow, version, 11.1.0" rather than a
+       bare "11.1.0" with no idea whose it is. */
+    await expect(table.locator('tbody th[scope="row"]').first()).toBeVisible()
+  })
+})

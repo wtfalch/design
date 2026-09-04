@@ -22,30 +22,19 @@ a set of classes.
 
 Read `packages/design/README.md` for the vocabulary and how to write a theme.
 
-## Why the components are not linted yet
+## Everything is linted
 
-`biome.json` exempts `packages/design/src/components/**` and `gallery/src/**`.
-That is deliberate and temporary, and it is not "these files are fine".
+The components spent the migration exempt from biome, because they were copied
+verbatim from tf and reformatting them would have made every React Aria diff a
+mix of "this is now React Aria" and "biome moved a quote". That exemption is
+gone. The seventeen findings it hid are resolved rather than waved through:
+three style autofixes, two lists re-keyed by their data instead of their index,
+and reasoned `biome-ignore` lines on the rest -- `div role="list"` is valid
+ARIA and a `<ul>` reset is pixel churn for no gain; a `progressbar` is not
+interactive; Markdown's HTML is DOMPurify output and Illustration's is read
+from disk at build time; Brand's animation effect reads `t` once on purpose.
 
-They are copied verbatim from tf, which does not use biome, so they carry
-eighteen findings: style preferences (`useTemplate`, `noNonNullAssertion`),
-two deliberate uses of `dangerouslySetInnerHTML` (DOMPurify-sanitised markdown,
-and SVG inlined at build time), and three structural ones that the React Aria
-migration resolves by construction — `useSemanticElements` on `Modal` and
-`Rows`, `useFocusableInteractive` on `Progress`.
-
-Fixing them now means a large diff for no behaviour change, in exactly the files
-about to be rewritten — and then every migration diff is a mix of "this is now
-React Aria" and "biome moved a quote". **The exemption comes off one component
-at a time, as each is migrated**, which is also when the structural findings
-stop existing.
-
-**A migrated component comes back under the linter**, as a second `overrides`
-entry listing it by name. `Button` is the first. That list growing is the
-measure of phase 5, and it is a list rather than a wildcard so adding to it is a
-deliberate line in a diff.
-
-`illustrations.ts` is generated and stays exempt.
-
-Everything else — the token contract, the tools, the tests, the scripts — is
-fully linted.
+The one exception is `noArrayIndexKey` on `Skeleton.tsx`, turned off for that
+file in `biome.json`: a placeholder line has no identity but its position, and
+the rule reports the `.map` callback and the `key` attribute as one finding
+that no single suppression comment attaches to.

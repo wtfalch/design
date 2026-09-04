@@ -60,9 +60,7 @@ export default function Skeleton({
   lines?: number
   className?: string
 }) {
-  const cls =
-    `skel skel-${variant} skel-on-${surface}${animation === 'none' ? '' : ' skel-pulse'}` +
-    (className ? ` ${className}` : '')
+  const cls = `skel skel-${variant} skel-on-${surface}${animation === 'none' ? '' : ' skel-pulse'}${className ? ` ${className}` : ''}`
 
   if (lines && lines > 1) {
     return (

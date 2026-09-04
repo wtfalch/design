@@ -88,6 +88,7 @@ export default function Tour({ stops, onDone }: { stops: TourStop[]; onDone: () 
     }
   }, [stop, finish])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `at` is the trigger, not a value the body reads -- the card takes focus again on every step.
   useEffect(() => {
     card.current?.focus()
   }, [at])
@@ -129,6 +130,7 @@ export default function Tour({ stops, onDone }: { stops: TourStop[]; onDone: () 
         ref={card}
         className="tour-card"
         style={style}
+        // biome-ignore lint/a11y/useSemanticElements: a <dialog> brings the top layer, ::backdrop and showModal() focus semantics; this is an anchored coach-mark card that positions itself and manages its own focus, so the role is the faithful choice.
         role="dialog"
         aria-modal="true"
         aria-labelledby="tour-title"

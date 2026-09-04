@@ -66,6 +66,7 @@ export default function Illustration({
       /* The file is ours: it comes off disk at build time, not from a model, an
          applet or the network, so there is no untrusted string to sanitise
          here. Anything that ever arrives at runtime must not use this path. */
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: the SVG comes off disk at build time via scripts/build-illustrations.mjs; nothing here arrives from a request.
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   )

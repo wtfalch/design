@@ -33,6 +33,8 @@ const target = readTarget()
    direction that hides work: the missing entry is the one nobody screenshots. */
 ;(window as unknown as { __SPECIMENS__: unknown }).__SPECIMENS__ = manifest()
 
-createRoot(document.getElementById('root')!).render(
+const root = document.getElementById('root')
+if (!root) throw new Error('design.html has no #root to mount into')
+createRoot(root).render(
   <StrictMode>{target ? <Specimen target={target} /> : <Gallery />}</StrictMode>,
 )

@@ -72,6 +72,7 @@ export function Rows({
     return empty ? <div className="set-hint rows-empty">{empty}</div> : null
   }
   return (
+    // biome-ignore lint/a11y/useSemanticElements: valid ARIA on a div; a <ul> brings the browser's list reset and the stylesheet and 204 baselines key on `div.rows`.
     <div className={`rows${look === 'pick' ? ' rows-pick' : ''}`} role="list" aria-label={label}>
       {items}
     </div>
@@ -150,6 +151,7 @@ export function Row({
 
   return (
     <>
+      {/* biome-ignore lint/a11y/useSemanticElements: see `Rows` -- same reason, one level down. */}
       <div className={className} role="listitem">
         {onClick ? (
           <button type="button" className="row-hit" disabled={waiting} onClick={onClick}>

@@ -378,7 +378,11 @@ function PickCard() {
                 2.50 GB · installed
               </div>
             </div>
-            {at === id && <Pill tone="info" inRow>in use</Pill>}
+            {at === id && (
+              <Pill tone="info" inRow>
+                in use
+              </Pill>
+            )}
           </div>
         </Card>
       ))}
@@ -401,16 +405,20 @@ function TimedCallout() {
         </div>
       </div>
       <Row>
-        <Button onPress={() => {
+        <Button
+          onPress={() => {
             setSlow(true)
             setShown(true)
-          }}>
+          }}
+        >
           Show (5s)
         </Button>
-        <Button onPress={() => {
+        <Button
+          onPress={() => {
             setSlow(false)
             setShown(true)
-          }}>
+          }}
+        >
           Show (12s)
         </Button>
       </Row>
@@ -547,7 +555,9 @@ export const COMPONENTS: Component[] = [
               name="qwen3:8b"
               pills={
                 <>
-                  <Pill tone="info" inRow>in use</Pill>
+                  <Pill tone="info" inRow>
+                    in use
+                  </Pill>
                   <Pill inRow>thinks</Pill>
                   <Pill inRow>tools</Pill>
                 </>
@@ -563,7 +573,11 @@ export const COMPONENTS: Component[] = [
             />
             <DataRow
               name="nomic-embed-text"
-              pills={<Pill tone="warn" inRow>not a chat model</Pill>}
+              pills={
+                <Pill tone="warn" inRow>
+                  not a chat model
+                </Pill>
+              }
               hint="274 MB · 137M"
               actions={<Button size="sm">Remove</Button>}
             />
@@ -665,7 +679,11 @@ export const COMPONENTS: Component[] = [
               {
                 header: 'Actions',
                 quiet: true,
-                cell: () => <Button tone="danger" size="sm">Remove</Button>,
+                cell: () => (
+                  <Button tone="danger" size="sm">
+                    Remove
+                  </Button>
+                ),
               },
             ]}
             rows={[
@@ -942,9 +960,15 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <Row>
             <Button isDisabled>Default</Button>
-            <Button tone="primary" isDisabled>Primary</Button>
-            <Button tone="ghost" isDisabled>Ghost</Button>
-            <Button tone="danger" isDisabled>Danger</Button>
+            <Button tone="primary" isDisabled>
+              Primary
+            </Button>
+            <Button tone="ghost" isDisabled>
+              Ghost
+            </Button>
+            <Button tone="danger" isDisabled>
+              Danger
+            </Button>
           </Row>
         ),
       },
@@ -953,7 +977,9 @@ export const COMPONENTS: Component[] = [
         note: 'Working, not disabled. On `aria-busy`, so the styling and the screen reader read the same attribute; holds still under prefers-reduced-motion.',
         render: () => (
           <Row>
-            <Button tone="primary" busy>Installing…</Button>
+            <Button tone="primary" busy>
+              Installing…
+            </Button>
             <Button busy>Removing…</Button>
           </Row>
         ),
@@ -966,7 +992,9 @@ export const COMPONENTS: Component[] = [
             <Button size="sm">Small</Button>
             <Button size="md">Medium</Button>
             <Button size="lg">Large</Button>
-            <Button tone="primary" size="lg">Install</Button>
+            <Button tone="primary" size="lg">
+              Install
+            </Button>
           </Row>
         ),
       },
@@ -1133,7 +1161,9 @@ export const COMPONENTS: Component[] = [
             <span className="grow">
               <span className="named">
                 <span className="truncate">qwen3-8-27b-uncensored</span>
-                <Pill tone="info" inRow>in use</Pill>
+                <Pill tone="info" inRow>
+                  in use
+                </Pill>
                 <Pill inRow>thinks</Pill>
                 <Pill inRow>tools</Pill>
               </span>
@@ -1355,7 +1385,9 @@ export const COMPONENTS: Component[] = [
               title="A model to talk to"
               description="The one that answers questions and writes things. Start here if you are only picking one."
             >
-              <Button tone="primary" block>Choose one</Button>
+              <Button tone="primary" block>
+                Choose one
+              </Button>
             </Card>
             <Card
               icon="image"
@@ -1379,13 +1411,17 @@ export const COMPONENTS: Component[] = [
               <span className="grow">
                 ollama<div className="set-hint">v0.33.2 · running</div>
               </span>
-              <Button tone="ghost" size="sm">Remove</Button>
+              <Button tone="ghost" size="sm">
+                Remove
+              </Button>
             </div>
             <div className="set-row">
               <span className="grow">
                 stable-diffusion.cpp<div className="set-hint">not installed</div>
               </span>
-              <Button tone="primary" size="sm">Install</Button>
+              <Button tone="primary" size="sm">
+                Install
+              </Button>
             </div>
           </Card>
         ),

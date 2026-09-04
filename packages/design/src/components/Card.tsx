@@ -67,12 +67,7 @@ export default function Card({
     </div>
   )
 
-  const cls =
-    'card' +
-    (onClick ? ' card-pick' : '') +
-    (selected ? ' card-on' : '') +
-    (tone ? ` card-${tone}` : '') +
-    (className ? ` ${className}` : '')
+  const cls = `card${onClick ? ' card-pick' : ''}${selected ? ' card-on' : ''}${tone ? ` card-${tone}` : ''}${className ? ` ${className}` : ''}`
 
   const body = children && <div className="card-body">{children}</div>
 

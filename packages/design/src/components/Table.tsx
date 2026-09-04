@@ -59,9 +59,9 @@ export default function Table<T>({
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
-            {columns.map((c, i) => (
+            {columns.map((c) => (
               <th
-                key={i}
+                key={c.header}
                 scope="col"
                 style={{ width: c.width, textAlign: c.align === 'end' ? 'right' : undefined }}
               >
@@ -80,7 +80,7 @@ export default function Table<T>({
                 const Cell = i === 0 ? 'th' : 'td'
                 return (
                   <Cell
-                    key={i}
+                    key={c.header}
                     scope={i === 0 ? 'row' : undefined}
                     className={c.align === 'end' ? 'num' : undefined}
                   >

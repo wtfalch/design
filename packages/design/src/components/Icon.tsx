@@ -332,11 +332,11 @@ export default function Icon({
       aria-label={title}
     >
       {title && <title>{title}</title>}
-      {g.d.map((d, i) => (
-        <path key={i} d={d} />
+      {g.d.map((d) => (
+        <path key={d} d={d} />
       ))}
-      {g.dots?.map(([cx, cy, r], i) => (
-        <circle key={i} cx={cx} cy={cy} r={r} />
+      {g.dots?.map(([cx, cy, r]) => (
+        <circle key={`${cx},${cy},${r}`} cx={cx} cy={cy} r={r} />
       ))}
     </svg>
   )

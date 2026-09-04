@@ -134,10 +134,10 @@ function aligned(mark: [number, number][]): [number, number][] {
 
 function toPath(points: [number, number][], close: boolean): string {
   const body = points.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join('')
-  return close ? body + 'Z' : body
+  return close ? `${body}Z` : body
 }
 
-const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
 
 /* 180 ms, from 520: William asked for much faster. It is the time the eye
    needs to see it happen, not a beat to admire. */
@@ -182,12 +182,12 @@ export default function Brand({
     ring.current = aligned(pts)
   }, [])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `t` is the starting point of a run, read once when `hover` flips -- listing it would restart the morph on every frame it sets.
   useEffect(() => {
     if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches)
       return
     const from = t
     const to = hover ? 1 : 0
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (from === to) return
     const started = performance.now()
     const step = (now: number) => {
@@ -197,13 +197,18 @@ export default function Brand({
     }
     frame.current = requestAnimationFrame(step)
     return () => cancelAnimationFrame(frame.current)
-    // `t` is the starting point of a run, read once when `hover` flips.
   }, [hover])
 
-  const morphing = t > 0 && mark.current
-  const d = morphing
+  /* Bound once, narrowed once. `mark.current` is set by the layout effect
+     above and `t > 0` only after that, so inside the morph it is never
+     undefined -- but TypeScript cannot carry that across a `&&`, and a `!` is
+     the thing the linter rightly refuses. A named binding says the same
+     thing without asserting it. */
+  const points = t > 0 ? mark.current : null
+  const morphing = points !== null
+  const d = points
     ? toPath(
-        mark.current!.map(([x, y], i) => [
+        points.map(([x, y], i) => [
           x + (ring.current[i][0] - x) * t,
           y + (ring.current[i][1] - y) * t,
         ]),
