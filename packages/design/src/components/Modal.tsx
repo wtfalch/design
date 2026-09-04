@@ -24,13 +24,14 @@
  * answering by accident.
  */
 
-import { useCallback, useRef } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useId, useRef } from 'react'
+import { Modal as AriaModal, Dialog, Heading, ModalOverlay } from 'react-aria-components'
+
+import Button from './Button'
 import Icon from './Icon'
 
 /* The trap is the same obligation wherever it applies, and the studio needs it
    without being shaped like this, so it lives in a hook rather than here. */
-import { useTrapFocus } from '../hooks/useTrapFocus'
 
 export default function Modal({
   title,
@@ -77,58 +78,94 @@ export default function Modal({
    *  today's behaviour for the workspaces; `Dialog` turns it off. */
   dismissOnScrim?: boolean
   /** A question answers itself with its own buttons; a ✕ beside them is a third
-   *  answer that means nothing. Workspaces keep it. */
+   *  answer that means nothing. `Dialog` turns it off. */
   closeButton?: boolean
-  /** When the window titles itself inside `children` rather than using
-   *  `title`. */
+  /** The id of whatever names this window, when it is not `title`. */
   labelledBy?: string
 }) {
-  const box = useRef<HTMLDivElement>(null)
-  const headingId = useRef(`modal-${Math.random().toString(36).slice(2, 8)}`)
+  const headingId = useId()
+  const canClose = Boolean(onClose) && !closeDisabled
 
-  const close = useCallback(() => {
-    if (!closeDisabled) onClose?.()
-  }, [closeDisabled, onClose])
+  /* React Aria owns the three things every hand-built modal here got wrong.
 
-  const onKeyDown = useTrapFocus(box, { onEscape: onClose ? close : undefined })
+     `ModalOverlay` is the scrim: portalled, `position: fixed` from `.backdrop`,
+     and it closes on a press outside the box only when `isDismissable` -- so
+     `dismissOnScrim={false}` is a prop rather than a `mousedown` handler
+     checking `e.target === e.currentTarget`. `Modal` is the box. `Dialog` is
+     what makes it one to a screen reader -- `role="dialog"`, `aria-modal`,
+     and everything behind it made inert -- and it moves focus in on open,
+     keeps it in, and puts it back on the control that opened it when it
+     closes. `useTrapFocus` did all of that by hand and only for windows that
+     used it, which is how eight of them shipped without a trap; it stays
+     exported for a window that genuinely is not this shape.
 
-  return createPortal(
-    <div
+     `onClose` absent means the window cannot be dismissed at all: no scrim,
+     no Escape. `closeDisabled` means the same while something is saving. */
+  /* `aria-modal`, set on the element rather than passed as a prop. React Aria
+     hides the rest of the page with `aria-hidden` and does not set it -- and
+     its `filterDOMProps` drops the prop in silence, the same way it dropped
+     `aria-busy` on `Button`. Stated because the old component stated it, and
+     because axe reads it. */
+  const dialogRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    dialogRef.current?.setAttribute('aria-modal', 'true')
+  })
+
+  return (
+    <ModalOverlay
       className="backdrop"
-      onMouseDown={(e) => {
-        if (e.target !== e.currentTarget) return
-        if (dismissOnScrim) close()
+      isOpen
+      isDismissable={canClose && dismissOnScrim}
+      isKeyboardDismissDisabled={!canClose}
+      onOpenChange={(open) => {
+        if (!open && canClose) onClose?.()
       }}
     >
-      <div
-        ref={box}
+      <AriaModal
         className={`modal${className ? ` ${className}` : ''}`}
         style={width ? { width } : undefined}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={labelledBy ?? (title ? headingId.current : undefined)}
-        tabIndex={-1}
-        onKeyDown={onKeyDown}
       >
-        {(title || head || (onClose && closeButton)) && (
-          <header className="modal-head">
-            {title && <strong id={headingId.current}>{title}</strong>}
-            {subtitle}
-            {head}
-            {onClose && closeButton && (
-              <button type="button" className="x" onClick={close} disabled={closeDisabled} aria-label="Close">
-                <Icon name="close" size={16} />
-              </button>
-            )}
-          </header>
-        )}
-        {description && <p className="modal-desc">{description}</p>}
-        <div className={`modal-body${bodyClass ? ` ${bodyClass}` : ''}`}>{children}</div>
-        {footer && (
-          <footer className={`set-actions${footerClass ? ` ${footerClass}` : ''}`}>{footer}</footer>
-        )}
-      </div>
-    </div>,
-    document.body,
+        {/* `Dialog` renders a `<section>` of its own inside the box and moves
+            focus onto it, so it is a layer the stylesheet has to know about:
+            `.modal > .set-actions` stopped matching and the footer grew a
+            border, and Chrome drew its focus ring around the whole window.
+            Named, so those rules can find it. */}
+        <Dialog
+          ref={dialogRef}
+          className="modal-dialog"
+          aria-labelledby={labelledBy ?? (title ? headingId : undefined)}
+        >
+          {(title || head || (onClose && closeButton)) && (
+            <header className="modal-head">
+              {title && (
+                <Heading slot="title" id={headingId} level={2}>
+                  <strong>{title}</strong>
+                </Heading>
+              )}
+              {subtitle}
+              {head}
+              {onClose && closeButton && (
+                <Button
+                  iconOnly
+                  className="x"
+                  aria-label="Close"
+                  isDisabled={closeDisabled}
+                  onPress={() => onClose()}
+                >
+                  <Icon name="close" size={16} />
+                </Button>
+              )}
+            </header>
+          )}
+          {description && <p className="modal-desc">{description}</p>}
+          <div className={`modal-body${bodyClass ? ` ${bodyClass}` : ''}`}>{children}</div>
+          {footer && (
+            <footer className={`set-actions${footerClass ? ` ${footerClass}` : ''}`}>
+              {footer}
+            </footer>
+          )}
+        </Dialog>
+      </AriaModal>
+    </ModalOverlay>
   )
 }

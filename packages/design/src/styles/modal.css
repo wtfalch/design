@@ -24,7 +24,25 @@
    activate something that does not do anything. The trap and `aria-modal` are
    what communicate here; the ring belongs on the controls inside. */
 .modal:focus,
-.modal:focus-visible { outline: none; }
+.modal:focus-visible,
+.modal-dialog:focus,
+.modal-dialog:focus-visible { outline: none; }
+
+/* The dialog is a `<section>` React Aria renders inside the box, and it is
+   where focus lands on open. It sits between `.modal` and the head, body and
+   actions, so it has to be the column the box used to be: `.modal-body`
+   scrolls only while it is a flex item of something with a bounded height,
+   and a plain block in between would let long content overflow instead.
+
+   Not `display: contents`, which was the first attempt. An element with no box
+   cannot take focus, so React Aria's initial focus fell through to the first
+   input and Escape -- handled on the section -- stopped closing the window. */
+.modal-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
 
 .modal {
   background: var(--panel);
@@ -109,7 +127,8 @@
    modal's padding, so the buttons sat in a strip of panel with a rule above
    them and nothing around them -- they read as being outside the thing they
    belong to. */
-.modal > .set-actions {
+.modal > .set-actions,
+.modal-dialog > .set-actions {
   margin-top: 0;
   padding: var(--space-2) var(--space-4) var(--space-3);
   border-top: none;

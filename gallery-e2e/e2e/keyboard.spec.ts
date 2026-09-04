@@ -310,3 +310,103 @@ test.describe('Field', () => {
     }
   })
 })
+
+test.describe('Modal', () => {
+  const open = async (page: import('@playwright/test').Page) => {
+    await page.goto(specimenUrl({ c: 'modal', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Open a window' })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('dialog')).toBeVisible()
+    return trigger
+  }
+
+  test('is a dialog to a screen reader, named by its title', async ({ page }) => {
+    await open(page)
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toHaveAttribute('aria-modal', 'true')
+    await expect(dialog, 'named by its heading').toHaveAccessibleName('Model settings')
+  })
+
+  test('focus moves in, and is kept in', async ({ page }) => {
+    await open(page)
+    const inside = () =>
+      page.evaluate(() =>
+        document.querySelector('[role="dialog"]')?.contains(document.activeElement),
+      )
+    expect(await inside(), 'focus lands inside on open').toBe(true)
+
+    /* Tab past the last button and you are on the page behind it, operating
+       controls under the scrim you cannot see. No mouse ever finds that, which
+       is why all eight hand-built modals shipped without a trap. */
+    for (let i = 0; i < 12; i++) {
+      await page.keyboard.press('Tab')
+      expect(await inside(), `focus escaped the dialog on Tab ${i + 1}`).toBe(true)
+    }
+    for (let i = 0; i < 12; i++) {
+      await page.keyboard.press('Shift+Tab')
+      expect(await inside(), `focus escaped the dialog on Shift+Tab ${i + 1}`).toBe(true)
+    }
+  })
+
+  test('Escape closes it, and focus goes back where it came from', async ({ page }) => {
+    const trigger = await open(page)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    /* Not to the top of the document, which makes a keyboard user start the
+       page again. */
+    await expect(trigger).toBeFocused()
+  })
+
+  test('the ✕ closes it', async ({ page }) => {
+    await open(page)
+    await page.getByRole('button', { name: 'Close' }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
+  test('the scrim closes a workspace', async ({ page }) => {
+    await open(page)
+    // Top-left corner of the viewport is scrim, never box.
+    await page.mouse.click(5, 5)
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+})
+
+test.describe('Dialog', () => {
+  test('the scrim decides nothing', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'dialog', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    await page.getByRole('button', { name: 'Ask something' }).click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+
+    /* For "may this applet write to your files", a click that lands on the
+       scrim by accident would be an answer. Escape still works here because
+       this dialog has a safe default (`onCancel`); one without has no Escape
+       either. */
+    await page.mouse.click(5, 5)
+    await expect(page.getByRole('dialog'), 'still open after a scrim click').toBeVisible()
+    /* A press on the scrim of a non-dismissable dialog is handled by React
+       Aria pulling focus back inside -- asynchronously. Escape is read by the
+       dialog, so it has to be sent once focus is back there, and "focus is
+       inside" is the condition to wait on rather than a sleep. */
+    await expect
+      .poll(() =>
+        page.evaluate(() =>
+          document.querySelector('[role="dialog"]')?.contains(document.activeElement),
+        ),
+      )
+      .toBe(true)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+  })
+
+  test('has no ✕ — the answers are the buttons', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'dialog', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    await page.getByRole('button', { name: 'Ask something' }).click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+    await expect(page.getByRole('dialog').getByRole('button', { name: 'Close' })).toHaveCount(0)
+    await expect(page.getByRole('dialog').getByRole('button', { name: 'Allow' })).toBeVisible()
+  })
+})
