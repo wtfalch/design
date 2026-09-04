@@ -58,7 +58,12 @@ const TOKEN_GROUPS: { title: string; match: (k: string) => boolean }[] = [
   },
   {
     title: 'Surface & elevation',
-    match: (k) => /^--(app-bg|app-overlay|app-overlay-opacity|shadow-|scrim)/.test(k),
+    /* `--control` and `--illo-paper` joined the vocabulary in the extraction --
+       the surface every input sits on, and the paper behind an illustration --
+       and sat under "Ungrouped" until 2026-09-05, which is the page saying a
+       token exists and nothing about what kind of thing it is. */
+    match: (k) =>
+      /^--(app-bg|app-overlay|app-overlay-opacity|shadow-|scrim|control|illo-paper)/.test(k),
   },
   { title: 'Typography', match: (k) => /^--(font|text-|line-height|tracking|weight)/.test(k) },
   { title: 'Shape', match: (k) => /^--(radius|border-width)/.test(k) },
@@ -87,7 +92,9 @@ const TOKEN_GROUPS: { title: string; match: (k: string) => boolean }[] = [
  */
 function Demo({ name, value }: { name: string; value: string }) {
   if (
-    /^--(bg|panel|border|text|muted|accent|good|warn|bad|info|on-accent|app-bg|scrim)/.test(name)
+    /^--(bg|panel|border|text|muted|accent|good|warn|bad|info|on-accent|app-bg|scrim|control|illo-paper)/.test(
+      name,
+    )
   ) {
     return <span className="spec-chip" style={{ background: value }} aria-hidden="true" />
   }

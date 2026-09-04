@@ -28,11 +28,29 @@
   animation: tf-toast-in var(--dur-md) var(--ease);
 }
 
+/* The tone is the edge and the mark, in the tone's own colour. It used to be the
+   edge alone, and `info` drew it in `--accent` -- a teal that sits a step from
+   the green `good` uses, so the two toasts read as one tone with two icons.
+   `--info` is the blue every other tone-bearing thing in the system means by
+   the word, and the mark now carries the colour too: three signals -- edge,
+   glyph shape, glyph colour -- and none of them alone. */
+.toast-info { border-left: 2px solid var(--info); }
+
 .toast-good { border-left: 2px solid var(--good); }
+
+.toast-warn { border-left: 2px solid var(--warn); }
 
 .toast-bad { border-left: 2px solid var(--bad); }
 
-.toast-info { border-left: 2px solid var(--accent); }
+.toast-mark { flex: none; }
+
+.toast-info .toast-mark { color: var(--info); }
+
+.toast-good .toast-mark { color: var(--good); }
+
+.toast-warn .toast-mark { color: var(--warn); }
+
+.toast-bad .toast-mark { color: var(--bad); }
 
 /* `data-exiting` is React Aria's: it keeps a toast in the DOM for the length
    of this animation after it is closed, then removes it, which is what the

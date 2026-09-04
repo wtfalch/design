@@ -146,6 +146,7 @@ function ToastDemo() {
     <Row>
       <Button onPress={() => toast('Settings saved')}>Info</Button>
       <Button onPress={() => toast('Model removed', 'good')}>Good</Button>
+      <Button onPress={() => toast('Disk is nearly full', 'warn')}>Warn</Button>
       <Button tone="danger" onPress={() => toast('The download failed', 'bad')}>
         Bad
       </Button>
@@ -342,6 +343,29 @@ function SliderSizes() {
         step={0.5}
         onChange={setV}
         format={f}
+      />
+    </div>
+  )
+}
+
+/* Each holds its own state. They were `checked onChange={() => {}}` -- a
+   controlled switch wired to nothing -- so on this page they could be pressed
+   and would not move, which reads as the component being broken rather than
+   the demo being static. A specimen of a control that applies as it moves has
+   to move. */
+function ToggleSizesDemo() {
+  const [sm, setSm] = useState(true)
+  const [md, setMd] = useState(true)
+  const [lg, setLg] = useState(true)
+  return (
+    <div style={{ maxWidth: 420 }}>
+      <Toggle size="sm" label="Small — in a toolbar or a dense row" checked={sm} onChange={setSm} />
+      <Toggle size="md" label="Medium — the default" checked={md} onChange={setMd} />
+      <Toggle
+        size="lg"
+        label="Large — the only thing on the screen"
+        checked={lg}
+        onChange={setLg}
       />
     </div>
   )
@@ -733,23 +757,7 @@ export const COMPONENTS: Component[] = [
           'The same three names every other control takes. The switch scales with ' +
           'the row — a 30×18 track beside 12px text is a different control from ' +
           'the same track beside 16px text.',
-        render: () => (
-          <div style={{ maxWidth: 420 }}>
-            <Toggle
-              size="sm"
-              label="Small — in a toolbar or a dense row"
-              checked
-              onChange={() => {}}
-            />
-            <Toggle size="md" label="Medium — the default" checked onChange={() => {}} />
-            <Toggle
-              size="lg"
-              label="Large — the only thing on the screen"
-              checked
-              onChange={() => {}}
-            />
-          </div>
-        ),
+        render: () => <ToggleSizesDemo />,
       },
     ],
   },
@@ -909,7 +917,11 @@ export const COMPONENTS: Component[] = [
     variants: [
       {
         name: 'Tones',
-        note: '`role="status"`, except the failing one, which is an `alert` — an alert interrupts a screen reader, right for bad news and rude for “copied”.',
+        note:
+          'Four tones, the same words as `Callout` and `Pill`. `role="status"`, except ' +
+          'the failing one, which is an `alert` — an alert interrupts a screen reader, ' +
+          'right for bad news and rude for “copied”. A warning is news, not a failure, ' +
+          'so it waits its turn too.',
         render: () => (
           <ToastHost>
             <ToastDemo />

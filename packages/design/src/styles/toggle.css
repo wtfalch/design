@@ -156,3 +156,31 @@ input[type='radio']:active:not(:disabled) {
   background: color-mix(in srgb, var(--text) var(--press-ink), var(--control));
   transform: none;
 }
+
+/* The knob under a pointer. `Toggle.tsx` sets `--knob-x` (0..1) on the track
+   while it is dragged and `data-dragging` with it; the knob's `left` follows,
+   with no transition, because a knob that eases towards the thumb is a knob
+   that lags it. `--knob-travel` is the distance it may move: the inner width
+   less the knob and its 2px margin at each end, which is the same arithmetic
+   the `[data-selected]` positions above encode as `100% - 14px` and friends.
+   `pan-y`, so a thumb across the track is a drag and a thumb down the page is
+   still a scroll. The second selector is there to outrank the sized selected
+   positions, which carry one class more than the plain one. */
+.toggle { touch-action: pan-y; --knob-travel: calc(100% - 16px); }
+
+.switch-sm .toggle { --knob-travel: calc(100% - 14px); }
+
+.switch-lg .toggle { --knob-travel: calc(100% - 20px); }
+
+.switch-row .toggle[data-dragging]::after,
+.switch-row[data-selected] .toggle[data-dragging]::after {
+  left: calc(2px + var(--knob-x, 0) * var(--knob-travel));
+  transition: none;
+}
+
+/* Held on the knob itself. React Aria's `data-pressed` never arrives for a
+   press the track kept to itself, so the track says so with `data-held` and the
+   knob widens the same 16px it does under the label's press. */
+.switch-row .toggle[data-held]:not([data-dragging])::after { width: 16px; transition: width var(--dur-fast); }
+
+.switch-row[data-selected] .toggle[data-held]:not([data-dragging])::after { left: calc(100% - 18px); }

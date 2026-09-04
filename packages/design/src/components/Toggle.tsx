@@ -29,7 +29,15 @@
  * `Checkbox`.
  */
 
+import { useRef, useState } from 'react'
 import { Switch } from 'react-aria-components'
+
+/** The knob's diameter per size, as `toggle.css` draws it. The drag needs it
+ *  to turn pixels into a position: the knob travels the track's inner width
+ *  less itself and its 2px of margin at each end. */
+const KNOB = { sm: 10, md: 12, lg: 16 } as const
+/** Under this many pixels a press is a tap, and the label toggles it. */
+const SLOP = 3
 
 export default function Toggle({
   label,
@@ -69,6 +77,35 @@ export default function Toggle({
      plain span, and `toggle.css` reads the state off the row instead of off
      `:checked`. The row is the label either way, which keeps the words as the
      hit area. */
+  /* Dragging the knob.
+
+     React Aria's `Switch` is a press: down and up on the label toggles, and a
+     pointer that wanders in between is still a press. A switch drawn as a
+     track and a knob invites the other gesture -- drag the knob across -- and
+     nothing answered it. So the track handles its own pointer: on down it
+     stops the event before the label's press begins and captures the pointer.
+     Under `SLOP` pixels of movement it is a tap and toggles on release; past
+     it, the knob follows the pointer through `--knob-x` and the side it is on
+     at release is the answer. Either way the click the browser fires afterwards
+     is swallowed, so the label does not toggle it a second time -- and it has
+     to be handled here rather than left to the label, because once the press
+     is stopped at the track a tap on the knob no longer reaches the input by
+     itself (measured, in `keyboard.spec.ts`).
+
+     `onChange` is called once per gesture, or not at all if the knob was put
+     back where it started -- a consumer that saves on change must not see a
+     drag as two saves. The keyboard is untouched: the input is still the
+     switch. */
+  const [knob, setKnob] = useState<number | null>(null)
+  const [held, setHeld] = useState(false)
+  const gesture = useRef<{ id: number; startX: number; from: number; moved: boolean } | null>(null)
+  const swallowClick = useRef(false)
+
+  const position = (track: HTMLSpanElement, g: NonNullable<typeof gesture.current>, x: number) => {
+    const travel = track.clientWidth - KNOB[size] - 4
+    return Math.min(1, Math.max(0, g.from + (x - g.startX) / travel))
+  }
+
   return (
     <Switch
       className={`switch-row switch-${size}`}
@@ -81,7 +118,54 @@ export default function Toggle({
         {hint && <span className="switch-hint">{hint}</span>}
       </span>
       {said && <span className="switch-said mono">{said}</span>}
-      <span className="toggle" aria-hidden="true" />
+      {/* biome-ignore lint/a11y/useKeyWithClickEvents: the track is aria-hidden and takes no focus -- the keyboard operates the input; onClick here only swallows the click a gesture leaves behind */}
+      <span
+        className="toggle"
+        aria-hidden="true"
+        data-held={held || undefined}
+        data-dragging={knob === null ? undefined : true}
+        style={knob === null ? undefined : ({ '--knob-x': knob } as React.CSSProperties)}
+        onPointerDown={(e) => {
+          if (disabled || e.button !== 0) return
+          e.stopPropagation()
+          e.currentTarget.setPointerCapture(e.pointerId)
+          gesture.current = {
+            id: e.pointerId,
+            startX: e.clientX,
+            from: checked ? 1 : 0,
+            moved: false,
+          }
+          setHeld(true)
+        }}
+        onPointerMove={(e) => {
+          const g = gesture.current
+          if (!g || e.pointerId !== g.id) return
+          if (!g.moved && Math.abs(e.clientX - g.startX) < SLOP) return
+          g.moved = true
+          setKnob(position(e.currentTarget, g, e.clientX))
+        }}
+        onPointerUp={(e) => {
+          const g = gesture.current
+          if (!g || e.pointerId !== g.id) return
+          gesture.current = null
+          setHeld(false)
+          setKnob(null)
+          swallowClick.current = true
+          const on = g.moved ? position(e.currentTarget, g, e.clientX) > 0.5 : !checked
+          if (on !== checked) onChange(on)
+        }}
+        onPointerCancel={() => {
+          gesture.current = null
+          setHeld(false)
+          setKnob(null)
+        }}
+        onClick={(e) => {
+          if (!swallowClick.current) return
+          swallowClick.current = false
+          e.preventDefault()
+          e.stopPropagation()
+        }}
+      />
     </Switch>
   )
 }

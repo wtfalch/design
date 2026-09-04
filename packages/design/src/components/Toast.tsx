@@ -31,12 +31,15 @@ import {
 
 export interface Toast {
   text: string
-  tone: 'info' | 'good' | 'bad'
+  /** The same four words `Callout` and `Pill` use. `warn` was missing here
+   *  until 2026-09-05 -- three tones where the rest of the system has four. */
+  tone: 'info' | 'good' | 'warn' | 'bad'
 }
 
 const MARK: Record<Toast['tone'], IconName> = {
   info: 'info',
   good: 'check',
+  warn: 'warning',
   bad: 'error',
 }
 
@@ -110,7 +113,7 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
       <ToastRegion queue={queue} className="toasts">
         {({ toast }) => (
           <AriaToast toast={toast} className={`toast toast-${toast.content.tone}`}>
-            <Icon name={MARK[toast.content.tone]} size={16} />
+            <Icon name={MARK[toast.content.tone]} size={16} className="toast-mark" />
             <ToastContent className="grow">
               <Text slot="title">{toast.content.text}</Text>
             </ToastContent>

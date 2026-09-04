@@ -201,6 +201,11 @@ allowed to, once, explained in the commit.
 - **It renders the real thing.** A page that documents hand-written markup is a
   page that will be copied — that is how tf ended up with five gallery pages and
   no component behind them. When you build a component, point its page at it.
+- **A specimen of a control that moves has to move.** The Sizes toggles were
+  `checked onChange={() => {}}` -- controlled, wired to nothing -- so on the
+  page they could be pressed and would not budge, and the first person to try
+  read the component as broken rather than the demo as static. A demo holds
+  its own state.
 - **A theme that is not tf's is photographed too.** The built-ins are examples,
   and an example proves nothing about whether the vocabulary is wide enough for
   an app that looks nothing like the one it came from. `gallery/src/brand.ts` is

@@ -792,3 +792,80 @@ test.describe('Input', () => {
     await expect(page.locator('.secret .secret-eye').last()).toBeDisabled()
   })
 })
+
+test.describe('Toggle · pointer', () => {
+  const TOGGLE = { c: 'toggle', v: 'Default' }
+  /* The first row, "Enabled", starts on. */
+  const track = (page: import('@playwright/test').Page) =>
+    page.locator('.switch-row').first().locator('.toggle')
+  /* The input's `checked` property. React Aria writes no `aria-checked` on a
+     native checkbox -- the property is the state, and a screen reader reads it
+     as one. */
+  const state = (page: import('@playwright/test').Page) =>
+    page.locator('.switch-row').first().locator('[role=switch]').isChecked()
+
+  async function drag(
+    page: import('@playwright/test').Page,
+    fromX: number,
+    toX: number,
+    back = false,
+  ) {
+    const box = (await track(page).boundingBox()) ?? { x: 0, y: 0, width: 0, height: 0 }
+    const y = box.y + box.height / 2
+    await page.mouse.move(box.x + fromX, y)
+    await page.mouse.down()
+    await page.mouse.move(box.x + toX, y, { steps: 6 })
+    if (back) await page.mouse.move(box.x + fromX, y, { steps: 6 })
+    await page.mouse.up()
+  }
+
+  test('the knob drags across, and a drag toggles exactly once', async ({ page }) => {
+    await page.goto(specimenUrl(TOGGLE, 'system'))
+    await themeApplied(page, 'system')
+    expect(await state(page)).toBe(true)
+    await drag(page, 24, 4)
+    expect(await state(page), 'dragged left: off').toBe(false)
+    await drag(page, 4, 24)
+    expect(await state(page), 'dragged right: on again').toBe(true)
+    /* Once, not twice: a drag must not also fire the label's own click. If it
+       did, the state would flip and flip back and read unchanged here -- so
+       check the intermediate too. */
+    await drag(page, 24, 4)
+    expect(await state(page)).toBe(false)
+  })
+
+  test('a drag that ends where it began changes nothing', async ({ page }) => {
+    await page.goto(specimenUrl(TOGGLE, 'system'))
+    await themeApplied(page, 'system')
+    await drag(page, 24, 4, true)
+    expect(await state(page)).toBe(true)
+  })
+
+  test('a tap on the knob is still a tap', async ({ page }) => {
+    await page.goto(specimenUrl(TOGGLE, 'system'))
+    await themeApplied(page, 'system')
+    await track(page).click()
+    expect(await state(page), 'one tap: off').toBe(false)
+    await track(page).click()
+    expect(await state(page), 'two taps: on').toBe(true)
+  })
+
+  test('the knob follows the pointer while held', async ({ page }) => {
+    await page.goto(specimenUrl(TOGGLE, 'system'))
+    await themeApplied(page, 'system')
+    const box = (await track(page).boundingBox()) ?? { x: 0, y: 0, width: 0, height: 0 }
+    const y = box.y + box.height / 2
+    await page.mouse.move(box.x + 24, y)
+    await page.mouse.down()
+    await page.mouse.move(box.x + 14, y, { steps: 4 })
+    const mid = await track(page).evaluate((el) => ({
+      dragging: el.hasAttribute('data-dragging'),
+      x: Number(el.style.getPropertyValue('--knob-x')),
+    }))
+    expect(mid.dragging).toBe(true)
+    expect(mid.x).toBeGreaterThan(0)
+    expect(mid.x).toBeLessThan(1)
+    await page.mouse.up()
+    expect(await track(page).getAttribute('data-dragging')).toBeNull()
+  })
+})
