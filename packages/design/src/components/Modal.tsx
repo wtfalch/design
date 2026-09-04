@@ -138,7 +138,14 @@ export default function Modal({
           {(title || head || (onClose && closeButton)) && (
             <header className="modal-head">
               {title && (
-                <Heading slot="title" id={headingId} level={2}>
+                /* `Heading` is what React Aria labels the dialog by, and it
+                   renders an `<h2>` -- which the browser gives its own margins
+                   and its own size (17px above and below, 21px type). The old
+                   header was a bare `<strong>` and had neither. `.modal-title`
+                   takes them back off so the `<strong>` inside draws exactly as
+                   it did; without it every window opened with its title
+                   floating in a band twice the height of the head. */
+                <Heading slot="title" id={headingId} level={2} className="modal-title">
                   <strong>{title}</strong>
                 </Heading>
               )}

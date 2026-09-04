@@ -1305,6 +1305,31 @@ export const COMPONENTS: Component[] = [
         ),
       },
       {
+        name: 'Password',
+        note:
+          'An eye that shows what you typed, so a token is not retyped until it ' +
+          'takes. A React Aria toggle: `aria-pressed` says which state it is in, ' +
+          'the label stays "Show password" in both, and the box is still the one ' +
+          "`<input>` -- `Field`'s wiring lands on it as before. Revealed text " +
+          'stops autocorrecting, because a phone keyboard treats a visible field ' +
+          'as prose.',
+        render: () => (
+          <div style={{ display: 'grid', gap: 'var(--space-5)', maxWidth: 400 }}>
+            <Field label="Token" hint="Pasted, usually — which is exactly when you want to see it.">
+              {(f) => <Input {...f} type="password" defaultValue="tf_live_8f3a9c2e1b7d" mono />}
+            </Field>
+            <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+              <Input type="password" size="sm" defaultValue="hunter2" aria-label="Small password" />
+              <Input type="password" defaultValue="hunter2" aria-label="Medium password" />
+              <Input type="password" size="lg" defaultValue="hunter2" aria-label="Large password" />
+            </div>
+            <Field label="Disabled">
+              {(f) => <Input {...f} type="password" defaultValue="hunter2" disabled />}
+            </Field>
+          </div>
+        ),
+      },
+      {
         name: 'The bare control',
         note:
           'What `Field` wraps. On its own only where the surroundings already ' +

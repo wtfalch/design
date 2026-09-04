@@ -52,3 +52,34 @@
 .field-stack { display: grid; gap: var(--space-4); }
 
 .field-row > .field { flex: 1; min-width: 0; }
+
+/* A password with an eye -- `Input type="password"`.
+   A grid rather than `position: absolute`: both children take the one cell, the
+   button is pushed to the end and centred on the cross axis, so it sits inside
+   the input's right edge at every `size` without anybody knowing the input's
+   height. The eye is an icon-only button, and `.icon-btn` would make it the
+   picker's 34px tile -- taller than a small input -- so it is sized here from
+   its glyph instead: 14, 16 or 18px of icon (set in `Input.tsx` from `size`)
+   plus square padding, 22 / 24 / 34 tall against boxes of 27 / 36 / 50. The
+   input keeps room for it on the right: the eye's width plus the gap to the
+   edge and the same again before the text, on the scale so a density change
+   moves the room with the button. */
+.secret { display: grid; align-items: center; }
+
+.secret > input,
+.secret > .secret-eye { grid-area: 1 / 1; }
+
+.secret > input { padding-right: var(--space-8); }
+
+/* No `--space-12` on the scale; two steps that are, added. */
+.secret-lg > input { padding-right: calc(var(--space-10) + var(--space-1)); }
+
+.secret > .secret-eye {
+  justify-self: end;
+  margin-right: var(--space-1);
+  width: auto; height: auto;
+  padding: var(--space-1);
+  opacity: 1;
+}
+
+.secret-lg > .secret-eye { padding: var(--space-2); }

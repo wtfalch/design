@@ -113,6 +113,10 @@
   },
   {
     "c": "input",
+    "v": "Password"
+  },
+  {
+    "c": "input",
     "v": "The bare control"
   },
   {

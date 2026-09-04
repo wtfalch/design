@@ -46,6 +46,9 @@ export const ICON_NAMES = [
   // `sees` and `draws` were rejected as names -- nobody could tell which
   // way the picture went. An eye takes one in, a palette puts one out.
   'eye',
+  // The same eye, struck through: the other half of a show/hide toggle.
+  // Not for a capability tag -- a model that cannot see has no tag.
+  'eye-off',
   'palette',
   'stars',
   'wrench',

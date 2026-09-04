@@ -89,6 +89,13 @@
 
 .modal-head strong { font-size: var(--text-base); }
 
+/* The `<h2>` React Aria puts around the title, reduced to a wrapper. A heading
+   element carries the browser's margins and type size, and this header was
+   laid out for the bare `<strong>` it used to hold -- 86px tall with them,
+   41px without, on a head whose padding is 12 over 8. `font: inherit` so the
+   `<strong>` rule above is the one that sets the size. */
+.modal-title { margin: 0; font: inherit; }
+
 /* Under the title, on the header's padding rather than the body's, so it reads
    as part of the heading rather than as the first line of content. */
 .modal-desc {
@@ -101,6 +108,24 @@
 }
 
 .modal-body { padding: var(--space-2) var(--space-4) var(--space-3); overflow-y: auto; }
+
+/* The close cross. Its rule stayed behind in tf's stylesheet when the split
+   ran -- a one-letter class name, and the scan that finds classes in source
+   dropped it -- so in the package the cross had only `.icon-btn`, which is the
+   picker's 34px square tile with a panel behind it. The head is laid out for
+   a 16px glyph with 4px of padding, and grew from 44 to 54. Later in the
+   cascade than `.icon-btn`, so these win; the width and height are said out
+   loud because the tile rule sets them, and `opacity` because the tile dims
+   itself until hovered and the way out of a window should not be faint. */
+.x {
+  width: auto; height: auto;
+  background: none; border: none; color: var(--muted); opacity: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  line-height: 1; padding: var(--space-1);
+  border-radius: var(--radius-sm);
+}
+
+.x:hover { color: var(--text); border-color: transparent; background: var(--panel-2); }
 
 /* Always the top right corner, whatever else is in the header.
    Nothing used to push it there: `.modal-head` is a flex row and every caller
@@ -134,4 +159,33 @@
   border-top: none;
 }
 
+/* Moved here from `base.css` on 2026-09-05, and the position is the point.
+   The extractor filed `.dialog` under base because more than one component
+   named the class, and base is concatenated first -- so this single-class rule
+   came BEFORE `.modal { width: min(760px, 100%) }` instead of after it, as it
+   had for as long as the two existed. Equal specificity, later wins: every
+   dialog opened 760 wide, the exact "wide grey band" the comment below was
+   written to end. No baseline caught it because the suite photographed the
+   button that opens a dialog and never the dialog. `windows.spec.ts` does now. */
+/* A question is not a workspace.
+   `.modal` is sized for Settings -- 760px wide and pinned near the top of the
+   screen, because eleven panes of preferences need the room and want to start
+   where the eye already is. A two-button question inherited all of that and
+   became a wide grey band across the top of the page: the shape said "here is
+   somewhere to work", the content said "answer this and go". */
+.dialog {
+  width: min(440px, 100%);
+  /* `auto` on the block axis beats the backdrop's `flex-start`, so the short
+     one centres and the tall one still starts at the top. */
+  margin-block: auto;
+  box-shadow: var(--shadow-3);
+}
+
 .dialog .modal-body { color: var(--muted); }
+
+/* The tone is on the box, not only on the button. A destructive question that
+   looks like every other question is one the reader skims.
+   `Dialog` writes this as `dialog-${tone}`, which a literal scan of the source
+   never sees -- so the rule was left behind in tf's stylesheet by the split and
+   the package shipped a `tone="bad"` prop that changed nothing. */
+.dialog-bad { border-color: color-mix(in oklab, var(--bad) 45%, var(--border)); }

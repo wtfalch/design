@@ -16,6 +16,11 @@
  * copy going stale is a failure rather than a slow drift.
  *
  *   node scripts/manifest.mjs [http://127.0.0.1:5199]
+ *
+ * It reads a served gallery and starts none: `pnpm manifest` runs it in the
+ * Playwright container behind `serve.mjs`, the way the suite's own `webServer`
+ * would. Run bare against nothing it dies on a refused connection, which it did
+ * the first time a variant was added after the split.
  */
 import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'

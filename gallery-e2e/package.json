@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "echo 'visual suite runs via pnpm e2e (needs a gallery server)' ",
     "a11y:record": "bash ../tools/e2e-docker.sh node scripts/a11y-known.mjs",
-    "manifest": "bash ../tools/e2e-docker.sh node scripts/manifest.mjs"
+    "manifest": "bash ../tools/e2e-docker.sh bash -c 'node scripts/serve.mjs & until curl -sf -o /dev/null http://127.0.0.1:${GALLERY_PORT:-5199}/design.html; do sleep 0.2; done; node scripts/manifest.mjs'"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

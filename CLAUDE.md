@@ -62,6 +62,16 @@ allowed to, once, explained in the commit.
   other two non-determinism sources found by running it: a countdown drawn off
   the wall clock, and a theme applied in an effect so a scan read the previous
   palette.
+- **A window is outside the stage.** `visual.spec.ts` photographs each
+  specimen's stage, and a modal is portalled out of it — so for `Modal` and
+  `Dialog` the suite had a picture of the button and none of the window. Three
+  regressions lived there unphotographed until a person opened one: React
+  Aria's `Heading` wrapped every title in an `<h2>` with the browser's margins
+  (the head went 44 → 86), the split filed `.dialog` ahead of `.modal` so every
+  dialog opened 760 wide, and the close cross lost its one-letter class rule to
+  the split and fell back to the picker's 34px tile. `windows.spec.ts` opens
+  each window, photographs the viewport and measures the head. A specimen that
+  portals needs a test of its own; the stage cannot see it.
 - **`a11y-known.json` records where things stand**, and fails on anything new
   *and* on any entry that stops being true.
 - **No `devices[...]` descriptor in the Playwright config.** It spoofs a

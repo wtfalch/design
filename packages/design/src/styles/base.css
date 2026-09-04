@@ -750,20 +750,6 @@ input:active, textarea:active, select:active { transform: none; }
    pages instead of sliding when Back appears. */
 .first-run-actions { align-items: center; }
 
-/* A question is not a workspace.
-   `.modal` is sized for Settings -- 760px wide and pinned near the top of the
-   screen, because eleven panes of preferences need the room and want to start
-   where the eye already is. A two-button question inherited all of that and
-   became a wide grey band across the top of the page: the shape said "here is
-   somewhere to work", the content said "answer this and go". */
-.dialog {
-  width: min(440px, 100%);
-  /* `auto` on the block axis beats the backdrop's `flex-start`, so the short
-     one centres and the tall one still starts at the top. */
-  margin-block: auto;
-  box-shadow: var(--shadow-3);
-}
-
 @keyframes listening-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 
 /* table ---------------------------------------------------------------- */

@@ -728,3 +728,67 @@ test.describe('Rows and Table', () => {
     await expect(table.locator('tbody th[scope="row"]').first()).toBeVisible()
   })
 })
+
+test.describe('Input', () => {
+  const PASSWORD = { c: 'input', v: 'Password' }
+
+  test('the eye on a password reveals it, and announces as a toggle', async ({ page }) => {
+    await page.goto(specimenUrl(PASSWORD, 'system'))
+    await themeApplied(page, 'system')
+    const input = page.locator('.secret input').first()
+    const eye = page.locator('.secret .secret-eye').first()
+
+    await expect(input).toHaveAttribute('type', 'password')
+    await expect(eye).toHaveAttribute('aria-pressed', 'false')
+    await expect(eye).toHaveAccessibleName('Show password')
+
+    /* Tab from the box lands on its eye: the toggle is in the tab order right
+       after the thing it toggles, not at the end of the form. */
+    await input.focus()
+    await page.keyboard.press('Tab')
+    await expect(eye).toBeFocused()
+
+    await page.keyboard.press('Space')
+    await expect(input).toHaveAttribute('type', 'text')
+    await expect(eye).toHaveAttribute('aria-pressed', 'true')
+    /* The label does not flip. A toggle that reads "Hide password, pressed"
+       says the same thing twice, one of them backwards. */
+    await expect(eye).toHaveAccessibleName('Show password')
+    /* Switching `type` must not remount the box and lose what was in it. */
+    await expect(input).toHaveValue('tf_live_8f3a9c2e1b7d')
+
+    await page.keyboard.press('Space')
+    await expect(input).toHaveAttribute('type', 'password')
+  })
+
+  test('the eye sits inside the box, at every size', async ({ page }) => {
+    await page.goto(specimenUrl(PASSWORD, 'system'))
+    await themeApplied(page, 'system')
+    const boxes = await page.locator('.secret').evaluateAll((els) =>
+      els.map((el) => {
+        const input = el.querySelector('input')?.getBoundingClientRect()
+        const eye = el.querySelector('.secret-eye')?.getBoundingClientRect()
+        if (!input || !eye)
+          return { size: el.className, inside: false, centred: false, fits: false }
+        return {
+          size: el.className,
+          inside: eye.right < input.right && eye.left > input.left,
+          centred: Math.abs(eye.top + eye.height / 2 - (input.top + input.height / 2)) <= 1,
+          fits: eye.height <= input.height,
+        }
+      }),
+    )
+    expect(boxes.length).toBeGreaterThanOrEqual(4)
+    for (const b of boxes) {
+      expect(b.inside, `${b.size}: the eye is not inside the box`).toBe(true)
+      expect(b.centred, `${b.size}: the eye is off the box's centre line`).toBe(true)
+      expect(b.fits, `${b.size}: the eye is taller than the box`).toBe(true)
+    }
+  })
+
+  test('a disabled password has a disabled eye', async ({ page }) => {
+    await page.goto(specimenUrl(PASSWORD, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.locator('.secret .secret-eye').last()).toBeDisabled()
+  })
+})

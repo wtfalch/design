@@ -19,8 +19,28 @@
  *
  * `type="text"` is the default, the way `type="button"` is `Button`'s: stated
  * so it is in the signature rather than inherited from the browser.
+ *
+ * **`type="password"` grows an eye.** A password field that cannot be read back
+ * is a field you retype until it takes; the toggle is the one control every
+ * sign-in form has grown and every hand-written one here lacked. The box is
+ * still the same `<input>` -- `Field`'s wiring, the element rules, the ref all
+ * land on it -- wrapped in a grid so the button can sit inside its right edge
+ * without absolute positioning against a height that changes with `size`.
+ *
+ * The eye is a React Aria `ToggleButton`, not `Button`: a show/hide is a
+ * pressed state, and `aria-pressed` is what a toggle announces. It is not
+ * passed as a prop because `filterDOMProps` would drop it in silence -- the
+ * same trap `aria-busy` fell into on `Button` -- and `ToggleButton` writes it
+ * itself. The label stays "Show password" in both states, as a toggle's should:
+ * a label that flips to "Hide password" *and* reads as pressed says the same
+ * thing twice, once of them backwards. Revealed text is also told to stop
+ * autocorrecting and capitalising, because a phone keyboard treats a visible
+ * field as prose and rewrites the password it was asked to show.
  */
-import { forwardRef } from 'react'
+import { forwardRef, useState } from 'react'
+import { ToggleButton } from 'react-aria-components'
+
+import Icon from './Icon'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'className'> {
@@ -49,7 +69,39 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
     .filter(Boolean)
     .join(' ')
 
-  return <input ref={ref} type={type} className={classes || undefined} {...rest} />
+  /* State lives here even for a text input, so switching a field's `type` at
+     run time does not remount it -- a hook count that changes with a prop is a
+     React error, and a remount would drop the caret. */
+  const [shown, setShown] = useState(false)
+
+  if (type !== 'password') {
+    return <input ref={ref} type={type} className={classes || undefined} {...rest} />
+  }
+
+  return (
+    <span className={`secret secret-${size}${block ? ' block' : ''}`}>
+      <input
+        ref={ref}
+        type={shown ? 'text' : 'password'}
+        className={classes || undefined}
+        /* Only while revealed: as a password these are moot, and setting them
+           on a password field makes some browsers stop offering to fill it. */
+        autoCapitalize={shown ? 'off' : undefined}
+        autoCorrect={shown ? 'off' : undefined}
+        spellCheck={shown ? false : undefined}
+        {...rest}
+      />
+      <ToggleButton
+        className={`icon-btn ghost secret-eye${size === 'md' ? '' : ` size-${size}`}`}
+        aria-label="Show password"
+        isSelected={shown}
+        onChange={setShown}
+        isDisabled={rest.disabled}
+      >
+        <Icon name={shown ? 'eye-off' : 'eye'} size={{ sm: 14, md: 16, lg: 18 }[size]} />
+      </ToggleButton>
+    </span>
+  )
 })
 
 export default Input
