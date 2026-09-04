@@ -40,6 +40,11 @@ React Aria" and "biome moved a quote". **The exemption comes off one component
 at a time, as each is migrated**, which is also when the structural findings
 stop existing.
 
+**A migrated component comes back under the linter**, as a second `overrides`
+entry listing it by name. `Button` is the first. That list growing is the
+measure of phase 5, and it is a list rather than a wildcard so adding to it is a
+deliberate line in a diff.
+
 `illustrations.ts` is generated and stays exempt.
 
 Everything else — the token contract, the tools, the tests, the scripts — is

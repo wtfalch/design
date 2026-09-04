@@ -1,4 +1,5 @@
 import { type ReactNode, useState } from 'react'
+import Button from './Button'
 import Field from './Field'
 
 /**
@@ -110,39 +111,39 @@ export function DangerAction({
                 />
               )}
             </Field>
-            <button type="button"
-              className="danger"
-              disabled={disabled || busy || typed.trim() !== match}
-              onClick={onConfirm}
+            <Button
+              tone="danger"
+              isDisabled={disabled || busy || typed.trim() !== match}
+              onPress={onConfirm}
             >
               {busy ? (busyLabel ?? '…') : label}
-            </button>
+            </Button>
           </div>
         </>
       ) : confirm === 'none' ? (
         <div className="row danger-row">
-          <button type="button"
-            className={tone === 'plain' ? 'primary' : 'danger'}
-            disabled={disabled || busy}
-            onClick={onConfirm}
+          <Button
+            tone={tone === 'plain' ? 'primary' : 'danger'}
+            isDisabled={disabled || busy}
+            onPress={onConfirm}
           >
             {busy ? (busyLabel ?? '…') : label}
-          </button>
+          </Button>
         </div>
       ) : asking ? (
         <div className="row danger-row">
-          <button type="button" className="danger" disabled={disabled || busy} onClick={onConfirm}>
+          <Button tone="danger" isDisabled={disabled || busy} onPress={onConfirm}>
             {busy ? (busyLabel ?? '…') : label}
-          </button>
-          <button type="button" disabled={disabled || busy} onClick={() => setAsking(false)}>
+          </Button>
+          <Button isDisabled={disabled || busy} onPress={() => setAsking(false)}>
             Cancel
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="row danger-row">
-          <button type="button" className="danger" disabled={disabled || busy} onClick={() => setAsking(true)}>
+          <Button tone="danger" isDisabled={disabled || busy} onPress={() => setAsking(true)}>
             {label}
-          </button>
+          </Button>
         </div>
       )}
     </div>

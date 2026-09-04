@@ -25,6 +25,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import Button from './Button'
 import { markTourSeen } from './tourMarker'
 
 export interface TourStop {
@@ -142,12 +143,12 @@ export default function Tour({ stops, onDone }: { stops: TourStop[]; onDone: () 
             {at + 1} of {live.length}
           </span>
           <span className="grow" />
-          <button type="button" className="ghost size-sm" onClick={finish}>
+          <Button tone="ghost" size="sm" onPress={finish}>
             Skip
-          </button>
-          <button type="button" className="primary size-sm" onClick={next}>
+          </Button>
+          <Button tone="primary" size="sm" onPress={next}>
             {at + 1 < live.length ? 'Next' : 'Done'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>,

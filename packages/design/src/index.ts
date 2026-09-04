@@ -18,6 +18,8 @@
  */
 
 export { default as Brand } from './components/Brand'
+export { default as Button } from './components/Button'
+export type { Props as ButtonProps } from './components/Button'
 export { default as Callout } from './components/Callout'
 export { default as Card } from './components/Card'
 export { default as Checkbox } from './components/Checkbox'

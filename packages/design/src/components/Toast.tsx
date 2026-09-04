@@ -17,7 +17,10 @@
  */
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+
 import { createPortal } from 'react-dom'
+
+import Button from './Button'
 
 import Icon, { type IconName } from './Icon'
 
@@ -95,9 +98,9 @@ function Toasted({ toast, onGone }: { toast: Toast; onGone: () => void }) {
     >
       <Icon name={MARK[toast.tone]} size={16} />
       <span className="grow">{toast.text}</span>
-      <button type="button" className="ghost size-sm" aria-label="Dismiss" onClick={onGone}>
+      <Button tone="ghost" size="sm" aria-label="Dismiss" onPress={onGone}>
         <Icon name="close" size={14} />
-      </button>
+      </Button>
     </div>
   )
 }

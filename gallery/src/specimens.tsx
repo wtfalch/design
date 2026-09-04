@@ -21,6 +21,7 @@ import { useState } from 'react'
 
 import {
   Brand,
+  Button,
   Callout,
   Card,
   Checkbox,
@@ -140,11 +141,11 @@ function ToastDemo() {
   const toast = useToast()
   return (
     <Row>
-      <button type="button" onClick={() => toast('Settings saved')}>Info</button>
-      <button type="button" onClick={() => toast('Model removed', 'good')}>Good</button>
-      <button type="button" className="danger" onClick={() => toast('The download failed', 'bad')}>
+      <Button onPress={() => toast('Settings saved')}>Info</Button>
+      <Button onPress={() => toast('Model removed', 'good')}>Good</Button>
+      <Button tone="danger" onPress={() => toast('The download failed', 'bad')}>
         Bad
-      </button>
+      </Button>
     </Row>
   )
 }
@@ -153,19 +154,19 @@ function DialogDemo() {
   const [open, setOpen] = useState(false)
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)}>Ask something</button>
+      <Button onPress={() => setOpen(true)}>Ask something</Button>
       {open && (
         <Dialog
           title="Write to this folder?"
           onCancel={() => setOpen(false)}
           actions={
             <>
-              <button type="button" className="ghost" onClick={() => setOpen(false)}>
+              <Button tone="ghost" onPress={() => setOpen(false)}>
                 Not now
-              </button>
-              <button type="button" className="primary" onClick={() => setOpen(false)}>
+              </Button>
+              <Button tone="primary" onPress={() => setOpen(false)}>
                 Allow
-              </button>
+              </Button>
             </>
           }
         >
@@ -198,7 +199,7 @@ function ModalDemo() {
   const [open, setOpen] = useState(false)
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)}>Open a window</button>
+      <Button onPress={() => setOpen(true)}>Open a window</Button>
       {open && (
         <Modal
           title="Model settings"
@@ -207,12 +208,12 @@ function ModalDemo() {
           width="min(520px, 100%)"
           footer={
             <>
-              <button type="button" className="ghost" onClick={() => setOpen(false)}>
+              <Button tone="ghost" onPress={() => setOpen(false)}>
                 Cancel
-              </button>
-              <button type="button" className="primary" onClick={() => setOpen(false)}>
+              </Button>
+              <Button tone="primary" onPress={() => setOpen(false)}>
                 Save
-              </button>
+              </Button>
             </>
           }
         >
@@ -397,22 +398,18 @@ function TimedCallout() {
         </div>
       </div>
       <Row>
-        <button type="button"
-          onClick={() => {
+        <Button onPress={() => {
             setSlow(true)
             setShown(true)
-          }}
-        >
+          }}>
           Show (5s)
-        </button>
-        <button type="button"
-          onClick={() => {
+        </Button>
+        <Button onPress={() => {
             setSlow(false)
             setShown(true)
-          }}
-        >
+          }}>
           Show (12s)
-        </button>
+        </Button>
       </Row>
     </div>
   )
@@ -518,7 +515,7 @@ export const COMPONENTS: Component[] = [
           'window-sized dashed rectangle reads as a layout that failed — and the ' +
           'box centres itself in whatever it was dropped into.',
         render: () => (
-          <Empty illustration="uhm" action={<button type="button" className="primary">New applet</button>}>
+          <Empty illustration="uhm" action={<Button tone="primary">New applet</Button>}>
             Nothing on this view yet. An applet is a small thing a model writes for you and keeps
             here.
           </Empty>
@@ -553,19 +550,19 @@ export const COMPONENTS: Component[] = [
                 </>
               }
               hint="10.62 GB · 27.3B · q4_K_M"
-              actions={<button type="button" className="size-sm">Remove</button>}
+              actions={<Button size="sm">Remove</Button>}
             />
             <DataRow
               name="qwen2.5vl:3b"
               pills={<span className="pill row-pill">reads images</span>}
               hint="3.2 GB · 3.8B · q4_K_M"
-              actions={<button type="button" className="size-sm">Remove</button>}
+              actions={<Button size="sm">Remove</Button>}
             />
             <DataRow
               name="nomic-embed-text"
               pills={<span className="pill pill-warn row-pill">not a chat model</span>}
               hint="274 MB · 137M"
-              actions={<button type="button" className="size-sm">Remove</button>}
+              actions={<Button size="sm">Remove</Button>}
             />
           </Rows>
         ),
@@ -600,7 +597,7 @@ export const COMPONENTS: Component[] = [
                   </>
                 }
                 hint="24.1 GB"
-                actions={<button type="button" className="size-sm">Remove</button>}
+                actions={<Button size="sm">Remove</Button>}
               />
             </Rows>
           </div>
@@ -665,7 +662,7 @@ export const COMPONENTS: Component[] = [
               {
                 header: 'Actions',
                 quiet: true,
-                cell: () => <button type="button" className="danger size-sm">Remove</button>,
+                cell: () => <Button tone="danger" size="sm">Remove</Button>,
               },
             ]}
             rows={[
@@ -929,10 +926,10 @@ export const COMPONENTS: Component[] = [
         name: 'Kinds',
         render: () => (
           <Row>
-            <button>Default</button>
-            <button type="button" className="primary">Primary</button>
-            <button type="button" className="ghost">Ghost</button>
-            <button type="button" className="danger">Danger</button>
+            <Button>Default</Button>
+            <Button tone="primary">Primary</Button>
+            <Button tone="ghost">Ghost</Button>
+            <Button tone="danger">Danger</Button>
           </Row>
         ),
       },
@@ -941,16 +938,10 @@ export const COMPONENTS: Component[] = [
         note: 'A disabled primary gives up its fill. At 45% opacity it was still a coloured fill — the one button you cannot press was the loudest thing on the panel.',
         render: () => (
           <Row>
-            <button type="button" disabled>Default</button>
-            <button type="button" className="primary" disabled>
-              Primary
-            </button>
-            <button type="button" className="ghost" disabled>
-              Ghost
-            </button>
-            <button type="button" className="danger" disabled>
-              Danger
-            </button>
+            <Button isDisabled>Default</Button>
+            <Button tone="primary" isDisabled>Primary</Button>
+            <Button tone="ghost" isDisabled>Ghost</Button>
+            <Button tone="danger" isDisabled>Danger</Button>
           </Row>
         ),
       },
@@ -959,10 +950,8 @@ export const COMPONENTS: Component[] = [
         note: 'Working, not disabled. On `aria-busy`, so the styling and the screen reader read the same attribute; holds still under prefers-reduced-motion.',
         render: () => (
           <Row>
-            <button type="button" className="primary" aria-busy="true">
-              Installing…
-            </button>
-            <button type="button" aria-busy="true">Removing…</button>
+            <Button tone="primary" busy>Installing…</Button>
+            <Button busy>Removing…</Button>
           </Row>
         ),
       },
@@ -971,10 +960,10 @@ export const COMPONENTS: Component[] = [
         note: 'Asked for, not inherited. Four sizes existed before and every one came from a descendant selector — a button’s size was a fact about where it had been put.',
         render: () => (
           <Row>
-            <button type="button" className="size-sm">Small</button>
-            <button type="button" className="size-md">Medium</button>
-            <button type="button" className="size-lg">Large</button>
-            <button type="button" className="primary size-lg">Install</button>
+            <Button size="sm">Small</Button>
+            <Button size="md">Medium</Button>
+            <Button size="lg">Large</Button>
+            <Button tone="primary" size="lg">Install</Button>
           </Row>
         ),
       },
@@ -985,7 +974,7 @@ export const COMPONENTS: Component[] = [
           <div style={{ display: 'grid', gap: 10 }}>
             {(['sm', 'md', 'lg'] as const).map((z) => (
               <Row key={z}>
-                <button type="button" className={`size-${z}`}>Button</button>
+                <Button size={z}>Button</Button>
                 <Select aria-label="Model" size={z} defaultValue="a">
                   <option value="a">Select</option>
                   <option value="b">Another</option>
@@ -1001,21 +990,21 @@ export const COMPONENTS: Component[] = [
         note: 'Every one carries an aria-label — an icon-only button without a name is the first anti-pattern on the list.',
         render: () => (
           <Row>
-            <button type="button" className="icon-btn" aria-label="Settings">
+            <Button iconOnly aria-label="Settings">
               <Icon name="settings" />
-            </button>
-            <button type="button" className="icon-btn" aria-label="Chat">
+            </Button>
+            <Button iconOnly aria-label="Chat">
               <Icon name="chat" />
-            </button>
-            <button type="button" className="icon-btn" aria-label="Refresh">
+            </Button>
+            <Button iconOnly aria-label="Refresh">
               <Icon name="refresh" />
-            </button>
-            <button type="button" className="icon-btn" aria-label="Minimise">
+            </Button>
+            <Button iconOnly aria-label="Minimise">
               <Icon name="minimize" />
-            </button>
-            <button type="button" className="icon-btn" aria-label="Studio">
+            </Button>
+            <Button iconOnly aria-label="Studio">
               <Icon name="code" />
-            </button>
+            </Button>
           </Row>
         ),
       },
@@ -1363,14 +1352,14 @@ export const COMPONENTS: Component[] = [
               title="A model to talk to"
               description="The one that answers questions and writes things. Start here if you are only picking one."
             >
-              <button type="button" className="primary block">Choose one</button>
+              <Button tone="primary" block>Choose one</Button>
             </Card>
             <Card
               icon="image"
               title="A model that draws"
               description="Makes pictures from a description. Bigger, slower, and not needed for anything else to work."
             >
-              <button type="button" className="block">Choose one</button>
+              <Button block>Choose one</Button>
             </Card>
           </div>
         ),
@@ -1387,13 +1376,13 @@ export const COMPONENTS: Component[] = [
               <span className="grow">
                 ollama<div className="set-hint">v0.33.2 · running</div>
               </span>
-              <button type="button" className="ghost size-sm">Remove</button>
+              <Button tone="ghost" size="sm">Remove</Button>
             </div>
             <div className="set-row">
               <span className="grow">
                 stable-diffusion.cpp<div className="set-hint">not installed</div>
               </span>
-              <button type="button" className="primary size-sm">Install</button>
+              <Button tone="primary" size="sm">Install</Button>
             </div>
           </Card>
         ),
@@ -1401,7 +1390,7 @@ export const COMPONENTS: Component[] = [
       {
         name: 'Selectable',
         note:
-          '`onClick` makes the card a `<button>`, so it gets a keyboard and a ' +
+          '`onClick` makes the card a `<Button>`, so it gets a keyboard and a ' +
           'focus ring instead of a hover state and nothing else.',
         render: () => <PickCard />,
       },
@@ -1419,7 +1408,7 @@ export const COMPONENTS: Component[] = [
                   Hugging Face answered 404
                 </div>
               </div>
-              <button type="button" className="ghost">Retry</button>
+              <Button tone="ghost">Retry</Button>
             </div>
           </Card>
         ),
@@ -1465,7 +1454,7 @@ export const COMPONENTS: Component[] = [
                   1,204,993 downloads · 412 likes · apache-2.0
                 </div>
               </div>
-              <button>Choose quant</button>
+              <Button>Choose quant</Button>
             </div>
           </Card>
         ),
@@ -1508,9 +1497,9 @@ export const COMPONENTS: Component[] = [
             </div>
             <footer className="set-actions first-run-actions">
               <span className="grow" />
-              <button type="button" className="primary" disabled>
+              <Button tone="primary" isDisabled>
                 Next
-              </button>
+              </Button>
             </footer>
           </div>
         ),
@@ -1624,18 +1613,18 @@ export const COMPONENTS: Component[] = [
         note: 'Takes `currentColor`, so it never needs a variant for a tone.',
         render: () => (
           <Row>
-            <button type="button" className="icon-btn" aria-label="Settings">
+            <Button iconOnly aria-label="Settings">
               <Icon name="settings" />
-            </button>
-            <button type="button" className="icon-btn" aria-label="Chat">
+            </Button>
+            <Button iconOnly aria-label="Chat">
               <Icon name="chat" />
-            </button>
-            <button type="button" className="danger">
+            </Button>
+            <Button tone="danger">
               <Icon name="close" size={15} /> Remove
-            </button>
-            <button type="button" className="primary">
+            </Button>
+            <Button tone="primary">
               <Icon name="download" size={15} /> Install
-            </button>
+            </Button>
           </Row>
         ),
       },
@@ -1646,9 +1635,9 @@ export const COMPONENTS: Component[] = [
           <Row>
             <Icon name="spinner" className="spin" />
             <Icon name="spinner" className="spin" size={22} />
-            <button type="button" className="primary" aria-busy="true">
+            <Button tone="primary" busy>
               <Icon name="spinner" className="spin" size={15} /> Installing…
-            </button>
+            </Button>
           </Row>
         ),
       },
