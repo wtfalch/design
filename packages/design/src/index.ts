@@ -79,3 +79,6 @@ export {
   resolvedTokens,
 } from './themes'
 export type { Theme, ThemeTokens } from './themes'
+
+/** The measurement behind the contrast rule, for a theme that is yours. */
+export { luminance, ratio } from './contrast'

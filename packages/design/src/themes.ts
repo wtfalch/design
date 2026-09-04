@@ -346,7 +346,12 @@ export const THEMES: Record<string, Theme> = {
       '--good': '#1c7a4a',
       '--warn': '#8a6216',
       '--bad': '#b3312c',
-      '--info': '#2f7fe6',
+      // `#2f7fe6` was 3.96:1 on this theme's white panel -- the "information is
+      // blue" colour was measured on the dark base when it was added and never
+      // on a light one. Found by contrast.test.ts on its first run. This is the
+      // lightest step on the same hue that clears 4.5:1 on the panel *and* the
+      // page, with room: 5.24 on white, 4.88 on the page.
+      '--info': '#216bc9',
       // Black shadows are right on a dark UI and muddy on a light one. This is
       // the whole reason elevation had to become a token.
       '--shadow-1': '0 4px 14px rgba(16, 24, 40, 0.08)',
@@ -377,15 +382,23 @@ export function isTheme(name: unknown): name is string {
  * declares leaves the *previous* theme's values behind on every key it happens
  * not to mention, which reads as two themes at once and is very hard to see.
  */
-export function applyTheme(name: string, el: HTMLElement = document.documentElement): void {
-  const theme = THEMES[name] ?? THEMES[DEFAULT_THEME]
+export function applyTheme(
+  theme: string | Theme,
+  el: HTMLElement = document.documentElement,
+): void {
+  /* A registered name, or a `Theme` object straight from `defineTheme`.
+     The second is how an app that is not tf applies its own palette without
+     first pushing it into a registry it does not own -- `THEMES` is the
+     built-ins, and a consumer's theme is theirs. */
+  const resolved = typeof theme === 'string' ? (THEMES[theme] ?? THEMES[DEFAULT_THEME]) : theme
+  const name = typeof theme === 'string' ? theme : resolved.name.toLowerCase().replace(/\s+/g, '-')
   for (const key of TOKEN_KEYS) {
-    const value = theme.tokens[key]
+    const value = resolved.tokens[key]
     if (value === undefined) el.style.removeProperty(key)
     else el.style.setProperty(key, value)
   }
   el.dataset.theme = name
-  el.style.colorScheme = theme.scheme
+  el.style.colorScheme = resolved.scheme
 }
 
 /**
