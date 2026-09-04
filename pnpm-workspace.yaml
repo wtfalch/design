@@ -1,3 +1,4 @@
 packages:
   - packages/*
   - gallery
+  - gallery-e2e

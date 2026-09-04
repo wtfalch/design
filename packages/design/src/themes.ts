@@ -275,7 +275,14 @@ const NIGHT: Partial<ThemeTokens> = {
   '--muted': '#8b94a4',
   '--accent': '#5b9dff',
   '--accent-dim': '#2a4877',
-  '--on-accent': '#ffffff',
+  /* No `--on-accent` here on purpose, so it inherits the base near-black.
+     Night used to set `#ffffff`, which is 2.72:1 on this accent -- the exact
+     pair `tokens.css` records as the reason the token exists at all. The base
+     was fixed and the theme carrying the old palette was never revisited, so
+     the primary button in the app's fixed dark theme failed the body-text
+     minimum by a wide margin for as long as the token had been "fixed".
+     `#06181a` on `#5b9dff` is 6.69:1. Found by the contrast scan, which is the
+     argument for shipping the measurement rather than the rule. */
   '--app-bg': '#0f1115',
 }
 

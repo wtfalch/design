@@ -1,0 +1,27 @@
+{
+  "button · Sizes agree across controls": [
+    "label"
+  ],
+  "card · Warned · night": [
+    "Element has insufficient color contrast of 4.08 (foreground color: #8b94a4, background color: #39332b, font size: 9.0pt (11.998px), font weight: normal). Expected contrast ratio of 4.5:1",
+    "Element has insufficient color contrast of 4.08 (foreground color: #8b94a4, background color: #39332b, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1"
+  ],
+  "input · The bare control": [
+    "label"
+  ],
+  "slider · Stepped, continuous, disabled · night": [
+    "Element has insufficient color contrast of 2.62 (foreground color: #565d69, background color: #161a21, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1",
+    "Element has insufficient color contrast of 2.62 (foreground color: #565d69, background color: #161a21, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1"
+  ],
+  "slider · Stepped, continuous, disabled · paper": [
+    "Element has insufficient color contrast of 2.31 (foreground color: #a6abb2, background color: #ffffff, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1",
+    "Element has insufficient color contrast of 2.31 (foreground color: #a6abb2, background color: #ffffff, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1"
+  ],
+  "slider · Stepped, continuous, disabled · system": [
+    "Element has insufficient color contrast of 2.31 (foreground color: #a6abb2, background color: #ffffff, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1",
+    "Element has insufficient color contrast of 2.31 (foreground color: #a6abb2, background color: #ffffff, font size: 8.3pt (11.004px), font weight: normal). Expected contrast ratio of 4.5:1"
+  ],
+  "textarea · The bare control": [
+    "label"
+  ]
+}

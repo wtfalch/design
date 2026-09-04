@@ -1,0 +1,22 @@
+{
+  "name": "@wtfalch/design-e2e",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "e2e:update": "playwright test --update-snapshots",
+    "e2e:ui": "playwright test --ui",
+    "e2e:docker": "bash ../tools/e2e-docker.sh npx playwright test",
+    "typecheck": "tsc --noEmit",
+    "test": "echo 'visual suite runs via pnpm e2e (needs a gallery server)' ",
+    "a11y:record": "bash ../tools/e2e-docker.sh node scripts/a11y-known.mjs",
+    "manifest": "bash ../tools/e2e-docker.sh node scripts/manifest.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "1.62.1",
+    "@types/node": "^22",
+    "typescript": "^5.9.0"
+  }
+}

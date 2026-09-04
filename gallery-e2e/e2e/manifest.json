@@ -1,0 +1,274 @@
+[
+  {
+    "c": "brand",
+    "v": "In the header"
+  },
+  {
+    "c": "button",
+    "v": "Busy"
+  },
+  {
+    "c": "button",
+    "v": "Disabled"
+  },
+  {
+    "c": "button",
+    "v": "Icon only"
+  },
+  {
+    "c": "button",
+    "v": "Kinds"
+  },
+  {
+    "c": "button",
+    "v": "Sizes"
+  },
+  {
+    "c": "button",
+    "v": "Sizes agree across controls"
+  },
+  {
+    "c": "callout",
+    "v": "The mark"
+  },
+  {
+    "c": "callout",
+    "v": "Timed"
+  },
+  {
+    "c": "callout",
+    "v": "Tones"
+  },
+  {
+    "c": "card",
+    "v": "Bare"
+  },
+  {
+    "c": "card",
+    "v": "Failed"
+  },
+  {
+    "c": "card",
+    "v": "Holding rows"
+  },
+  {
+    "c": "card",
+    "v": "Selectable"
+  },
+  {
+    "c": "card",
+    "v": "Title and description"
+  },
+  {
+    "c": "card",
+    "v": "Warned"
+  },
+  {
+    "c": "checkbox",
+    "v": "A set"
+  },
+  {
+    "c": "checkbox",
+    "v": "The parts"
+  },
+  {
+    "c": "dialog",
+    "v": "Default"
+  },
+  {
+    "c": "empty",
+    "v": "A whole surface"
+  },
+  {
+    "c": "empty",
+    "v": "In a card"
+  },
+  {
+    "c": "icon",
+    "v": "In a button"
+  },
+  {
+    "c": "icon",
+    "v": "Sizes"
+  },
+  {
+    "c": "icon",
+    "v": "The set"
+  },
+  {
+    "c": "icon",
+    "v": "Working"
+  },
+  {
+    "c": "illustration",
+    "v": "All of them"
+  },
+  {
+    "c": "illustration",
+    "v": "Given a colour"
+  },
+  {
+    "c": "input",
+    "v": "Labelled"
+  },
+  {
+    "c": "input",
+    "v": "The bare control"
+  },
+  {
+    "c": "input",
+    "v": "The parts"
+  },
+  {
+    "c": "modal",
+    "v": "Default"
+  },
+  {
+    "c": "modal",
+    "v": "Shown inline"
+  },
+  {
+    "c": "pill",
+    "v": "After a name"
+  },
+  {
+    "c": "pill",
+    "v": "Capability"
+  },
+  {
+    "c": "pill",
+    "v": "Quiet"
+  },
+  {
+    "c": "pill",
+    "v": "State"
+  },
+  {
+    "c": "pill",
+    "v": "When the name is too long"
+  },
+  {
+    "c": "progress",
+    "v": "Determinate"
+  },
+  {
+    "c": "progress",
+    "v": "Failed"
+  },
+  {
+    "c": "progress",
+    "v": "Indeterminate"
+  },
+  {
+    "c": "rows",
+    "v": "Clickable"
+  },
+  {
+    "c": "rows",
+    "v": "Default"
+  },
+  {
+    "c": "rows",
+    "v": "Empty"
+  },
+  {
+    "c": "rows",
+    "v": "When the name is too long"
+  },
+  {
+    "c": "rows",
+    "v": "With a trailing column"
+  },
+  {
+    "c": "select",
+    "v": "Block"
+  },
+  {
+    "c": "select",
+    "v": "Default"
+  },
+  {
+    "c": "select",
+    "v": "Disabled"
+  },
+  {
+    "c": "sizegrid",
+    "v": "Interactive"
+  },
+  {
+    "c": "skeleton",
+    "v": "A paragraph"
+  },
+  {
+    "c": "skeleton",
+    "v": "Shapes"
+  },
+  {
+    "c": "skeleton",
+    "v": "Still"
+  },
+  {
+    "c": "skeleton",
+    "v": "The shape of a row"
+  },
+  {
+    "c": "slider",
+    "v": "Sizes"
+  },
+  {
+    "c": "slider",
+    "v": "Stepped, continuous, disabled"
+  },
+  {
+    "c": "table",
+    "v": "Default"
+  },
+  {
+    "c": "table",
+    "v": "Empty"
+  },
+  {
+    "c": "tabs",
+    "v": "Default"
+  },
+  {
+    "c": "tabs",
+    "v": "Vertical, grouped"
+  },
+  {
+    "c": "text",
+    "v": "Markdown"
+  },
+  {
+    "c": "text",
+    "v": "Registers"
+  },
+  {
+    "c": "text",
+    "v": "The scale"
+  },
+  {
+    "c": "textarea",
+    "v": "Labelled"
+  },
+  {
+    "c": "textarea",
+    "v": "The bare control"
+  },
+  {
+    "c": "toast",
+    "v": "Tones"
+  },
+  {
+    "c": "toggle",
+    "v": "Default"
+  },
+  {
+    "c": "toggle",
+    "v": "Sizes"
+  },
+  {
+    "c": "tooltip",
+    "v": "Default"
+  }
+]
