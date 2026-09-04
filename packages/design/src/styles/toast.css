@@ -34,8 +34,14 @@
 
 .toast-info { border-left: 2px solid var(--accent); }
 
-.toast.leaving { animation: tf-toast-out var(--dur-fast) var(--ease) forwards; }
+/* `data-exiting` is React Aria's: it keeps a toast in the DOM for the length
+   of this animation after it is closed, then removes it, which is what the
+   `.leaving` class and a second timer used to do by hand. */
+.toast[data-exiting] { animation: tf-toast-out var(--dur-fast) var(--ease) forwards; }
 
 @media (prefers-reduced-motion: reduce) {
-  .toast, .toast.leaving { animation: none; }
+  .toast, /* `data-exiting` is React Aria's: it keeps a toast in the DOM for the length
+   of this animation after it is closed, then removes it, which is what the
+   `.leaving` class and a second timer used to do by hand. */
+.toast[data-exiting] { animation: none; }
 }

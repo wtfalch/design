@@ -16,16 +16,20 @@
  * The failing case passes `tone="bad"`, which is the one that promotes itself.
  */
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
-
-import { createPortal } from 'react-dom'
-
-import Button from './Button'
+import { createContext, useContext, useMemo, useState } from 'react'
 
 import Icon, { type IconName } from './Icon'
 
+import {
+  UNSTABLE_Toast as AriaToast,
+  Button,
+  Text,
+  UNSTABLE_ToastContent as ToastContent,
+  UNSTABLE_ToastQueue as ToastQueue,
+  UNSTABLE_ToastRegion as ToastRegion,
+} from 'react-aria-components'
+
 export interface Toast {
-  id: number
   text: string
   tone: 'info' | 'good' | 'bad'
 }
@@ -36,71 +40,90 @@ const MARK: Record<Toast['tone'], IconName> = {
   bad: 'error',
 }
 
-/** How long one stays. Long enough to read twice, which is the length of time
- *  it takes to callout something appeared and then read it. */
+/** How long one stays. Long enough to read twice, short enough that a run of
+ *  them does not pile up -- and paused while the pointer or focus is on it,
+ *  because a message that expires while you are reading it was never shown. */
 const LINGER = 4000
 
 const Ctx = createContext<(text: string, tone?: Toast['tone']) => void>(() => {})
 
-/** `useToast()('Saved')`, from anywhere under the provider. */
 export function useToast() {
   return useContext(Ctx)
 }
 
+/**
+ * The queue and the region, once, at the root.
+ *
+ * React Aria's `ToastQueue` owns what a `useState` list and two `setTimeout`s
+ * did by hand, and three things they did not: the timeout pauses while the
+ * pointer or focus is on the toast; the region is a landmark, so a screen
+ * reader can reach it with F6 rather than only hearing it; and dismissing one
+ * puts focus back where it was, instead of dropping it on the body.
+ *
+ * The role changes, and on purpose. Each toast was `role="status"` -- or
+ * `alert` for the failing tone -- which is right for text that only has to be
+ * heard. These carry a Dismiss button, and a live region's contents are not
+ * reachable; React Aria makes each toast an `alertdialog` inside a live
+ * `region` for that reason, so the announcement still happens and the button
+ * can still be reached.
+ */
 export function ToastHost({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([])
-  const next = useRef(1)
+  const queue = useMemo(() => new ToastQueue<Toast>({ maxVisibleToasts: 4 }), [])
 
-  const push = useCallback((text: string, tone: Toast['tone'] = 'info') => {
-    const id = next.current++
-    setToasts((t) => [...t, { id, text, tone }])
-  }, [])
+  /* What gets read aloud, and it is not the toast.
+
+     The old region was `aria-live="polite"` around the toasts themselves, so a
+     screen reader heard "Settings saved" the moment it appeared. React Aria's
+     region is a landmark instead -- reachable, labelled "1 notification." --
+     and after a push there is no live region anywhere in the document: that
+     was measured, not assumed, and it would have shipped "saved", "copied" and
+     "the download failed" in silence to anyone not looking.
+
+     So the text is mirrored into two visually-hidden live regions of our own:
+     polite for the ordinary case and assertive for a failure, the same
+     distinction `role="status"` and `role="alert"` used to draw. An alert
+     interrupts whatever is being read, right for bad news and rude for
+     "copied". */
+  const [polite, setPolite] = useState('')
+  const [assertive, setAssertive] = useState('')
+  const push = useMemo(
+    () =>
+      (text: string, tone: Toast['tone'] = 'info') => {
+        queue.add({ text, tone }, { timeout: LINGER })
+        const say = tone === 'bad' ? setAssertive : setPolite
+        // Cleared and re-set, so the same message twice is announced twice.
+        say('')
+        requestAnimationFrame(() => say(text))
+      },
+    [queue],
+  )
 
   return (
     <Ctx.Provider value={push}>
       {children}
-      {createPortal(
-        <div className="toasts" aria-live="polite" aria-atomic="false">
-          {toasts.map((t) => (
-            <Toasted
-              key={t.id}
-              toast={t}
-              onGone={() => setToasts((all) => all.filter((x) => x.id !== t.id))}
-            />
-          ))}
-        </div>,
-        document.body,
-      )}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {polite}
+      </div>
+      <div className="sr-only" aria-live="assertive" aria-atomic="true">
+        {assertive}
+      </div>
+      <ToastRegion queue={queue} className="toasts">
+        {({ toast }) => (
+          <AriaToast toast={toast} className={`toast toast-${toast.content.tone}`}>
+            <Icon name={MARK[toast.content.tone]} size={16} />
+            <ToastContent className="grow">
+              <Text slot="title">{toast.content.text}</Text>
+            </ToastContent>
+            {/* React Aria's own `Button`, because `slot="close"` is how the
+                region knows which control dismisses -- and how it knows to
+                put focus back afterwards. The classes are the ones our
+                `Button` would have chosen. */}
+            <Button slot="close" className="ghost size-sm" aria-label="Dismiss">
+              <Icon name="close" size={14} />
+            </Button>
+          </AriaToast>
+        )}
+      </ToastRegion>
     </Ctx.Provider>
-  )
-}
-
-function Toasted({ toast, onGone }: { toast: Toast; onGone: () => void }) {
-  const [leaving, setLeaving] = useState(false)
-
-  useEffect(() => {
-    const go = setTimeout(() => setLeaving(true), LINGER)
-    // Removed after the exit rather than on it, or it vanishes mid-animation.
-    const gone = setTimeout(onGone, LINGER + 200)
-    return () => {
-      clearTimeout(go)
-      clearTimeout(gone)
-    }
-  }, [onGone])
-
-  return (
-    <div
-      className={`toast toast-${toast.tone}${leaving ? ' leaving' : ''}`}
-      // `status` for the ordinary ones and `alert` only for a failure: an alert
-      // interrupts whatever is being read, which is right for bad news and rude
-      // for "copied".
-      role={toast.tone === 'bad' ? 'alert' : 'status'}
-    >
-      <Icon name={MARK[toast.tone]} size={16} />
-      <span className="grow">{toast.text}</span>
-      <Button tone="ghost" size="sm" aria-label="Dismiss" onPress={onGone}>
-        <Icon name="close" size={14} />
-      </Button>
-    </div>
   )
 }

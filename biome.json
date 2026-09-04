@@ -60,6 +60,7 @@
         "packages/design/src/components/Pill.tsx",
         "packages/design/src/components/Select.tsx",
         "packages/design/src/components/Textarea.tsx",
+        "packages/design/src/components/Toast.tsx",
         "packages/design/src/components/Toggle.tsx",
         "packages/design/src/components/Tooltip.tsx"
       ],

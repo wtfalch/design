@@ -654,3 +654,50 @@ test.describe('Select', () => {
     await expect(page.locator('.sel-control')).not.toBeFocused()
   })
 })
+
+test.describe('Toast', () => {
+  const TONES = { c: 'toast', v: 'Tones' }
+
+  test('a toast is announced, without being focused', async ({ page }) => {
+    await page.goto(specimenUrl(TONES, 'system'))
+    await themeApplied(page, 'system')
+    const info = page.getByRole('button', { name: 'Info' })
+    await info.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.locator('.toast')).toBeVisible()
+    /* Measured before it was assumed: React Aria's region is a landmark, not
+       a live region, and after a push there was no `aria-live` in the document
+       at all. The mirror is what reads it out. */
+    await expect(page.locator('[aria-live="polite"]')).toContainText('Settings saved')
+    await expect(info, 'the trigger keeps focus; a toast is not a dialog to fill in').toBeFocused()
+  })
+
+  test('a failure is assertive; the rest are polite', async ({ page }) => {
+    await page.goto(specimenUrl(TONES, 'system'))
+    await themeApplied(page, 'system')
+    await page.getByRole('button', { name: 'Bad' }).click()
+    await expect(page.locator('[aria-live="assertive"]')).toContainText('The download failed')
+    await expect(page.locator('[aria-live="polite"]')).not.toContainText('The download failed')
+  })
+
+  test('Dismiss puts focus back where it was', async ({ page }) => {
+    await page.goto(specimenUrl(TONES, 'system'))
+    await themeApplied(page, 'system')
+    const good = page.getByRole('button', { name: 'Good' })
+    await good.click()
+    const toast = page.locator('.toast')
+    await expect(toast).toBeVisible()
+    await toast.getByRole('button', { name: 'Dismiss' }).click()
+    await expect(toast).toHaveCount(0)
+    /* Not to the body, which is where a removed element leaves focus by
+       default and from where a keyboard user starts the page again. */
+    await expect(good).toBeFocused()
+  })
+
+  test('it lives in a landmark a screen reader can reach', async ({ page }) => {
+    await page.goto(specimenUrl(TONES, 'system'))
+    await themeApplied(page, 'system')
+    await page.getByRole('button', { name: 'Info' }).click()
+    await expect(page.getByRole('region', { name: /notification/ })).toBeVisible()
+  })
+})
