@@ -1,15 +1,4 @@
-import {
-  Children,
-  type ReactNode,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-import { createPortal } from 'react-dom'
+import { Children, type ReactNode, isValidElement, useEffect, useRef } from 'react'
 
 /**
  * The app's select. A button and a list, not a `<select>`.
@@ -67,34 +56,35 @@ function readOptions(children: ReactNode): Choice[] {
    free when that element was a `<select>` and is wrong now that it is a
    `<button>` -- `onCopy` alone is typed against a different element. Call sites
    pass five things between them, so five is what this takes. */
+
+import {
+  Select as AriaSelect,
+  Button,
+  ListBox,
+  ListBoxItem,
+  Popover,
+  SelectValue,
+} from 'react-aria-components'
+
 interface Props {
   block?: boolean
-  /** The same scale buttons and inputs use, so a row of mixed controls lines
-   *  up without anyone measuring. Absent means the default, `md`. */
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  /** `<option>`s, exactly as a native select takes them. The children are the
+   *  API and React Aria's items are the implementation; `readOptions` is the
+   *  seam between them. */
   children?: ReactNode
   id?: string
   title?: string
-  /** What this selects. Required in practice, though not by the type: a native
-   *  `<select>` inherited a name from the `<label>` around it and a button does
-   *  not, so every one of these announced itself as "combobox" and its current
-   *  value with no indication of what it was for. */
   'aria-label'?: string
-  /** ...or the id of something on screen that already says it, which is better:
-   *  a visible label and an announced one that agree cannot drift. */
   'aria-labelledby'?: string
   disabled?: boolean
   value?: string | number
   defaultValue?: string | number
+  /** Native-select-shaped on purpose -- `e.target.value` -- because that is
+   *  what every call site was written against when this *was* a `<select>`. */
   onChange?: (event: { target: { value: string } }) => void
-  /** Something drawn on each row of the open list, after the label, and
-   *  nowhere else: the closed control shows the label alone. For a thing to do
-   *  with an option that is not choosing it -- hearing a speaker -- and the
-   *  reason it takes the value is so the caller can do it. The list picks on
-   *  `pointerdown`; anything here that should not pick stops that event. Not
-   *  reachable from the keyboard, which never focuses inside the list, so it
-   *  must be a convenience beside a control that is. */
+  /** Something to the right of an option -- a play button beside a voice. */
   aside?: (value: string) => ReactNode
 }
 
@@ -113,194 +103,48 @@ export default function Select({
   'aria-labelledby': ariaLabelledBy,
   aside,
 }: Props) {
-  const options = useMemo(() => readOptions(children), [children])
-  /* Uncontrolled callers exist (`defaultValue`), so the chosen value lives here
-     and `value` overrides it when given -- the same bargain the native element
-     makes. */
-  const [own, setOwn] = useState(() => String(defaultValue ?? options[0]?.value ?? ''))
-  const chosen = value !== undefined ? String(value) : own
+  const options = readOptions(children)
 
-  const [open, setOpen] = useState(false)
-  /* Where to draw the list, in viewport coordinates.
-     It is rendered into `document.body` rather than beside the button, because
-     an ancestor that scrolls or hides its overflow clips it -- and in this app
-     that is not hypothetical: every settings pane scrolls, and the first place
-     this was tried the list showed one row of three. Escaping the ancestors
-     means positioning by hand, which is the trade. */
-  const [box, setBox] = useState({ top: 0, left: 0, width: 0 })
-  const [active, setActive] = useState(0)
-  const root = useRef<HTMLDivElement>(null)
-  const list = useRef<HTMLUListElement>(null)
-  const typed = useRef({ text: '', at: 0 })
-
-  const current = options.find((o) => o.value === chosen)
-
+  /* `title`, set on the element: React Aria's `Button` takes `id` and the
+     `aria-*` labelling props and filters the rest, the same `filterDOMProps`
+     that dropped `aria-busy` on `Button` and `aria-modal` on `Modal`. */
   const control = useRef<HTMLButtonElement>(null)
-
-  /* Closing returns focus to the control, whichever way it closed.
-     Choosing with the pointer left focus wherever the press landed -- on
-     `document.body` in practice -- so the next Tab started from the top of the
-     page rather than from the thing just used. Keyboard users lose their place
-     silently, which is the kind of bug that is invisible to anyone testing with
-     a mouse. */
-  const close = useCallback(() => {
-    setOpen(false)
-    control.current?.focus()
-  }, [])
-
-  const pick = useCallback(
-    (v: string) => {
-      if (value === undefined) setOwn(v)
-      onChange?.({ target: { value: v } })
-      close()
-    },
-    [close, onChange, value],
-  )
-
-  // Opening lands on the chosen row rather than the first, which is where the
-  // eye already is and where a native select would have put it.
-  //
-  // Keyed on what the options *are*, not on the array: `options` is read off
-  // `children` on every render, so a parent re-rendering under an open list
-  // -- a store publishing, a poll -- made a fresh array, re-ran this, and
-  // snapped the highlight back to the chosen row while the pointer was three
-  // rows down. The memo rules in CLAUDE.md keep parents quiet; this keeps
-  // the list steady when one is not.
-  const shape = options.map((o) => o.value).join('\n')
   useEffect(() => {
-    if (!open) return
-    const at = options.findIndex((o) => o.value === chosen)
-    setActive(at >= 0 ? at : 0)
-  }, [open, chosen, shape]) // `shape` stands for `options`; see above
+    const el = control.current
+    if (!el) return
+    if (title) el.title = title
+    else el.removeAttribute('title')
+  }, [title])
 
-  // Measured when it opens, and again if the window moves under it. Not on
-  // scroll of every ancestor -- the list closes on an outside press anyway, and
-  // a scroll listener per ancestor is a lot of bookkeeping for a menu that is
-  // open for two seconds.
-  useLayoutEffect(() => {
-    if (!open) return
-    const place = () => {
-      const r = root.current?.getBoundingClientRect()
-      if (!r) return
-      setBox({ top: r.bottom + 4, left: r.left, width: r.width })
-    }
-    place()
-    window.addEventListener('resize', place)
-    return () => window.removeEventListener('resize', place)
-  }, [open])
+  /* React Aria owns what was 13 KB of hand-rolled behaviour: the popover is
+     positioned against the button and flips when the edge is near, which the
+     measured-rectangle `top`/`left` could not; typeahead, Home and End, the
+     arrows, Escape, outside-press and focus restore are all its. What stays
+     is the seam -- `<option>` children in, `{target: {value}}` out -- because
+     the call sites were written against a native select and there is no
+     reason to make them care that it is not one any more.
 
-  // Keep the active row in view without scrolling the page behind it.
-  useLayoutEffect(() => {
-    if (!open) return
-    list.current
-      ?.querySelector<HTMLElement>('[data-active="true"]')
-      ?.scrollIntoView({ block: 'nearest' })
-  }, [open, active])
-
-  // Anywhere else closes it. `pointerdown` rather than `click`, so it closes on
-  // the press instead of waiting for a release that may land somewhere else.
-  useEffect(() => {
-    if (!open) return
-    const away = (e: PointerEvent) => {
-      if (!root.current?.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('pointerdown', away)
-    return () => document.removeEventListener('pointerdown', away)
-  }, [open])
-
-  const step = (from: number, by: number) => {
-    const n = options.length
-    for (let i = 1; i <= n; i++) {
-      const at = (from + by * i + n * n) % n
-      if (!options[at]?.disabled) return at
-    }
-    return from
-  }
-
-  const onKey = (e: React.KeyboardEvent) => {
-    if (disabled) return
-    switch (e.key) {
-      case 'ArrowDown':
-      case 'ArrowUp': {
-        e.preventDefault()
-        const by = e.key === 'ArrowDown' ? 1 : -1
-        if (!open) {
-          setOpen(true)
-          return
-        }
-        setActive((a) => step(a, by))
-        return
-      }
-      case 'Home':
-      case 'End':
-        if (!open) return
-        e.preventDefault()
-        setActive(step(e.key === 'Home' ? -1 : options.length, e.key === 'Home' ? 1 : -1))
-        return
-      case 'Enter':
-      case ' ':
-        e.preventDefault()
-        if (!open) setOpen(true)
-        else if (options[active] && !options[active].disabled) pick(options[active].value)
-        return
-      case 'Escape':
-        if (open) {
-          e.preventDefault()
-          close()
-        }
-        return
-      case 'Tab':
-        setOpen(false)
-        return
-      default:
-        break
-    }
-    /* Typeahead. A native select has it and people use it without knowing they
-       do -- typing `qw` to reach `qwen3:4b` in a list of thirty. The buffer
-       clears after a second, so `qq` means the second q-word rather than a word
-       beginning `qq`. */
-    if (e.key.length === 1 && !e.metaKey && !e.ctrlKey && !e.altKey) {
-      const now = Date.now()
-      typed.current.text =
-        now - typed.current.at > 1000
-          ? e.key.toLowerCase()
-          : typed.current.text + e.key.toLowerCase()
-      typed.current.at = now
-      const at = options.findIndex(
-        (o) => !o.disabled && o.text.toLowerCase().startsWith(typed.current.text),
-      )
-      if (at >= 0) {
-        if (open) setActive(at)
-        else pick(options[at].value)
-      }
-    }
-  }
-
-  const listId = `${id ?? 'sel'}-list`
-
+     `sel-value` and the caret are the same markup as before, so the closed
+     control is pixel-identical; the list is the same markup with React Aria's
+     state attributes where the classes were. */
   return (
-    <div
-      ref={root}
-      className={`sel${block ? ' block' : ''}${open ? ' open' : ''}${className ? ` ${className}` : ''}`}
+    <AriaSelect
+      className={`sel${block ? ' block' : ''}${className ? ` ${className}` : ''}`}
+      selectedKey={value !== undefined ? String(value) : undefined}
+      defaultSelectedKey={
+        defaultValue !== undefined ? String(defaultValue) : (options[0]?.value ?? undefined)
+      }
+      onSelectionChange={(key) => {
+        if (key !== null) onChange?.({ target: { value: String(key) } })
+      }}
+      isDisabled={disabled}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
     >
-      <button
-        ref={control}
-        type="button"
-        title={title}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        id={id}
-        className={`sel-control${size ? ` size-${size}` : ''}`}
-        role="combobox"
-        aria-expanded={open}
-        aria-controls={listId}
-        aria-haspopup="listbox"
-        aria-activedescendant={open ? `${listId}-${active}` : undefined}
-        disabled={disabled}
-        onClick={() => !disabled && setOpen((o) => !o)}
-        onKeyDown={onKey}
-      >
-        <span className="sel-value">{current?.label ?? current?.text ?? ''}</span>
+      <Button ref={control} id={id} className={`sel-control${size ? ` size-${size}` : ''}`}>
+        <SelectValue className="sel-value">
+          {({ selectedText, defaultChildren }) => selectedText ?? defaultChildren}
+        </SelectValue>
         {/* Inline rather than a component: one path, used here and nowhere
             else. `Caret` was a module and an export for exactly this. */}
         <svg className="sel-caret" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
@@ -313,63 +157,48 @@ export default function Select({
             d="m6 9 6 6 6-6"
           />
         </svg>
-      </button>
-
-      {open &&
-        createPortal(
-          <ul
-            className="sel-list"
-            id={listId}
-            role="listbox"
-            ref={list}
-            tabIndex={-1}
-            style={{ top: box.top, left: box.left, minWidth: box.width }}
-          >
-            {options.map((o, i) => (
-              <li
-                key={o.value + i}
-                id={`${listId}-${i}`}
-                role="option"
-                aria-selected={o.value === chosen}
-                aria-disabled={o.disabled || undefined}
-                data-active={i === active}
-                className={`sel-item${o.value === chosen ? ' on' : ''}${o.disabled ? ' off' : ''}`}
-                /* `pointerdown`, not `click`: the button keeps focus, so the
-                 outside-press handler does not close the list underneath the
-                 press that was choosing from it. */
-                onPointerDown={(e) => {
-                  e.preventDefault()
-                  if (!o.disabled) pick(o.value)
-                }}
-                onPointerEnter={() => !o.disabled && setActive(i)}
+      </Button>
+      {/* `maxHeight` as a prop, because React Aria writes it inline -- to the
+          space left in the viewport, 733px on a laptop -- and an inline style
+          beats the sheet's `max-height: 280px` cap. The cap is the sheet's
+          decision: a list taller than that is a list you scroll, not one that
+          runs to the bottom of the screen. */}
+      <Popover className="sel-list" placement="bottom start" offset={4} maxHeight={280}>
+        <ListBox className="sel-listbox">
+          {options.map((o) => (
+            <ListBoxItem
+              key={o.value}
+              id={o.value}
+              textValue={o.text}
+              isDisabled={o.disabled}
+              className="sel-item"
+            >
+              <span className="sel-item-label">{o.label}</span>
+              <svg
+                className="sel-tick"
+                viewBox="0 0 24 24"
+                width="13"
+                height="13"
+                aria-hidden="true"
               >
-                <span className="sel-item-label">{o.label}</span>
-                <svg
-                  className="sel-tick"
-                  viewBox="0 0 24 24"
-                  width="13"
-                  height="13"
-                  aria-hidden="true"
-                >
-                  <path
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m5 13 4 4 10-10"
-                  />
-                </svg>
-                {/* After the tick, so it is flush with the row's edge rather
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="m5 13 4 4 10-10"
+                />
+              </svg>
+              {/* After the tick, so it is flush with the row's edge rather
                   than floating a tick's width in from it. The tick holds its
                   place whether or not it is drawn, so nothing shifts when the
                   choice moves. */}
-                {aside?.(o.value)}
-              </li>
-            ))}
-          </ul>,
-          document.body,
-        )}
-    </div>
+              {aside?.(o.value)}
+            </ListBoxItem>
+          ))}
+        </ListBox>
+      </Popover>
+    </AriaSelect>
   )
 }

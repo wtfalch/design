@@ -576,3 +576,81 @@ test.describe('Slider', () => {
     }
   })
 })
+
+test.describe('Select', () => {
+  const DEFAULT = { c: 'select', v: 'Default' }
+
+  test('is a combobox that opens a listbox', async ({ page }) => {
+    await page.goto(specimenUrl(DEFAULT, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    const control = page.locator('.sel-control')
+    await expect(control).toBeFocused()
+    await expect(control).toHaveAttribute('aria-haspopup', 'listbox')
+    await expect(control).toHaveAttribute('aria-expanded', 'false')
+    /* React Aria names the button as the value and the label together --
+       "qwen3:4b — thinks, tools Model" -- which is what a native select is
+       announced as, and what the first version of this test wrongly expected
+       to be the label alone. The label must be in it; the value is allowed. */
+    await expect(control).toHaveAccessibleName(/Model/)
+
+    await page.keyboard.press('ArrowDown')
+    const list = page.getByRole('listbox')
+    await expect(list).toBeVisible()
+    await expect(list.getByRole('option')).toHaveCount(3)
+    await expect(control).toHaveAttribute('aria-expanded', 'true')
+    /* The chosen row is marked, and it is where the list opens. */
+    await expect(list.getByRole('option', { selected: true })).toHaveText(
+      'qwen3:4b — thinks, tools',
+    )
+  })
+
+  test('the arrows and Enter choose, and the choice reaches onChange', async ({ page }) => {
+    await page.goto(specimenUrl(DEFAULT, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('ArrowDown')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('listbox')).toHaveCount(0)
+    /* `SelectDemo` holds the value in state and hands it back through
+       `onChange({target: {value}})` -- the native-select-shaped seam every
+       call site was written against. The visible value is the proof it fired. */
+    await expect(page.locator('.sel-value')).toHaveText('qwen2.5vl:3b — reads images')
+    await expect(page.locator('.sel-control'), 'focus returns to the control').toBeFocused()
+  })
+
+  test('Escape closes it without choosing', async ({ page }) => {
+    await page.goto(specimenUrl(DEFAULT, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('ArrowDown')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('listbox')).toHaveCount(0)
+    await expect(page.locator('.sel-value'), 'the value is unchanged').toHaveText(
+      'qwen3:4b — thinks, tools',
+    )
+    await expect(page.locator('.sel-control')).toBeFocused()
+  })
+
+  test('typing jumps to the option that starts with it', async ({ page }) => {
+    await page.goto(specimenUrl(DEFAULT, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('ArrowDown')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await page.keyboard.type('s')
+    await expect(page.getByRole('option', { name: /^sd15/ })).toBeFocused()
+  })
+
+  test('a disabled select is not a tab stop', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'select', v: 'Disabled' }, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.locator('.sel-control')).toBeDisabled()
+    await page.keyboard.press('Tab')
+    await expect(page.locator('.sel-control')).not.toBeFocused()
+  })
+})

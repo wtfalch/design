@@ -75,15 +75,20 @@ select,
 
 .sel-caret { flex: none; opacity: 0.6; transition: transform var(--dur-fast) var(--ease); }
 
-.sel.open .sel-caret { transform: rotate(180deg); }
+.sel[data-open] .sel-caret { transform: rotate(180deg); }
 
-.sel.open .sel-control { border-color: var(--accent); }
+.sel[data-open] .sel-control { border-color: var(--accent); }
 
+/* State is read off React Aria's attributes: `data-open` on the root,
+   `data-focused` / `data-selected` / `data-disabled` on an item, where
+   `.open`, `[data-active]`, `.on` and `.off` used to be. */
 .sel-list {
   /* `fixed`, and in `document.body`: an ancestor that scrolls or hides its
      overflow would otherwise clip it, which in this app means every settings
      pane. Position comes from the button's measured rectangle. */
-  position: fixed;
+  /* Positioned by React Aria -- inline `top`/`left` on a portalled popover
+     that flips when the edge is near. `position: fixed` and the measured
+     rectangle it was placed by are gone with the hand-rolled version. */
   z-index: 60;
   max-height: 280px;
   overflow-y: auto;
@@ -119,17 +124,17 @@ select,
 /* Hover and keyboard land on the same row, because they are the same idea --
    two highlights for one cursor is how a list starts lying about where Enter
    will go. */
-.sel-item[data-active='true'] { background: var(--panel-2); }
+.sel-item[data-focused] { background: var(--panel-2); }
 
-.sel-item.on { color: var(--accent); }
+.sel-item[data-selected] { color: var(--accent); }
 
-.sel-item.off { opacity: 0.45; cursor: not-allowed; }
+.sel-item[data-disabled] { opacity: 0.45; cursor: not-allowed; }
 
 /* The tick marks the chosen row. Colour alone would not: a list where the only
    difference is a hue is a list you cannot read past. */
 .sel-tick { flex: none; opacity: 0; }
 
-.sel-item.on .sel-tick { opacity: 1; }
+.sel-item[data-selected] .sel-tick { opacity: 1; }
 
 /* The icon on a speaker's row in the open list -- `Select`'s `aside`. Last in
    the row and flush with its padding: it is a column of buttons down the right
