@@ -193,3 +193,64 @@ test.describe('Checkbox', () => {
     expect(shadow, 'the row paints --focus-ring').not.toBe('none')
   })
 })
+
+test.describe('Tooltip', () => {
+  const TIP = { c: 'tooltip', v: 'Default' }
+
+  test('Tab focuses the mark, the tip opens, and it is wired by aria-describedby', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(TIP, 'system'))
+    await themeApplied(page, 'system')
+
+    /* The old component was `role="note"` with a `tabIndex`: focusable, and
+       announced as its label and nothing else, because a note is not
+       interactive and the tip's text was never associated with anything. This
+       is the measurement of the fix. */
+    await expect(page.getByRole('tooltip'), 'closed at rest').toHaveCount(0)
+
+    await page.keyboard.press('Tab')
+    const tip = page.getByRole('tooltip')
+    await expect(tip, 'focus opens it').toBeVisible()
+    await expect(tip).toContainText('Reasoning is generated separately')
+
+    const wired = await page.evaluate(() => {
+      const trigger = document.activeElement as HTMLElement
+      const id = trigger.getAttribute('aria-describedby')
+      const tip = document.querySelector('[role="tooltip"]')
+      return { id, tipId: tip?.id, tag: trigger.tagName }
+    })
+    expect(wired.tag, 'the mark stays a span — a button inside a label row would toggle it').toBe(
+      'SPAN',
+    )
+    expect(wired.id, 'the trigger must be described by the tip').toBe(wired.tipId)
+  })
+
+  test('Escape closes it', async ({ page }) => {
+    await page.goto(specimenUrl(TIP, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('tooltip')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('tooltip')).toHaveCount(0)
+  })
+
+  test('hovering the mark opens it too', async ({ page }) => {
+    await page.goto(specimenUrl(TIP, 'system'))
+    await themeApplied(page, 'system')
+
+    /* Moved to, not teleported. `locator.hover()` lands the pointer in one
+       jump and React Aria's hover intent never opened the tip; the same mark
+       opened within 100ms when the mouse *travelled* there in steps. That is
+       hover intent doing its job -- a tip that opens for a pointer passing
+       through is the thing it exists to prevent -- so the test moves like a
+       hand does. */
+    const box = await page.locator('.explain').boundingBox()
+    if (!box) throw new Error('no mark to hover')
+    const cx = box.x + box.width / 2
+    const cy = box.y + box.height / 2
+    await page.mouse.move(cx - 60, cy + 40)
+    await page.mouse.move(cx, cy, { steps: 8 })
+    await expect(page.getByRole('tooltip')).toBeVisible()
+  })
+})

@@ -55,7 +55,8 @@
         "packages/design/src/components/Button.tsx",
         "packages/design/src/components/Checkbox.tsx",
         "packages/design/src/components/Pill.tsx",
-        "packages/design/src/components/Toggle.tsx"
+        "packages/design/src/components/Toggle.tsx",
+        "packages/design/src/components/Tooltip.tsx"
       ],
       "linter": {
         "enabled": true

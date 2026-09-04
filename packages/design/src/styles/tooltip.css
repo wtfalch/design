@@ -39,8 +39,10 @@
 .explain:focus-visible .explain-mark { color: var(--text); border-color: var(--accent); }
 
 .explain-tip {
-  position: absolute;
-  top: calc(100% + 8px);
+  /* No `position`/`top`/`left` here any more: the tip is portalled to
+     `document.body` and React Aria positions it inline, flipping to the other
+     side when the edge is near. `placement` and `offset` on the component
+     carry what `top: calc(100% + 8px)` and `left: -6px` used to. */
   /* Sized by what is in it, capped where a line stops being readable.
      
      It was a flat `width: 300px`, which is right for the paragraph a `?` mark
@@ -66,12 +68,10 @@
   z-index: 45;
 }
 
-/* Which way it grows. A mark at the right edge of a row has room to its left
-   and none to its right; one beside a heading is the other way round, and got
-   its first words cut off by the settings rail before this existed. */
-.explain-right .explain-tip { left: -6px; }
-
-.explain-left .explain-tip { right: -6px; }
+/* Which way it grows is `placement` on the component now -- `bottom start`
+   or `bottom end` -- and React Aria flips it when there is no room, which the
+   fixed `left: -6px` / `right: -6px` could not: a mark beside a heading got
+   its first words cut off by the settings rail before `align` existed. */
 
 /* Out of layout entirely while closed, not merely invisible.
    
@@ -89,13 +89,21 @@
 }
 
 /* Open while the pointer is inside the box as well as on the mark -- one that
-   vanishes as you move towards it cannot be read. */
-.explain:hover .explain-tip,
-.explain:focus-within .explain-tip {
+   vanishes as you move towards it cannot be read. React Aria keeps it open
+   through a `closeDelay` for that reason, and marks the box `data-entering`
+   and `data-exiting` around the transition. The box is only in the DOM while
+   open, so `display` is React Aria's decision; the fade is ours. */
+.explain-tip {
   display: block;
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+.explain-tip[data-entering],
+.explain-tip[data-exiting] {
+  opacity: 0;
+  transform: translateY(-3px);
 }
 
 .explain-tip strong { color: var(--text); font-weight: 600; }

@@ -23,6 +23,8 @@
  * section heading must grow right. Getting it wrong does not just look off --
  * the box runs under the settings rail and its first few words are cut away.
  */
+import { Tooltip as AriaTooltip, Focusable, TooltipTrigger } from 'react-aria-components'
+
 export default function Tooltip({
   label,
   align = 'right',
@@ -51,19 +53,60 @@ export default function Tooltip({
   className?: string
   children: React.ReactNode
 }) {
+  /* What was wrong, and what this fixes.
+
+     The old markup was `<span role="note" tabIndex={0} aria-label="About …">`
+     with the tip as a child span revealed by `:hover` and `:focus-within`. It
+     looked like a tooltip and was not one to anything that reads a page aloud:
+     `note` is not an interactive role, so a focusable note is a contradiction
+     the screen reader resolves by announcing the label and nothing else -- the
+     tip's text, the one thing worth reading, was never associated with the
+     trigger at all.
+
+     React Aria's `TooltipTrigger` wires `aria-describedby` from the trigger to
+     a `<div role="tooltip">`, opens it on hover with intent and on keyboard
+     focus, and closes it on Escape and on pointer-out with a grace period so
+     a box that vanishes as you move towards it cannot happen.
+
+     The mark stays a `<span>`, and `Focusable` is what makes that work. The
+     rows these sit in are `<label>`s wrapping a control, so anything that is a
+     `<button>` in there toggles the setting behind it -- the docblock's reason,
+     and still true. `Focusable` gives the span a tab stop and the focus and
+     hover handling a trigger needs without making it a button.
+
+     The tip is portalled to `document.body` and positioned by React Aria, which
+     is also why `overflow: hidden` on any ancestor no longer clips it -- the
+     Permissions pane's horizontal scrollbar, found by hiding one class at a
+     time, was this box sitting in the scrollable overflow. */
   return (
-    <span
-      className={`explain explain-${align}${className ? ` ${className}` : ''}`}
-      tabIndex={0}
-      role="note"
-      aria-label={mark ? label : `About ${label}`}
-    >
-      {mark ?? (
-        <span className="explain-mark" aria-hidden="true">
-          ?
+    <TooltipTrigger delay={0} closeDelay={150}>
+      <Focusable>
+        <span
+          className={`explain explain-${align}${className ? ` ${className}` : ''}`}
+          /* A role, because a name on a role-less span is prohibited -- axe's
+             `aria-prohibited-attr`, found the first time this was scanned. `img`
+             rather than `button`: the mark is a glyph that reveals help, not a
+             control that does something, and `button` would promise an action
+             and -- inside the `<label>` rows these sit in -- invite a click that
+             the label forwards to the setting behind it. */
+          role="img"
+          aria-label={mark ? label : `About ${label}`}
+        >
+          {mark ?? (
+            <span className="explain-mark" aria-hidden="true">
+              ?
+            </span>
+          )}
         </span>
-      )}
-      <span className="explain-tip">{children}</span>
-    </span>
+      </Focusable>
+      <AriaTooltip
+        className="explain-tip"
+        placement={align === 'left' ? 'bottom end' : 'bottom start'}
+        offset={8}
+        crossOffset={align === 'left' ? 6 : -6}
+      >
+        {children}
+      </AriaTooltip>
+    </TooltipTrigger>
   )
 }
