@@ -98,3 +98,98 @@ test.describe('Button', () => {
     expect(focused).not.toBe('BUTTON')
   })
 })
+
+test.describe('Toggle', () => {
+  const SIZES = { c: 'toggle', v: 'Sizes' }
+
+  test('Tab reaches the switch and Space flips it', async ({ page }) => {
+    /* `Default` renders `ToggleDemo`, which holds state. `Sizes` is three
+       switches with `checked` and a no-op `onChange` -- a picture of a switch,
+       which is right for a screenshot and cannot flip. */
+    await page.goto(specimenUrl({ c: 'toggle', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+
+    await page.keyboard.press('Tab')
+    const first = page.getByRole('switch').first()
+    await expect(first, 'the first switch takes focus').toBeFocused()
+    const was = await first.isChecked()
+
+    /* `role="switch"` is the docblock's core promise -- announced as on/off
+       rather than checked/unchecked, the only signal a non-visual reader gets
+       that it applies as it moves. React Aria keeps it. */
+    await page.keyboard.press('Space')
+    await expect(first, 'Space flips it').toBeChecked({ checked: !was })
+    await page.keyboard.press('Space')
+    await expect(first, 'Space flips it back').toBeChecked({ checked: was })
+  })
+
+  test('the focus ring is painted on the track, not the hidden input', async ({ page }) => {
+    await page.goto(specimenUrl(SIZES, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+
+    /* The input is one pixel square and off in a corner; a ring on it is a
+       ring nobody sees. The row carries `data-focus-visible`, and the track
+       reads it. */
+    const ring = await page.evaluate(() => {
+      const track = document.querySelector('.switch-row[data-focus-visible] .toggle')
+      if (!track) return null
+      const s = getComputedStyle(track)
+      return { outline: s.outlineWidth, shadow: s.boxShadow }
+    })
+    expect(ring, 'the focused row must carry data-focus-visible').not.toBeNull()
+    expect(ring?.outline !== '0px' || (ring?.shadow && ring.shadow !== 'none')).toBe(true)
+  })
+})
+
+test.describe('Checkbox', () => {
+  const PARTS = { c: 'checkbox', v: 'The parts' }
+
+  test('Tab reaches each box in order and Space toggles it', async ({ page }) => {
+    /* `A set` renders `CheckboxDemo`, which holds state; `The parts` is
+       controlled with a no-op and cannot change. */
+    await page.goto(specimenUrl({ c: 'checkbox', v: 'A set' }, 'system'))
+    await themeApplied(page, 'system')
+
+    await page.keyboard.press('Tab')
+    const first = page.getByRole('checkbox').first()
+    await expect(first).toBeFocused()
+    const was = await first.isChecked()
+    await page.keyboard.press('Space')
+    await expect(first, 'Space toggles it').toBeChecked({ checked: !was })
+
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('checkbox').nth(1), 'Tab moves to the next box').toBeFocused()
+  })
+
+  test('a disabled box is skipped, and its row says so', async ({ page }) => {
+    await page.goto(specimenUrl(PARTS, 'system'))
+    await themeApplied(page, 'system')
+
+    const boxes = page.getByRole('checkbox')
+    await expect(boxes).toHaveCount(4)
+    await expect(boxes.nth(3), 'the fourth is disabled').toBeDisabled()
+
+    // Three Tabs land on the three enabled boxes; a fourth leaves the stage.
+    for (let i = 0; i < 3; i++) await page.keyboard.press('Tab')
+    await expect(boxes.nth(2)).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(boxes.nth(3), 'Tab must not land on a disabled box').not.toBeFocused()
+
+    const rowSaysSo = await page.locator('.choice[data-disabled]').count()
+    expect(rowSaysSo, 'the disabled row carries data-disabled for the stylesheet').toBe(1)
+  })
+
+  test('the focus ring lands on the row, which is what is actually focused', async ({ page }) => {
+    await page.goto(specimenUrl(PARTS, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+
+    const shadow = await page.evaluate(() => {
+      const row = document.querySelector('.choice[data-focus-visible]')
+      return row ? getComputedStyle(row).boxShadow : null
+    })
+    expect(shadow, 'the focused row must carry data-focus-visible').not.toBeNull()
+    expect(shadow, 'the row paints --focus-ring').not.toBe('none')
+  })
+})

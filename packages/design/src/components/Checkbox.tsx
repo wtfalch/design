@@ -19,6 +19,8 @@
  * is no Save at the end of it, this is the wrong control — see `Toggle`.
  */
 
+import { Checkbox as AriaCheckbox } from 'react-aria-components'
+
 export default function Checkbox({
   label,
   why,
@@ -36,19 +38,19 @@ export default function Checkbox({
   onChange: (on: boolean) => void
   disabled?: boolean
 }) {
+  /* React Aria's `Checkbox` is the `<label>`. It keeps the real input in the
+     markup and visually hidden -- exactly the arrangement this component
+     already had by hand -- and stamps `data-selected`, `data-focus-visible`
+     and `data-disabled` on the row. The ring and the tick are still drawn by
+     the row's `::after` and `::before`; `checkbox.css` now reads the state off
+     those attributes instead of `:has(input:checked)`. */
   return (
-    <label className="choice">
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-      />
+    <AriaCheckbox className="choice" isSelected={checked} onChange={onChange} isDisabled={disabled}>
       <span className="choice-body">
         <span className="choice-name">{label}</span>
         {why && <span className="choice-why">{why}</span>}
         {meta && <span className="choice-meta">{meta}</span>}
       </span>
-    </label>
+    </AriaCheckbox>
   )
 }

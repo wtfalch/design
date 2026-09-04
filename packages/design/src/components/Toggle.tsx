@@ -29,6 +29,8 @@
  * `Checkbox`.
  */
 
+import { Switch } from 'react-aria-components'
+
 export default function Toggle({
   label,
   hint,
@@ -60,24 +62,26 @@ export default function Toggle({
    *  toolbar or a dense row; `lg` where it is the only thing on the screen. */
   size?: 'sm' | 'md' | 'lg'
 }) {
+  /* React Aria's `Switch` is the `<label>`: it owns a visually-hidden
+     `<input type="checkbox" role="switch">` and stamps `data-selected`,
+     `data-disabled`, `data-focus-visible` and `data-pressed` on the label. So
+     the track is no longer the input drawn with `appearance: none` -- it is a
+     plain span, and `toggle.css` reads the state off the row instead of off
+     `:checked`. The row is the label either way, which keeps the words as the
+     hit area. */
   return (
-    <label className={`switch-row switch-${size}${disabled ? ' is-disabled' : ''}`}>
+    <Switch
+      className={`switch-row switch-${size}`}
+      isSelected={checked}
+      onChange={onChange}
+      isDisabled={disabled}
+    >
       <span className={labelHidden ? 'sr-only' : 'switch-body'}>
         <span className="switch-label">{label}</span>
         {hint && <span className="switch-hint">{hint}</span>}
       </span>
       {said && <span className="switch-said mono">{said}</span>}
-      <input
-        type="checkbox"
-        /* Not a checkbox to anything that reads it aloud: "on"/"off" rather
-           than "checked"/"unchecked", because this applies as it moves and
-           there is no Save to wait for. */
-        role="switch"
-        className="toggle"
-        checked={checked}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.checked)}
-      />
-    </label>
+      <span className="toggle" aria-hidden="true" />
+    </Switch>
   )
 }

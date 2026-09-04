@@ -51,7 +51,12 @@
       }
     },
     {
-      "include": ["packages/design/src/components/Button.tsx"],
+      "include": [
+        "packages/design/src/components/Button.tsx",
+        "packages/design/src/components/Checkbox.tsx",
+        "packages/design/src/components/Pill.tsx",
+        "packages/design/src/components/Toggle.tsx"
+      ],
       "linter": {
         "enabled": true
       },

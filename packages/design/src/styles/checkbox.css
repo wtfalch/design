@@ -71,16 +71,21 @@
 
 /* Suggestible: it lifts toward the accent before you commit, so the row reads
    as something that responds rather than something that is written on. */
+/* State is read off the row. React Aria's `Checkbox` is the `<label>` and
+   stamps `data-selected`, `data-focus-visible` and `data-disabled` on it, so
+   every `:has(input:checked)` below became `[data-selected]`. Same specificity
+   as `:hover` (0,2,0), so the selected rule sits after it and wins by order,
+   which is what the old 0,2,1 did by weight. */
 .choice:hover { border-color: var(--accent); background: var(--panel-2); }
 
 /* Chosen. Quiet, because several of these are ticked at once in the accounts
    list and a strong fill on each would read as an alarm. */
-.choice:has(input:checked) {
+.choice[data-selected] {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 8%, var(--panel));
 }
 
-.choice:has(input:checked):hover {
+.choice[data-selected]:hover {
   background: color-mix(in srgb, var(--accent) 13%, var(--panel));
 }
 
@@ -96,7 +101,7 @@
    8%-100% of its own height, so its visual middle is four per cent below the
    box's, and it sat low. */
 .choice::after,
-.choice:has(input:checked)::before {
+.choice[data-selected]::before {
   content: '';
   position: absolute;
   top: var(--space-3);
@@ -112,7 +117,7 @@
               border-color var(--dur-fast) var(--ease);
 }
 
-.choice:has(input:checked)::after {
+.choice[data-selected]::after {
   border-color: var(--accent);
   background: var(--accent);
 }
@@ -126,7 +131,7 @@
    pixel high inside a ring that was otherwise exactly concentric with it. Every
    even glyph size divides cleanly -- this one is 3px a side -- and it fills the
    ring better besides. Measured at 20x: offset 0.000px both axes. */
-.choice:has(input:checked)::before {
+.choice[data-selected]::before {
   z-index: 1;
   background: var(--on-accent);
   -webkit-mask: var(--tick-mask) center / 10px 10px no-repeat;
@@ -135,7 +140,7 @@
 
 /* The ring goes on the row, because the row is what is focused: the input it
    contains is one pixel square and off in a corner. */
-.choice:has(input:focus-visible) {
+.choice[data-focus-visible] {
   outline: none;
   box-shadow: var(--focus-ring);
   border-color: var(--accent);
@@ -152,13 +157,13 @@
 
 .choice-meta { color: var(--muted); font-size: var(--text-xs); font-family: var(--font-mono); }
 
-.choice:has(input:disabled) {
+.choice[data-disabled] {
   cursor: not-allowed;
   border-color: var(--border);
   background: var(--panel);
 }
 
-.choice:has(input:disabled) .choice-name,
-.choice:has(input:disabled) .choice-why { opacity: 0.5; }
+.choice[data-disabled] .choice-name,
+.choice[data-disabled] .choice-why { opacity: 0.5; }
 
-.choice:has(input:disabled)::after { opacity: 0.4; }
+.choice[data-disabled]::after { opacity: 0.4; }

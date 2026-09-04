@@ -37,7 +37,7 @@
   cursor: pointer;
 }
 
-.switch-row.is-disabled { cursor: default; opacity: 0.55; }
+.switch-row[data-disabled] { cursor: default; opacity: 0.55; }
 
 .switch-body { flex: 1; min-width: 0; display: grid; gap: 1px; }
 
@@ -67,26 +67,33 @@
 
 .switch-sm .switch-hint { font-size: var(--text-xs); }
 
-.switch-sm input[type='checkbox'].toggle { width: 26px; height: 16px; }
+.switch-sm .toggle { width: 26px; height: 16px; }
 
-.switch-sm input[type='checkbox'].toggle::after { width: 10px; height: 10px; }
+.switch-sm .toggle::after { width: 10px; height: 10px; }
 
-.switch-sm input[type='checkbox'].toggle:checked::after { left: calc(100% - 12px); }
+.switch-row.switch-sm[data-selected] .toggle::after { left: calc(100% - 12px); }
 
 .switch-lg { gap: var(--space-4); padding: var(--space-3) 0; font-size: var(--text-md); }
 
-.switch-lg input[type='checkbox'].toggle { width: 38px; height: 22px; }
+.switch-lg .toggle { width: 38px; height: 22px; }
 
-.switch-lg input[type='checkbox'].toggle::after { width: 16px; height: 16px; }
+.switch-lg .toggle::after { width: 16px; height: 16px; }
 
-.switch-lg input[type='checkbox'].toggle:checked::after { left: calc(100% - 18px); }
+.switch-row.switch-lg[data-selected] .toggle::after { left: calc(100% - 18px); }
 
 /* `input[type='checkbox']` is an attribute selector plus a type -- 0-1-1 --
    and `.toggle` is a class, 0-1-0. So the tick-box base outranked this no
    matter which came last in the file, and the switch rendered as a 17px
    rounded square with a checkmark in it. Matching the base's shape is the fix;
    `!important` would have been the other one, and the wrong one. */
-input[type='checkbox'].toggle {
+/* State is read off the row, not off the input.
+   React Aria's `Switch` is the `<label>`; it stamps `data-selected`,
+   `data-disabled`, `data-focus-visible` and `data-pressed` there and keeps the
+   real input visually hidden. So the track is a span, and every rule that was
+   `input.toggle:checked` is now `.switch-row[data-selected] .toggle`. The size
+   variants gain `.switch-row` in their selector to keep outranking the generic
+   state rule the way `input[type='checkbox']` used to. */
+.toggle {
   appearance: none; -webkit-appearance: none;
   position: relative; flex: none; cursor: pointer;
   display: block;
@@ -103,7 +110,7 @@ input[type='checkbox'].toggle {
    surface: a track with half of `--muted` in it, and a knob with an edge so
    it reads as a knob on the darker track. By placement rather than a prop,
    so a toggle put on a card cannot be left in the wrong version. */
-.card input[type='checkbox'].toggle {
+.card .toggle {
   --toggle-off: color-mix(in srgb, var(--muted) 50%, var(--border));
 }
 
@@ -111,11 +118,11 @@ input[type='checkbox'].toggle {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--muted) 30%, transparent), 0 1px 2px rgba(0, 0, 0, 0.18);
 }
 
-.card input[type='checkbox'].toggle:checked::after { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18); }
+.card .switch-row[data-selected] .toggle::after { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18); }
 
 /* The knob, not the tick. The base draws a checkmark through `::before`, which
    a switch has no use for. */
-input[type='checkbox'].toggle::before { content: none; }
+.toggle::before { content: none; }
 
 .toggle::after {
   content: ''; position: absolute; top: 50%; left: 2px;
@@ -128,21 +135,21 @@ input[type='checkbox'].toggle::before { content: none; }
 /* Accent rather than green. Green reads as "this is the safe one", and the
    safe one here is off -- the switch should not editorialise about which way
    you ought to have it. */
-input[type='checkbox'].toggle:checked { background: var(--accent); border-color: var(--accent); }
+.switch-row[data-selected] .toggle { background: var(--accent); border-color: var(--accent); }
 
-.toggle:checked::after { left: calc(100% - 14px); }
+.switch-row[data-selected] .toggle::after { left: calc(100% - 14px); }
 
-input[type='checkbox'].toggle:disabled { opacity: .5; cursor: default; background: var(--toggle-off); }
+.switch-row[data-disabled] .toggle { opacity: .5; cursor: default; background: var(--toggle-off); }
 
-input[type='checkbox'].toggle:checked:disabled { background: var(--accent); border-color: var(--accent); }
+.switch-row[data-selected][data-disabled] .toggle { background: var(--accent); border-color: var(--accent); }
 
-.toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.switch-row[data-focus-visible] .toggle { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* A toggle's knob widens while held, the way a switch does under a thumb,
    and snaps to its side on release. A tick box and a radio darken. */
-.toggle:active:not(:disabled)::after { width: 16px; transition: width var(--dur-fast); }
+.switch-row[data-pressed]:not([data-disabled]) .toggle::after { width: 16px; transition: width var(--dur-fast); }
 
-.toggle:checked:active:not(:disabled)::after { left: calc(100% - 18px); }
+.switch-row[data-selected][data-pressed]:not([data-disabled]) .toggle::after { left: calc(100% - 18px); }
 
 input[type='checkbox']:active:not(:disabled):not(.toggle),
 input[type='radio']:active:not(:disabled) {

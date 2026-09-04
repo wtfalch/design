@@ -35,6 +35,7 @@ import {
   Illustration,
   Markdown,
   Modal,
+  Pill,
   Progress,
   Rows,
   Select,
@@ -375,7 +376,7 @@ function PickCard() {
                 2.50 GB · installed
               </div>
             </div>
-            {at === id && <span className="pill pill-info row-pill">in use</span>}
+            {at === id && <Pill tone="info" inRow>in use</Pill>}
           </div>
         </Card>
       ))}
@@ -544,9 +545,9 @@ export const COMPONENTS: Component[] = [
               name="qwen3:8b"
               pills={
                 <>
-                  <span className="pill pill-info row-pill">in use</span>
-                  <span className="pill row-pill">thinks</span>
-                  <span className="pill row-pill">tools</span>
+                  <Pill tone="info" inRow>in use</Pill>
+                  <Pill inRow>thinks</Pill>
+                  <Pill inRow>tools</Pill>
                 </>
               }
               hint="10.62 GB · 27.3B · q4_K_M"
@@ -554,13 +555,13 @@ export const COMPONENTS: Component[] = [
             />
             <DataRow
               name="qwen2.5vl:3b"
-              pills={<span className="pill row-pill">reads images</span>}
+              pills={<Pill inRow>reads images</Pill>}
               hint="3.2 GB · 3.8B · q4_K_M"
               actions={<Button size="sm">Remove</Button>}
             />
             <DataRow
               name="nomic-embed-text"
-              pills={<span className="pill pill-warn row-pill">not a chat model</span>}
+              pills={<Pill tone="warn" inRow>not a chat model</Pill>}
               hint="274 MB · 137M"
               actions={<Button size="sm">Remove</Button>}
             />
@@ -592,8 +593,8 @@ export const COMPONENTS: Component[] = [
                 name="qwen3-6-27b-fable-fusion-711-uncensored-heretic-nm-dau-neo-max-mtp"
                 pills={
                   <>
-                    <span className="pill row-pill">thinks</span>
-                    <span className="pill row-pill">tools</span>
+                    <Pill inRow>thinks</Pill>
+                    <Pill inRow>tools</Pill>
                   </>
                 }
                 hint="24.1 GB"
@@ -1085,9 +1086,9 @@ export const COMPONENTS: Component[] = [
           'happens to sit in a row.',
         render: () => (
           <Row>
-            <span className="pill pill-quiet">10.62 GB</span>
-            <span className="pill pill-quiet">stdio</span>
-            <span className="pill pill-quiet">4 shards</span>
+            <Pill quiet>10.62 GB</Pill>
+            <Pill quiet>stdio</Pill>
+            <Pill quiet>4 shards</Pill>
           </Row>
         ),
       },
@@ -1098,10 +1099,10 @@ export const COMPONENTS: Component[] = [
           'and none of them is louder than the others.',
         render: () => (
           <Row>
-            <span className="pill">thinks</span>
-            <span className="pill">tools</span>
-            <span className="pill">reads images</span>
-            <span className="pill">draws</span>
+            <Pill>thinks</Pill>
+            <Pill>tools</Pill>
+            <Pill>reads images</Pill>
+            <Pill>draws</Pill>
           </Row>
         ),
       },
@@ -1113,10 +1114,10 @@ export const COMPONENTS: Component[] = [
           'something that is actually not working.',
         render: () => (
           <Row>
-            <span className="pill pill-info">in use</span>
-            <span className="pill pill-good">signed in</span>
-            <span className="pill pill-warn">writes</span>
-            <span className="pill pill-bad">sign-in expired</span>
+            <Pill tone="info">in use</Pill>
+            <Pill tone="good">signed in</Pill>
+            <Pill tone="warn">writes</Pill>
+            <Pill tone="bad">sign-in expired</Pill>
           </Row>
         ),
       },
@@ -1130,9 +1131,9 @@ export const COMPONENTS: Component[] = [
             <span className="grow">
               <span className="named">
                 <span className="truncate">qwen3-8-27b-uncensored</span>
-                <span className="pill pill-info row-pill">in use</span>
-                <span className="pill row-pill">thinks</span>
-                <span className="pill row-pill">tools</span>
+                <Pill tone="info" inRow>in use</Pill>
+                <Pill inRow>thinks</Pill>
+                <Pill inRow>tools</Pill>
               </span>
               <div className="set-hint">10.62 GB · 27.3B · quantisation not recorded</div>
             </span>
@@ -1149,7 +1150,7 @@ export const COMPONENTS: Component[] = [
                 <span className="truncate">
                   qwen3-6-27b-fable-fusion-711-uncensored-heretic-nm-dau-neo-max-mtp
                 </span>
-                <span className="pill row-pill">reads images</span>
+                <Pill inRow>reads images</Pill>
               </span>
               <div className="set-hint">12.60 GB · 26.9B · IQ2_M</div>
             </span>
