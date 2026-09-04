@@ -33,6 +33,7 @@ import {
   ILLUSTRATIONS,
   Icon,
   Illustration,
+  Input,
   Markdown,
   Modal,
   Pill,
@@ -44,6 +45,7 @@ import {
   Slider,
   Table,
   Tabs,
+  Textarea,
   ToastHost,
   Toggle,
   Tooltip,
@@ -220,7 +222,7 @@ function ModalDemo() {
         >
           <div className="set-row">
             <span className="grow">What to call it</span>
-            <input defaultValue="qwen3:8b" aria-label="What to call this model" />
+            <Input defaultValue="qwen3:8b" aria-label="What to call this model" />
           </div>
           <div className="set-row">
             <span className="grow">Keep loaded for</span>
@@ -245,11 +247,11 @@ function FieldDemo() {
         label="Server name"
         hint="How it appears in the tool list. Letters, digits and dashes."
       >
-        {(f) => <input {...f} defaultValue="linear" className="mono" />}
+        {(f) => <Input {...f} defaultValue="linear" className="mono" />}
       </Field>
       <Field label="Server URL" required hint="An SSE or streamable-HTTP endpoint." error={bad}>
         {(f) => (
-          <input {...f} className="mono" value={url} onChange={(e) => setUrl(e.target.value)} />
+          <Input {...f} className="mono" value={url} onChange={(e) => setUrl(e.target.value)} />
         )}
       </Field>
     </div>
@@ -980,7 +982,7 @@ export const COMPONENTS: Component[] = [
                   <option value="a">Select</option>
                   <option value="b">Another</option>
                 </Select>
-                <input className={`size-${z}`} defaultValue="Input" style={{ width: 140 }} />
+                <Input size={z} aria-label="Input" defaultValue="Input" style={{ width: 140 }} />
               </Row>
             ))}
           </div>
@@ -1252,22 +1254,22 @@ export const COMPONENTS: Component[] = [
           'never the only one.',
         render: () => (
           <div style={{ display: 'grid', gap: 'var(--space-5)', maxWidth: 400 }}>
-            <Field label="Plain">{(f) => <input {...f} />}</Field>
+            <Field label="Plain">{(f) => <Input {...f} />}</Field>
             <Field label="With a description" hint="What to put in it, or what it will do.">
-              {(f) => <input {...f} />}
+              {(f) => <Input {...f} />}
             </Field>
             <Field label="Required" required hint="The word, not just the asterisk.">
-              {(f) => <input {...f} />}
+              {(f) => <Input {...f} />}
             </Field>
             <Field label="In error" error="Something is wrong with this one.">
-              {(f) => <input {...f} defaultValue="nope" />}
+              {(f) => <Input {...f} defaultValue="nope" />}
             </Field>
             <Field
               label="Hidden label"
               labelHidden
               hint="Announced, not drawn — for a box under a heading that already names it."
             >
-              {(f) => <input {...f} placeholder="Search…" />}
+              {(f) => <Input {...f} placeholder="Search…" />}
             </Field>
           </div>
         ),
@@ -1279,9 +1281,9 @@ export const COMPONENTS: Component[] = [
           'name it — which is rarer than it looks.',
         render: () => (
           <Row>
-            <input placeholder="Your name" />
-            <input defaultValue="With a value" />
-            <input placeholder="Disabled" disabled />
+            <Input aria-label="Your name" placeholder="Your name" />
+            <Input aria-label="With a value" defaultValue="With a value" />
+            <Input aria-label="Disabled" placeholder="Disabled" disabled />
           </Row>
         ),
       },
@@ -1301,10 +1303,10 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <div style={{ display: 'grid', gap: 'var(--space-5)', maxWidth: 420 }}>
             <Field label="Environment" hint="One per line. Optional.">
-              {(f) => <textarea {...f} rows={2} placeholder="TOKEN=…" />}
+              {(f) => <Textarea {...f} rows={2} placeholder="TOKEN=…" />}
             </Field>
             <Field label="System prompt" error="Too long — this model takes 8k of context.">
-              {(f) => <textarea {...f} rows={2} defaultValue="You are a…" />}
+              {(f) => <Textarea {...f} rows={2} defaultValue="You are a…" />}
             </Field>
           </div>
         ),
@@ -1313,8 +1315,8 @@ export const COMPONENTS: Component[] = [
         name: 'The bare control',
         render: () => (
           <div style={{ display: 'grid', gap: 'var(--space-3)', maxWidth: 420 }}>
-            <textarea rows={3} placeholder="Message… (Enter to send)" />
-            <textarea rows={3} disabled defaultValue="Disabled" />
+            <Textarea aria-label="Message" rows={3} placeholder="Message… (Enter to send)" />
+            <Textarea aria-label="Disabled" rows={3} disabled defaultValue="Disabled" />
           </div>
         ),
       },

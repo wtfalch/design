@@ -254,3 +254,59 @@ test.describe('Tooltip', () => {
     await expect(page.getByRole('tooltip')).toBeVisible()
   })
 })
+
+test.describe('Field', () => {
+  const PARTS = { c: 'input', v: 'The parts' }
+
+  test('the label is an element, and clicking it focuses the input', async ({ page }) => {
+    await page.goto(specimenUrl(PARTS, 'system'))
+    await themeApplied(page, 'system')
+
+    /* "A label is an element, not a placeholder" -- the placeholder disappears
+       the moment somebody types. A real `<label for>` is what makes clicking
+       the words land in the box, and what a screen reader announces. */
+    await page.getByText('Plain', { exact: true }).click()
+    await expect(page.getByLabel('Plain', { exact: true })).toBeFocused()
+  })
+
+  test('the description and the error are wired with aria-describedby', async ({ page }) => {
+    await page.goto(specimenUrl(PARTS, 'system'))
+    await themeApplied(page, 'system')
+
+    const described = page.getByLabel('With a description')
+    const hintId = await described.getAttribute('aria-describedby')
+    expect(hintId, 'a described field names its hint').toBeTruthy()
+    await expect(page.locator(`#${hintId}`)).toHaveText('What to put in it, or what it will do.')
+
+    /* An error is wired to its field, and it is an alert: it appears in
+       response to something the reader just did, usually while they are
+       looking at the button and not the field. Red is the third signal. */
+    const bad = page.getByLabel('In error')
+    await expect(bad).toHaveAttribute('aria-invalid', 'true')
+    const errId = (await bad.getAttribute('aria-describedby')) ?? ''
+    const alert = page.locator(`#${errId.split(' ').pop()}`)
+    await expect(alert).toHaveAttribute('role', 'alert')
+    await expect(alert).toHaveText('Something is wrong with this one.')
+  })
+
+  test('a hidden label is still a label', async ({ page }) => {
+    await page.goto(specimenUrl(PARTS, 'system'))
+    await themeApplied(page, 'system')
+    // Announced, not drawn: the accessible name survives `labelHidden`.
+    await expect(page.getByLabel('Hidden label')).toHaveAttribute('placeholder', 'Search…')
+  })
+
+  test('Tab walks the inputs in order', async ({ page }) => {
+    await page.goto(specimenUrl(PARTS, 'system'))
+    await themeApplied(page, 'system')
+    /* `Required` is labelled "Required *" -- the asterisk is inside the label
+       with its own `aria-label`, so the accessible name is not the bare word.
+       A prefix match is the honest one here; `exact` was hiding that the name
+       includes the requirement, which is the point of the asterisk having a
+       name at all. */
+    for (const name of [/^Plain$/, /^With a description$/, /^Required/]) {
+      await page.keyboard.press('Tab')
+      await expect(page.getByLabel(name)).toBeFocused()
+    }
+  })
+})

@@ -54,7 +54,9 @@
       "include": [
         "packages/design/src/components/Button.tsx",
         "packages/design/src/components/Checkbox.tsx",
+        "packages/design/src/components/Input.tsx",
         "packages/design/src/components/Pill.tsx",
+        "packages/design/src/components/Textarea.tsx",
         "packages/design/src/components/Toggle.tsx",
         "packages/design/src/components/Tooltip.tsx"
       ],

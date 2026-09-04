@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from 'react'
 import Button from './Button'
 import Field from './Field'
+import Input from './Input'
 
 /**
  * The bottom of a settings panel, where the things that cannot be undone live.
@@ -100,9 +101,9 @@ export function DangerAction({
               }
             >
               {(f) => (
-                <input
+                <Input
                   {...f}
-                  className="mono"
+                  mono
                   value={typed}
                   disabled={disabled || busy}
                   autoComplete="off"
