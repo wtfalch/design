@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "ignore": ["node_modules", "dist", ".pnpm-store", "**/__screenshots__/**", "**/*.css"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      ".pnpm-store",
+      "**/__screenshots__/**",
+      "**/*.css",
+      "**/a11y-known.json",
+      "**/manifest.json"
+    ]
   },
   "formatter": {
     "enabled": true,
