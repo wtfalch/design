@@ -23,8 +23,10 @@ export type { Props as ButtonProps } from './components/Button'
 export { default as Callout } from './components/Callout'
 export { default as Card } from './components/Card'
 export { default as Checkbox } from './components/Checkbox'
-export { default as DangerZone } from './components/DangerZone'
-export type { DangerAction } from './components/DangerZone'
+/* `DangerAction` is a component -- a row inside the zone -- and was exported as
+   a type until the first consumer wrote `<DangerAction>` and TypeScript refused
+   it (TS1362). Nothing in this repo renders one, which is how it went unseen. */
+export { DangerAction, default as DangerZone } from './components/DangerZone'
 export { default as Dialog } from './components/Dialog'
 export { default as Empty } from './components/Empty'
 export { default as Field } from './components/Field'

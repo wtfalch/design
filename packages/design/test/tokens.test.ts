@@ -77,6 +77,19 @@ describe('the token vocabulary', () => {
   })
 })
 
+describe('the spacing scale', () => {
+  it('is a multiple of four at every step, and the name is the multiple', () => {
+    /* `--space-3` is 12px and cannot quietly become 13. A scale whose names do
+       not predict its values is a lookup table, and nobody memorises a lookup
+       table. tf's `spacing.test.ts` held this until the vocabulary moved. */
+    const steps = [...css.matchAll(/--space-(\d+): calc\((\d+)px \* var\(--density\)\)/g)]
+    expect(steps.length, 'the scale is missing').toBeGreaterThanOrEqual(8)
+    for (const [, n, px] of steps) {
+      expect(Number(px), `--space-${n} should be ${Number(n) * 4}px`).toBe(Number(n) * 4)
+    }
+  })
+})
+
 describe('the derived tokens', () => {
   it('are computed from a themeable token, not written as literals', () => {
     // The point of the category. `--text-lg: 18px` would be a step that stops

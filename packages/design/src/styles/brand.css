@@ -1,3 +1,20 @@
+/* Once the morph has finished (`Brand.tsx` adds the class at t = 1), the cog
+   turns -- a revolution in 5 s, a tooth every 0.8 s: the pace of a
+   mechanism, not a spinner. It was 2.4 s, which was too quick to William's
+   eye once the teeth were six and fat. Off under reduced motion, where the
+   mark never becomes a cog in the first place.
+
+   Not applied since 2026-09-03 -- William asked to try it without, and
+   `Brand.tsx` says so where the class would go. The rule stays so that putting
+   the class back is the whole change; it stays HERE, rather than in the app
+   that first held it, because the component that would add the class is this
+   package's. The keyframes are in `base.css` beside `.brand`. */
+.brand-turning { animation: brand-turn 5s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-turning { animation: none; }
+}
+
 .tf-dots { display: inline-flex; gap: var(--space-1); }
 
 .tf-dots i {

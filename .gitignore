@@ -9,3 +9,6 @@ blob-report
 # Baselines made on a laptop. CI reads only __screenshots__/linux.
 gallery-e2e/__screenshots__/darwin
 gallery/dist
+
+# `pnpm pack` output, for trying the tarball locally
+*.tgz
