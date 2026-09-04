@@ -20,6 +20,7 @@
 import { useEffect, useState } from 'react'
 
 import { Brand, Select, THEMES, TOKEN_KEYS, applyTheme } from '@wtfalch/design'
+import { brand } from './brand'
 import { COMPONENTS } from './specimens'
 
 /** The one page that is not a component. Tokens earn a page because every
@@ -185,7 +186,7 @@ export default function Gallery() {
   const tokens = useTokens(theme)
 
   useEffect(() => {
-    applyTheme(theme)
+    applyTheme(theme === 'brand' ? brand : theme)
   }, [theme])
 
   useEffect(() => {
@@ -230,7 +231,7 @@ export default function Gallery() {
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
           >
-            {Object.entries(THEMES).map(([id, t]) => (
+            {[...Object.entries(THEMES), ['brand', brand] as const].map(([id, t]) => (
               <option key={id} value={id}>
                 {t.name}
               </option>

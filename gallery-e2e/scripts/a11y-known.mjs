@@ -23,7 +23,7 @@ import { chromium } from '@playwright/test'
 import manifest from '../e2e/manifest.json' with { type: 'json' }
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
-const THEMES = ['system', 'night', 'paper']
+const THEMES = ['system', 'night', 'paper', 'brand']
 const base = process.env.GALLERY_URL ?? 'http://127.0.0.1:5199'
 const here = dirname(fileURLToPath(import.meta.url))
 

@@ -20,7 +20,7 @@ export interface Specimen {
  *  is only as good as its worst theme and the failures are theme-specific by
  *  nature: a `running` pill sat at 1.67:1 on Paper for weeks while looking
  *  correct on every dark theme anybody tested. */
-export const THEMES = ['system', 'night', 'paper'] as const
+export const THEMES = ['system', 'night', 'paper', 'brand'] as const
 
 let cached: Specimen[] | null = null
 

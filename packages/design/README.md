@@ -47,8 +47,9 @@ export const brand = defineTheme({
   },
 })
 
-applyTheme('brand')                    // the document
-applyTheme('brand', myEl)              // or a subtree
+applyTheme(brand)                      // the object, straight from defineTheme
+applyTheme(brand, myEl)                // or on a subtree
+applyTheme('paper')                    // or a built-in, by name
 ```
 
 Name the tokens you change; the rest inherit from `tokens.css`. A theme naming
@@ -70,6 +71,20 @@ reason the type is exported at all.
 `tokens.test.ts` holds all three lists to `tokens.css` in both directions. A
 token added to the stylesheet and to no list fails the suite rather than
 becoming a fourth, undocumented category.
+
+## The measurement ships
+
+```ts
+import { ratio } from '@wtfalch/design'
+ratio('#6d28d9', '#ffffff') // 6.30 -- the label on your primary button
+```
+
+`test/contrast.test.ts` measures every built-in theme, pair by pair, with the
+WCAG 2 formula: text on the page and on both panels, hints, the label on the
+primary button, all four status colours, and the two boundaries that want
+3:1. On its first run it found the built-in information blue at 3.96:1 on
+white. `ratio` and `luminance` are exported so the theme you write -- the one
+nobody here will ever look at -- can be held to the same numbers.
 
 ## Two rules that outrank any theme
 

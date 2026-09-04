@@ -30,7 +30,7 @@ const NEUTRAL: Record<string, string> = {
    on the root element -- and an inline style beats a stylesheet rule at the
    same specificity. A theme that set a duration would win over the media query
    unless the media query is the one place durations are decided. */
-for (const theme of ['system', 'night', 'paper']) {
+for (const theme of ['system', 'night', 'paper', 'brand']) {
   test(`motion collapses under prefers-reduced-motion · ${theme}`, async ({ page }) => {
     await page.goto(`/design.html?c=toggle&v=Sizes&theme=${theme}&chrome=0`)
     await expect(page.locator('.spec-stage')).toBeVisible()
