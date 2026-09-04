@@ -410,3 +410,109 @@ test.describe('Dialog', () => {
     await expect(page.getByRole('dialog').getByRole('button', { name: 'Allow' })).toBeVisible()
   })
 })
+
+test.describe('Tabs', () => {
+  /* Not migrated, and that is a decision: the strip already implements the
+     WAI-ARIA tabs pattern exactly -- `tablist`, `role="tab"`, `aria-selected`,
+     one tab stop with the arrows moving inside it, Home and End, selection
+     following focus. React Aria's `Tabs` would add nothing here and would
+     insist on owning `TabPanel`s the strip deliberately does not. These tests
+     are what make "already correct" a claim rather than an impression. */
+  const tabs = (page: import('@playwright/test').Page) => page.getByRole('tab')
+
+  test('one tab stop for the whole strip, on the selected tab', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'tabs', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await expect(tabs(page).filter({ hasText: 'Model' })).toBeFocused()
+    // A second Tab leaves the strip entirely rather than visiting the next tab.
+    await page.keyboard.press('Tab')
+    await expect(page.locator('[role="tab"]:focus')).toHaveCount(0)
+  })
+
+  test('the arrows move selection and focus together, and skip a disabled tab', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl({ c: 'tabs', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+
+    await page.keyboard.press('ArrowRight')
+    const perms = tabs(page).filter({ hasText: 'Permissions' })
+    await expect(perms).toBeFocused()
+    await expect(perms).toHaveAttribute('aria-selected', 'true')
+
+    await page.keyboard.press('ArrowRight')
+    await expect(tabs(page).filter({ hasText: 'Memories' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
+
+    /* "Discarded" is disabled. The next arrow wraps past it to "Model" rather
+       than landing on a tab that cannot be chosen. */
+    await page.keyboard.press('ArrowRight')
+    await expect(tabs(page).filter({ hasText: 'Model' })).toHaveAttribute('aria-selected', 'true')
+    await expect(tabs(page).filter({ hasText: 'Discarded' })).toBeDisabled()
+  })
+
+  test('Home and End', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'tabs', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('End')
+    // End lands on the last *enabled* tab.
+    await expect(tabs(page).filter({ hasText: 'Memories' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    )
+    await page.keyboard.press('Home')
+    await expect(tabs(page).filter({ hasText: 'Model' })).toHaveAttribute('aria-selected', 'true')
+  })
+
+  test('a vertical rail walks with Up and Down, and the group headings are not tabs', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl({ c: 'tabs', v: 'Vertical, grouped' }, 'system'))
+    await themeApplied(page, 'system')
+    await expect(tabs(page), 'two headings, four tabs').toHaveCount(4)
+    await expect(page.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical')
+
+    await page.keyboard.press('Tab')
+    await expect(tabs(page).filter({ hasText: 'Assistant' })).toBeFocused()
+    await page.keyboard.press('ArrowDown')
+    await expect(tabs(page).filter({ hasText: 'Speech' })).toHaveAttribute('aria-selected', 'true')
+    await page.keyboard.press('ArrowDown')
+    // Across the heading into the next group, without stopping on it.
+    await expect(tabs(page).filter({ hasText: 'Files' })).toBeFocused()
+  })
+})
+
+test.describe('Progress', () => {
+  /* Not migrated: the bar is already a correct `progressbar`, and the part
+     worth holding is the one that is easy to get wrong -- an indeterminate bar
+     carries no `aria-valuenow`, because "nought per cent" and "unknown" are
+     different statements and the second is the true one. React Aria's
+     `ProgressBar` says the same thing with a different DOM; there is nothing
+     to gain and a structure to lose. */
+  test('a determinate bar states its value, its range and its text', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'progress', v: 'Determinate' }, 'system'))
+    await themeApplied(page, 'system')
+    const bar = page.getByRole('progressbar', { name: 'ollama-darwin.tgz' })
+    await expect(bar).toHaveAttribute('aria-valuenow', '62')
+    await expect(bar).toHaveAttribute('aria-valuemin', '0')
+    await expect(bar).toHaveAttribute('aria-valuemax', '100')
+    await expect(bar).toHaveAttribute('aria-valuetext', '412 MB of 660 MB')
+    const width = await bar.locator('i').evaluate((el) => (el as HTMLElement).style.width)
+    expect(width, 'the fill tracks the value').toBe('62%')
+  })
+
+  test('an indeterminate bar carries no value at all', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'progress', v: 'Indeterminate' }, 'system'))
+    await themeApplied(page, 'system')
+    const bar = page.getByRole('progressbar', { name: 'Fetching' })
+    await expect(bar).not.toHaveAttribute('aria-valuenow', /.*/)
+    await expect(bar).toHaveAttribute('aria-valuetext', 'contacting GitHub…')
+    const anim = await bar.locator('i').evaluate((el) => getComputedStyle(el).animationName)
+    expect(anim, 'it moves, so it is not the same picture as stalled').not.toBe('none')
+  })
+})

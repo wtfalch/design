@@ -51,3 +51,16 @@ for (const theme of ['system', 'night', 'paper']) {
     }
   })
 }
+
+test('an indeterminate progress bar holds still under prefers-reduced-motion', async ({ page }) => {
+  /* The one animation in the system that is not a transition on a token: a
+     bar that sweeps to say "working". Its `@keyframes` are collapsed by the
+     component's own reduced-motion block, which is a second place the rule
+     lives -- and a second place it can be forgotten. */
+  await page.goto('/design.html?c=progress&v=Indeterminate&theme=system&chrome=0')
+  await expect(page.locator('.spec-stage')).toBeVisible()
+  const anim = await page
+    .locator('[role="progressbar"] i')
+    .evaluate((el) => getComputedStyle(el).animationName)
+  expect(anim).toBe('none')
+})
