@@ -516,3 +516,63 @@ test.describe('Progress', () => {
     expect(anim, 'it moves, so it is not the same picture as stalled').not.toBe('none')
   })
 })
+
+test.describe('Slider', () => {
+  /* Not migrated. It is a native `<input type="range">` laid over a drawn
+     track, and the platform already supplies the whole pattern: the `slider`
+     role, arrows by `step`, Home and End, touch, the announced value. What the
+     component adds on top -- `aria-valuetext` and a visible `<output>` from
+     `format`, a ring on the box -- is what these hold. React Aria's `Slider`
+     rebuilds all of it on divs, and would take the drawing with it. */
+  const STEPPED = { c: 'slider', v: 'Stepped, continuous, disabled' }
+
+  test('Tab reaches the first slider, and the ring is on the box', async ({ page }) => {
+    await page.goto(specimenUrl(STEPPED, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    const slider = page.getByRole('slider').first()
+    await expect(slider).toBeFocused()
+    const ring = await page.evaluate(() => {
+      const box = document.activeElement?.closest('.slider-box')
+      return box ? getComputedStyle(box).outlineWidth : null
+    })
+    expect(ring, 'the box paints the ring; the input inside is invisible').toBe('2px')
+  })
+
+  test("the arrows move by step, and the value is said in the caller's words", async ({ page }) => {
+    await page.goto(specimenUrl(STEPPED, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    const slider = page.getByRole('slider').first()
+    await expect(slider).toHaveAttribute('aria-valuetext', '12.0 GB')
+
+    await page.keyboard.press('ArrowRight')
+    await expect(slider).toHaveValue('12.5')
+    await expect(slider, 'the announced value follows format()').toHaveAttribute(
+      'aria-valuetext',
+      '12.5 GB',
+    )
+    await expect(page.locator('output').first(), 'and so does the visible one').toHaveText(
+      '12.5 GB',
+    )
+
+    await page.keyboard.press('End')
+    await expect(slider).toHaveValue('19.5')
+    await page.keyboard.press('Home')
+    await expect(slider).toHaveValue('2')
+  })
+
+  test('a disabled slider is skipped by Tab', async ({ page }) => {
+    await page.goto(specimenUrl(STEPPED, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.getByRole('slider')).toHaveCount(4)
+    await expect(page.locator('input[type="range"]:disabled')).toHaveCount(1)
+    for (let i = 0; i < 4; i++) {
+      await page.keyboard.press('Tab')
+      const onDisabled = await page.evaluate(
+        () => (document.activeElement as HTMLInputElement | null)?.disabled === true,
+      )
+      expect(onDisabled, `Tab ${i + 1} must not land on the disabled slider`).toBe(false)
+    }
+  })
+})
