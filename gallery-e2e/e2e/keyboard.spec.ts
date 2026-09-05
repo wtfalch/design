@@ -889,7 +889,7 @@ test.describe('Toggle · async', () => {
     expect(await on(page, 0), 'moved before the request landed').toBe(true)
     await expect(row(page, 0)).toHaveAttribute('data-pending', 'true')
     await expect(row(page, 0).locator('[role=switch]')).toHaveAttribute('aria-busy', 'true')
-    await expect(row(page, 0).locator('.toggle-sweep')).toHaveCount(1)
+    await expect(row(page, 0).locator('.toggle-busy')).toHaveCount(1)
 
     /* A second press while busy is refused: the state does not flip back. */
     await row(page, 0).click()
@@ -897,7 +897,7 @@ test.describe('Toggle · async', () => {
 
     await page.clock.runFor(1300)
     await expect(row(page, 0)).not.toHaveAttribute('data-pending', 'true')
-    await expect(row(page, 0).locator('.toggle-sweep')).toHaveCount(0)
+    await expect(row(page, 0).locator('.toggle-busy')).toHaveCount(0)
     expect(await on(page, 0), 'held after the request landed').toBe(true)
   })
 

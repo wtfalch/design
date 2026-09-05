@@ -189,46 +189,41 @@ input[type='radio']:active:not(:disabled) {
 
 .switch-row[data-selected] .toggle[data-held]:not([data-dragging])::after { left: calc(100% - 18px); }
 
-/* Pending: a sweep around the rim while `onChange`'s promise is out.
-   chef-monorepo's design, copied 2026-09-05. A ring 2px outside the track
-   (`inset: -2px`, a transparent 2px border) with a mask that keeps only the
-   rim -- the border box less the padding box -- and inside it a square twice
-   the size, painted as a conic gradient that is transparent for two thirds of
-   the turn, spinning once a second. The ring sits OUTSIDE the track, so it
-   reads against the page, not the track -- which is what the first tint got
-   wrong: panel-coloured on the accent track, it was white on a white page and
-   the on-state sweep vanished ("the ring is green and the bg is green"). Off,
-   the arc is the accent, which contrasts with a grey track and any page. On,
-   it is the accent pulled toward the text colour: darker than the track on a
-   light page, lighter than it on a dark one, and distinct from both. Under
-   reduced motion the ring stands still and dims to a steady tint: `aria-busy`
-   says what it means, and a still ring says it without a loop. */
-.toggle-sweep {
-  position: absolute; inset: -2px;
+/* Pending: the track works like the indeterminate `Progress` bar while
+   `onChange`'s promise is out.
+   The first design was chef-monorepo's ring around the rim, and at 30x18 it
+   was faint in every theme, twice: a 2px rim outside the track reads against
+   the page rather than the control, and a tint chosen against the track was
+   white on a white page. So the indicator moved inside. The track is already
+   a small bar; the system already says "working, duration unknown" with a
+   band travelling along a bar -- `tf-bar`, the keyframes `Progress` uses, at
+   the same timing -- and a switch that is saving is exactly that. The band is
+   `--on-accent` on the accent track and `--text` on the plain one, the two
+   colours the vocabulary guarantees to contrast with those surfaces, at a
+   strength that reads as a highlight moving over the track rather than a
+   second colour -- and strong enough to be seen at a glance, which the first
+   two attempts at this indicator were not. The knob paints above it. Under reduced motion the band
+   stands still across the middle of the track: `aria-busy` says what it
+   means, and a still band says it without a loop. */
+.toggle-busy {
+  position: absolute; inset: 0;
   border-radius: 999px;
-  border: 2px solid transparent;
+  overflow: hidden;
   pointer-events: none;
-  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
-  mask-composite: exclude;
 }
 
-.toggle-sweep::before {
+.toggle-busy::before {
   content: '';
-  position: absolute; top: 50%; left: 50%;
-  width: 220%; height: 220%;
-  translate: -50% -50%;
-  --sweep: color-mix(in oklab, var(--accent) 70%, transparent);
-  background: conic-gradient(from 0deg, transparent 0deg 60deg, var(--sweep) 180deg, transparent 300deg 360deg);
-  animation: tf-spin 1s linear infinite;
+  position: absolute; top: 0; bottom: 0; left: 0;
+  width: 55%;
+  border-radius: 999px;
+  --band: color-mix(in oklab, var(--text) 32%, transparent);
+  background: var(--band);
+  animation: tf-bar 1.2s var(--ease) infinite;
 }
 
-.switch-row[data-selected] .toggle-sweep::before { --sweep: color-mix(in oklab, var(--accent) 55%, var(--text)); }
-
-@keyframes tf-spin { to { rotate: 1turn; } }
+.switch-row[data-selected] .toggle-busy::before { --band: color-mix(in oklab, var(--on-accent) 62%, transparent); }
 
 @media (prefers-reduced-motion: reduce) {
-  .toggle-sweep::before { animation: none; background: color-mix(in oklab, var(--accent) 45%, transparent); }
-  .switch-row[data-selected] .toggle-sweep::before { background: color-mix(in oklab, var(--accent) 55%, var(--text)); opacity: 0.6; }
+  .toggle-busy::before { animation: none; left: 22.5%; }
 }
