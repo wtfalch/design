@@ -36,8 +36,13 @@ import { Switch } from 'react-aria-components'
  *  to turn pixels into a position: the knob travels the track's inner width
  *  less itself and its 2px of margin at each end. */
 const KNOB = { sm: 10, md: 12, lg: 16 } as const
-/** Under this many pixels a press is a tap, and the label toggles it. */
-const SLOP = 3
+/** Under this many pixels of horizontal travel a press is a tap. It was 3,
+ *  and a plain click carries that much hand jitter -- so a click on the knob
+ *  became a drag, the knob twitched toward the pointer and settled by which
+ *  side it was on, and the switch felt as if it wanted to be dragged rather
+ *  than pressed. Six is over the jitter and still a third of the way across
+ *  the shortest track. */
+const SLOP = 6
 
 export default function Toggle({
   label,
@@ -157,7 +162,13 @@ export default function Toggle({
 
   const [knob, setKnob] = useState<number | null>(null)
   const [held, setHeld] = useState(false)
-  const gesture = useRef<{ id: number; startX: number; from: number; moved: boolean } | null>(null)
+  const gesture = useRef<{
+    id: number
+    startX: number
+    startY: number
+    from: number
+    moved: boolean
+  } | null>(null)
   const swallowClick = useRef(false)
 
   const position = (track: HTMLSpanElement, g: NonNullable<typeof gesture.current>, x: number) => {
@@ -196,6 +207,7 @@ export default function Toggle({
           gesture.current = {
             id: e.pointerId,
             startX: e.clientX,
+            startY: e.clientY,
             from: shown ? 1 : 0,
             moved: false,
           }
@@ -204,8 +216,17 @@ export default function Toggle({
         onPointerMove={(e) => {
           const g = gesture.current
           if (!g || e.pointerId !== g.id) return
-          if (!g.moved && Math.abs(e.clientX - g.startX) < SLOP) return
-          g.moved = true
+          if (!g.moved) {
+            const dx = e.clientX - g.startX
+            const dy = e.clientY - g.startY
+            /* Mostly sideways and past the slop, or it is still a press. A
+               drag begins where the threshold was crossed, not where the
+               pointer first landed, so the knob starts from rest instead of
+               jumping the slop's width the moment it engages. */
+            if (Math.abs(dx) < SLOP || Math.abs(dx) <= Math.abs(dy)) return
+            g.moved = true
+            g.startX = e.clientX
+          }
           setKnob(position(e.currentTarget, g, e.clientX))
         }}
         onPointerUp={(e) => {

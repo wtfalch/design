@@ -841,6 +841,22 @@ test.describe('Toggle · pointer', () => {
     expect(await state(page)).toBe(true)
   })
 
+  test('a click with a few pixels of hand jitter is a tap, not a drag', async ({ page }) => {
+    await page.goto(specimenUrl(TOGGLE, 'system'))
+    await themeApplied(page, 'system')
+    const box = (await track(page).boundingBox()) ?? { x: 0, y: 0, width: 0, height: 0 }
+    const y = box.y + box.height / 2
+    /* Down on the knob, drift 4px sideways and 3px down the way a hand does,
+       release. Under the old 3px slop this was a drag that settled by side and
+       changed nothing; it is a press, and it toggles. */
+    await page.mouse.move(box.x + 24, y)
+    await page.mouse.down()
+    await page.mouse.move(box.x + 20, y + 3, { steps: 2 })
+    await page.mouse.up()
+    expect(await state(page), 'toggled off by a jittery click').toBe(false)
+    expect(await track(page).getAttribute('data-dragging')).toBeNull()
+  })
+
   test('a tap on the knob is still a tap', async ({ page }) => {
     await page.goto(specimenUrl(TOGGLE, 'system'))
     await themeApplied(page, 'system')
