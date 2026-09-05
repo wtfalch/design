@@ -65,7 +65,7 @@
   transform-origin: left;
   background: currentColor;
   opacity: 0.5;
-  animation: tf-callout-clock linear forwards;
+  animation: ds-callout-clock linear forwards;
 }
 
 /* Held while the pointer is on it. A message that expires while you are reading

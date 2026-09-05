@@ -18,11 +18,15 @@
  *  Re-running onboarding clears it -- see `forgetTour`. There is still no way
  *  to replay the tour on its own without doing that, which is worth a row in
  *  Settings and is said here rather than left implied. */
-const SEEN = 'tf-tour-seen'
+/** Where a product records that the tour was seen. Every product that installs
+ *  the package gets its own key by passing one; the default is the package's,
+ *  so two products on one origin do not share a memory. tf passes
+ *  `tf-tour-seen`, the key its users already hold. */
+export const DEFAULT_TOUR_KEY = 'design-tour-seen'
 
-export function tourSeen(): boolean {
+export function tourSeen(key = DEFAULT_TOUR_KEY): boolean {
   try {
-    return localStorage.getItem(SEEN) === '1'
+    return localStorage.getItem(key) === '1'
   } catch {
     // A browser refusing storage is not a reason to refuse the tour.
     return false
@@ -42,17 +46,17 @@ export function tourSeen(): boolean {
  * this a fact about one browser, which is what it is. If you are being asked
  * these questions again, you have not seen the walk that comes after them.
  */
-export function forgetTour(): void {
+export function forgetTour(key = DEFAULT_TOUR_KEY): void {
   try {
-    localStorage.removeItem(SEEN)
+    localStorage.removeItem(key)
   } catch {
     /* nothing to do about it, and nothing that needs doing */
   }
 }
 
-export function markTourSeen(): void {
+export function markTourSeen(key = DEFAULT_TOUR_KEY): void {
   try {
-    localStorage.setItem(SEEN, '1')
+    localStorage.setItem(key, '1')
   } catch {
     /* nothing to do about it, and nothing that needs doing */
   }

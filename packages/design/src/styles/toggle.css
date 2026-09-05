@@ -220,10 +220,10 @@ input[type='radio']:active:not(:disabled) {
   width: 220%; height: 220%;
   translate: -50% -50%;
   background: conic-gradient(from 0deg, transparent 0deg, transparent 60deg, color-mix(in oklab, var(--accent) 70%, transparent) 180deg, transparent 300deg, transparent 360deg);
-  animation: tf-spin 1s linear infinite;
+  animation: ds-spin 1s linear infinite;
 }
 
-@keyframes tf-spin { to { rotate: 1turn; } }
+@keyframes ds-spin { to { rotate: 1turn; } }
 
 @media (prefers-reduced-motion: reduce) {
   .toggle-sweep::before { animation: none; background: color-mix(in oklab, var(--accent) 45%, transparent); }

@@ -39,6 +39,16 @@ jobs:
           TAG="${GITHUB_REF_NAME#v}"
           PKG="$(node -p "require('./packages/design/package.json').version")"
           [ "$TAG" = "$PKG" ] || { echo "tag v$TAG != package $PKG"; exit 1; }
-      - run: pnpm --filter @wtfalch/design publish --access public --provenance --no-git-checks
+      # No token, no publish -- and no red run. 0.1.0 and 0.2.0 went out from a
+      # laptop with a browser login, and a tag pushed afterwards should record
+      # the release without failing on a step it was never going to take.
+      - name: publish, if there is a token
+        if: env.NODE_AUTH_TOKEN != ''
+        run: pnpm --filter @wtfalch/design publish --access public --provenance --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: not published
+        if: env.NODE_AUTH_TOKEN == ''
+        run: echo "NPM_TOKEN is not set; gates passed, nothing published."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

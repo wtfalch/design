@@ -515,12 +515,12 @@ export const COMPONENTS: Component[] = [
     id: 'brand',
     name: 'Brand',
     blurb:
-      'The wordmark: a lowercase tf in one unbroken stroke, the same path the ' +
-      'app icon is rendered from, held to it by `test/brandMark.test.ts`. It ' +
-      'was "TF" typeset in the system font, tracked until the pair read as one ' +
-      'mark; a drawn line renders the same on a machine without SF Pro, and it ' +
-      'has no join to get wrong. `currentColor`, so `.brand` decides the green ' +
-      'and a theme can move it through `--good`.',
+      "Every wtfalch product's mark, by name — `brandMarks.ts` is the table and " +
+      'adding a product is adding a row. tf is the first: a lowercase tf in one ' +
+      'unbroken stroke, the same path its app icon is rendered from, held to it ' +
+      "by tf's `brandMark.test.ts`. Still, on purpose: tf's cog-morph is tf's " +
+      'own component, layered over this path. `currentColor`, so `.brand` decides ' +
+      'the green and a theme can move it through `--good`.',
     variants: [
       {
         name: 'In the header',
@@ -528,7 +528,7 @@ export const COMPONENTS: Component[] = [
           'Sized off the type scale — 1.5 times `--text-md`, the line box the ' +
           'old wordmark occupied — so the header kept its height when the letters ' +
           'became a drawing. The width follows the viewBox.',
-        render: () => <Brand className="brand" />,
+        render: () => <Brand />,
       },
     ],
   },

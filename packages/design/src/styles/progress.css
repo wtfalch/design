@@ -33,7 +33,7 @@
    happening" without claiming to know how much of it is left. */
 .bar-indeterminate > i {
   width: 35%;
-  animation: tf-bar 1.2s var(--ease) infinite;
+  animation: ds-bar 1.2s var(--ease) infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,7 @@
 # @wtfalch/design
 
-Components on a fixed token vocabulary, so an app can look like itself without
-forking the stylesheet.
+wtfalch's design system: components on a fixed token vocabulary, so every
+product can look like itself without forking the stylesheet.
 
 ```bash
 pnpm add @wtfalch/design
@@ -125,10 +125,11 @@ theme on a light-mode laptop is not silently repainted.
 
 ## Status
 
-`0.1.0`. Twenty-eight components, every one of the 70 gallery specimens
+`0.2.0`. Twenty-eight components, every one of the 70 gallery specimens
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
-The first consumer is [tf](https://github.com/wtfalch/tf), the app it came from.
+It came out of [tf](https://github.com/wtfalch/tf), which is its first consumer;
+`Brand` holds every product's mark by name, tf's first.
 
 Requires React 19. Behaviour comes from
 [React Aria Components](https://react-spectrum.adobe.com/react-aria/); every

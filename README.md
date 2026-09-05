@@ -1,8 +1,8 @@
 # design
 
-The design system behind [tf](https://github.com/wtfalch/tf), published as
-`@wtfalch/design` so more than one app can use it and none of them have to look
-alike.
+wtfalch's design system, published as `@wtfalch/design`: it came out of
+[tf](https://github.com/wtfalch/tf) and serves every product, none of which
+have to look alike.
 
 | | |
 |---|---|

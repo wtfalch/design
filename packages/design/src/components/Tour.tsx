@@ -35,7 +35,16 @@ export interface TourStop {
   body: React.ReactNode
 }
 
-export default function Tour({ stops, onDone }: { stops: TourStop[]; onDone: () => void }) {
+export default function Tour({
+  stops,
+  onDone,
+  storageKey,
+}: {
+  stops: TourStop[]
+  onDone: () => void
+  /** Where this product records that the tour was seen. See `tourMarker.ts`. */
+  storageKey?: string
+}) {
   const [at, setAt] = useState(0)
   const [box, setBox] = useState<DOMRect | null>(null)
   const card = useRef<HTMLDivElement>(null)
@@ -58,9 +67,9 @@ export default function Tour({ stops, onDone }: { stops: TourStop[]; onDone: () 
   const stop = live[Math.min(at, Math.max(0, live.length - 1))]
 
   const finish = useCallback(() => {
-    markTourSeen()
+    markTourSeen(storageKey)
     onDone()
-  }, [onDone])
+  }, [onDone, storageKey])
 
   useLayoutEffect(() => {
     if (!stop) return finish()

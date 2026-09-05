@@ -132,7 +132,7 @@
    something happening now. */
 .rows-pick > .rows-row.is-loading {
   border-color: var(--accent);
-  animation: tf-pulse 1.4s ease-in-out infinite;
+  animation: ds-pulse 1.4s ease-in-out infinite;
 }
 
 /* And nothing else can be chosen while it happens: picking a second model

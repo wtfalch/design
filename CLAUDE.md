@@ -1,7 +1,10 @@
 # CLAUDE.md — agent guide for `design`
 
-`@wtfalch/design` is the design system that came out of tf's dashboard,
-published so more than one app can use it and none of them have to look alike.
+`@wtfalch/design` is wtfalch's design system. It came out of tf's dashboard and
+is published so every product can use it and none of them have to look alike.
+Nothing in it is one product's: a mark lives in `Brand` by name, a product's
+animation of its mark lives in that product, and no class or keyframe carries a
+product's initials.
 Three things in one pnpm workspace:
 
 | | |

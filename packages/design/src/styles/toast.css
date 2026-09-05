@@ -25,7 +25,7 @@
   background: var(--panel);
   box-shadow: var(--shadow-2);
   font-size: var(--text-sm);
-  animation: tf-toast-in var(--dur-md) var(--ease);
+  animation: ds-toast-in var(--dur-md) var(--ease);
 }
 
 /* The tone is the edge and the mark, in the tone's own colour. It used to be the
@@ -55,7 +55,7 @@
 /* `data-exiting` is React Aria's: it keeps a toast in the DOM for the length
    of this animation after it is closed, then removes it, which is what the
    `.leaving` class and a second timer used to do by hand. */
-.toast[data-exiting] { animation: tf-toast-out var(--dur-fast) var(--ease) forwards; }
+.toast[data-exiting] { animation: ds-toast-out var(--dur-fast) var(--ease) forwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .toast, /* `data-exiting` is React Aria's: it keeps a toast in the DOM for the length

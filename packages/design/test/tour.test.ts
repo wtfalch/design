@@ -15,10 +15,12 @@ const tour = readFileSync(resolve(here, '../src/components/tourMarker.ts'), 'utf
 
 describe('the tour marker', () => {
   it('forgetTour removes the key the gate reads', () => {
-    const key = tour.match(/const SEEN = '([^']+)'/)?.[1]
+    const key = tour.match(/const DEFAULT_TOUR_KEY = '([^']+)'/)?.[1]
     expect(key, 'the marker key must be a named constant').toBeTruthy()
-    expect(tour).toMatch(/export function forgetTour\(\)[\s\S]*?localStorage\.removeItem\(SEEN\)/)
-    const literals = [...tour.matchAll(/'tf-tour-seen'/g)].length
+    expect(tour).toMatch(
+      /export function forgetTour\(key = DEFAULT_TOUR_KEY\)[\s\S]*?localStorage\.removeItem\(key\)/,
+    )
+    const literals = [...tour.matchAll(/'design-tour-seen'/g)].length
     expect(literals, 'the key is written once, not as a second copy that can drift').toBe(1)
   })
 

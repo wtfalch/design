@@ -5,7 +5,7 @@
   height: 8px;
   border-radius: var(--radius-sm);
   background: var(--muted);
-  animation: tf-pulse 1.4s ease-in-out infinite;
+  animation: ds-pulse 1.4s ease-in-out infinite;
   vertical-align: middle;
 }
 
@@ -46,7 +46,7 @@
 
 /* Breathing rather than sliding. A sweep travelling across a skeleton implies
    progress from left to right, and nothing here knows how far along it is. */
-.skel-pulse { animation: tf-skel calc(var(--dur-slow) * 3) var(--ease) infinite alternate; }
+.skel-pulse { animation: ds-skel calc(var(--dur-slow) * 3) var(--ease) infinite alternate; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Still distinguishable from a real block of colour, and still still. */
