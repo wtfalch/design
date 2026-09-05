@@ -125,6 +125,23 @@ theme on a light-mode laptop is not silently repainted.
 
 ## Status
 
-`0.1.0`. Every component is in, every one of the 68 gallery specimens is
-photographed in four themes, and the contrast and reduced-motion rules are
-tests rather than sentences. The first consumer is the app it came from.
+`0.1.0`. Twenty-eight components, every one of the 70 gallery specimens
+photographed in four themes, the open windows photographed too, and the
+contrast, reduced-motion and keyboard rules are tests rather than sentences.
+The first consumer is [tf](https://github.com/wtfalch/tf), the app it came from.
+
+Requires React 19. Behaviour comes from
+[React Aria Components](https://react-spectrum.adobe.com/react-aria/); every
+pixel is the stylesheet's, styled through `data-*` attributes off the token
+vocabulary. No Tailwind, no utility layer.
+
+## Source and issues
+
+[github.com/wtfalch/design](https://github.com/wtfalch/design) — the package
+under `packages/design`, the gallery under `gallery`, and the visual, axe and
+keyboard suites under `gallery-e2e`. The repository's `CLAUDE.md` carries the
+rules the components follow, each with the bug that produced it.
+
+## Licence
+
+MIT.
