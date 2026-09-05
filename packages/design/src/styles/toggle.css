@@ -192,47 +192,39 @@ input[type='radio']:active:not(:disabled) {
 
 .switch-row[data-selected] .toggle[data-held]:not([data-dragging])::after { left: calc(100% - 18px); }
 
-/* Pending: the knob says "working", not the track.
-   Designed by the ux-designer pass on 2026-09-05 after three attempts had
-   spent the indicator on the track and failed: a rim outside a 30x18 pill,
-   swept and then solid, stayed faint against the page; a band travelling
-   inside it was called ugly. The knob is the piece that already moved to its
-   answer when the press landed, and a ring drawn at its own 10-16px edge is a
-   far bigger gesture, relative to what it sits on, than a rim ever was on the
-   whole shape. It pings rather than travels or spins -- expand and fade on a
-   loop, the shape a recording light uses, not a progress bar's or a spinner's,
-   neither of which is true here: the value is decided and only the
-   confirmation is outstanding.
-   `--text` in both states, and the reason is the knob, not the track. The
-   first cut used `--on-accent` on the accent track -- the colour that
-   contrasts with the track -- and on a light theme that is white growing out
-   of a white knob: it read as the knob swelling, not as a ring, and going off
-   to on the indicator was invisible. What a ring at the knob's edge has to
-   contrast with is the knob, which is `--panel`, and `--text` is the one
-   colour guaranteed against that in every theme; against the accent track
-   behind it, text is dark on light themes and light on dark ones and reads
-   either way. The ring also holds most of its colour until past halfway
-   before it lets go, because a ping that is bright only at its first frame is
-   a faint ring on average. It rides on the knob's own `box-shadow`, so on a
-   `.card` surface it stands in for the static edge ring that surface draws --
-   an accepted trade, pending being transient. `box-shadow` is paint only:
-   nothing in the row moves or resizes. */
-.switch-row[data-pending] .toggle::after {
-  animation: toggle-pulse 1.2s var(--ease) infinite;
+/* Pending: chef-monorepo's sweep, in this vocabulary.
+   `PendingSweep` from chef's `Toggle.tsx`, copied 2026-09-05 at William's
+   request after two of this file's own designs failed on the same track: a
+   ring 2px outside the track (`inset: -2px`, a transparent 2px border, a mask
+   that keeps only the rim -- the border box less the padding box), and inside
+   it a square twice the size painted as a conic gradient: transparent for the
+   first sixth of the turn, the accent at 70% by halfway, transparent again by
+   five sixths. It spins once a second. One tint in both states, as chef ships
+   it: the arc reads against the page outside the track, and the accent is the
+   colour every theme puts against its page. Under reduced motion the ring
+   stands still as a steady faint band; `aria-busy` says what it means. */
+.toggle-sweep {
+  position: absolute; inset: -2px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
 }
 
-@keyframes toggle-pulse {
-  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--text) 75%, transparent); }
-  55% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--text) 45%, transparent); }
-  100% { box-shadow: 0 0 0 6px transparent; }
+.toggle-sweep::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  width: 220%; height: 220%;
+  translate: -50% -50%;
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 60deg, color-mix(in oklab, var(--accent) 70%, transparent) 180deg, transparent 300deg, transparent 360deg);
+  animation: tf-spin 1s linear infinite;
 }
 
-/* Reduced motion: `aria-busy` already tells a screen reader what this means.
-   Visually the ring stops rather than vanishes -- held at mid-expansion, so a
-   still control still reads as waiting rather than as settled. */
+@keyframes tf-spin { to { rotate: 1turn; } }
+
 @media (prefers-reduced-motion: reduce) {
-  .switch-row[data-pending] .toggle::after {
-    animation: none;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--text) 45%, transparent);
-  }
+  .toggle-sweep::before { animation: none; background: color-mix(in oklab, var(--accent) 45%, transparent); }
 }

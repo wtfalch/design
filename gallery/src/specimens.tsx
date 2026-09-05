@@ -792,7 +792,7 @@ export const COMPONENTS: Component[] = [
         name: 'Async',
         note:
           'Return a promise from `onChange` and the knob moves at once, the row is ' +
-          'busy until it settles — `aria-busy`, a ring pulsing from the knob, no second ' +
+          'busy until it settles — `aria-busy`, a sweep around the track, no second ' +
           'press — and a rejection puts the knob back. A resolution holds the knob ' +
           'until `checked` catches up, because a saved request is not yet a refetched ' +
           'one. Copied from chef-monorepo.',

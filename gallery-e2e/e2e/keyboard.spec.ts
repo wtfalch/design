@@ -889,12 +889,7 @@ test.describe('Toggle · async', () => {
     expect(await on(page, 0), 'moved before the request landed').toBe(true)
     await expect(row(page, 0)).toHaveAttribute('data-pending', 'true')
     await expect(row(page, 0).locator('[role=switch]')).toHaveAttribute('aria-busy', 'true')
-    /* The indicator is the knob's own animation, so it is measured there. */
-    expect(
-      await row(page, 0)
-        .locator('.toggle')
-        .evaluate((el) => getComputedStyle(el, '::after').animationName),
-    ).toBe('toggle-pulse')
+    await expect(row(page, 0).locator('.toggle-sweep')).toHaveCount(1)
 
     /* A second press while busy is refused: the state does not flip back. */
     await row(page, 0).click()
@@ -902,11 +897,7 @@ test.describe('Toggle · async', () => {
 
     await page.clock.runFor(1300)
     await expect(row(page, 0)).not.toHaveAttribute('data-pending', 'true')
-    expect(
-      await row(page, 0)
-        .locator('.toggle')
-        .evaluate((el) => getComputedStyle(el, '::after').animationName),
-    ).toBe('none')
+    await expect(row(page, 0).locator('.toggle-sweep')).toHaveCount(0)
     expect(await on(page, 0), 'held after the request landed').toBe(true)
   })
 

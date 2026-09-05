@@ -107,9 +107,9 @@ export default function Toggle({
      Waiting for the reply before moving the knob makes every switch feel
      broken for the length of a round trip; moving it and forgetting makes a
      failed request look like a success. So: if `onChange` returns a promise,
-     the knob moves now and the row is busy -- `aria-busy` on the input, a
-     ring pulsing out from the knob (`toggle.css`, `[data-pending]`), no second
-     press -- until it settles. A rejection
+     the knob moves now and the row is busy -- `aria-busy` on the input, chef's
+     sweep around the rim of the track (`.toggle-sweep`), no second press --
+     until it settles. A rejection
      puts the knob back. A resolution HOLDS the optimistic value until `checked`
      changes, because a resolved save does not mean the caller's state has
      caught up (a refetch is a second round trip), and clearing on resolve
@@ -229,7 +229,9 @@ export default function Toggle({
           e.preventDefault()
           e.stopPropagation()
         }}
-      />
+      >
+        {pending && <span className="toggle-sweep" />}
+      </span>
     </Switch>
   )
 }
