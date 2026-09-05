@@ -17,6 +17,7 @@
  * that shipped. They are worth more than the code around them.
  */
 
+export { default as ArtProvider } from './components/ArtProvider'
 export { default as Brand } from './components/Brand'
 export { BRAND_NAMES } from './components/brandMarks'
 export type { BrandName } from './components/brandMarks'
@@ -87,6 +88,14 @@ export {
   resolvedTokens,
 } from './themes'
 export type { Theme, ThemeTokens } from './themes'
+/** A theme as the rule a consumer ships for first paint, generated so it
+ *  cannot drift from the object. */
+export { productCss, themeCss, themeId } from './themes/css'
 
 /** The measurement behind the contrast rule, for a theme that is yours. */
 export { luminance, ratio } from './contrast'
+
+/** A product's art as values, and the components typed to it. tf's pack is
+ *  `@wtfalch/design/art/tf`, and the default when none is installed. */
+export { SYSTEM_ICONS, bindArt, checkArt, defineArt } from './art'
+export type { ArtPack, Glyph, Mark, SystemIconName } from './art'

@@ -125,6 +125,20 @@ allowed to, once, explained in the commit.
   and a control outline have different thresholds and cannot share a value.
   They did, and the value could only be right for one of them.
 
+- **Themes are per product, and the CSS is generated.** `src/themes/<product>.ts`
+  holds a product's palettes, `THEMES` is the union, and `build-themes.mjs`
+  writes `dist/themes/<product>.css` from the objects at build time. A
+  consumer imports its own product's CSS and bundles nobody else's; nobody
+  writes a `:root[data-theme]` rule by hand, because a copy drifts from the
+  object the contrast test measured. Before 0.3.0 valet kept its theme in its
+  own repo and re-derived first paint, the measurement and a review page there.
+- **Three derived tokens are re-derived under `[data-theme]`.** `--control`,
+  `--illo-paper` and `--focus-ring` are `var()` expressions, and declared on
+  `:root` alone they resolve against the root's palette and inherit as finished
+  values. A theme on a subtree got the root's control surface and focus ring
+  under its own panels: black inputs and a teal ring on a light theme painted
+  beside a dark one, 2026-09-05.
+
 ## The CSS
 
 - **A theme never ships a selector.** The moment a theme can write a rule,
@@ -163,6 +177,15 @@ allowed to, once, explained in the commit.
   `prefers-color-scheme: light` block — the mechanism the `system` theme is
   built on), and a `length > 2` filter that took `.md` with it. That is the
   argument for baselining first, in one paragraph.
+
+- **Art is per product, through one provider.** Icons, illustrations and marks
+  are values in an `ArtPack`; `Icon`, `Illustration` and `Brand` read the
+  installed pack from context and fall back to tf's, which is
+  `@wtfalch/design/art/tf`. `bindArt(pack)` returns the three typed to the
+  pack's names. A pack has to hold `SYSTEM_ICONS`, the seven the package's own
+  components draw, and `checkArt` holds it to the rules `icons.test.ts` and
+  `illustrations.test.ts` hold tf's art to. The glyph table with its measured
+  views is `art/tf-icons.ts` now; `Icon.tsx` keeps the reasons.
 
 ## The components
 

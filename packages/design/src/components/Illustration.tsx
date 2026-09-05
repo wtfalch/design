@@ -24,6 +24,7 @@
  * message, which so far it never is.
  */
 
+import { useArt } from '../artContext'
 import { ILLUSTRATION_SVG, type IllustrationName } from '../illustrations'
 
 export type { IllustrationName }
@@ -37,7 +38,6 @@ export type { IllustrationName }
    not exist. `scripts/build-illustrations.mjs` generates a plain module
    instead, which removes the dependency on a bundler rather than documenting
    it. */
-const BY_NAME: Record<string, string> = ILLUSTRATION_SVG
 
 export default function Illustration({
   name,
@@ -53,7 +53,8 @@ export default function Illustration({
   alt?: string
   className?: string
 }) {
-  const svg = BY_NAME[name]
+  // The installed pack's drawing, or tf's. Both are strings off disk at build time.
+  const svg = (useArt()?.illustrations ?? (ILLUSTRATION_SVG as Record<string, string>))[name]
   if (!svg) return null
 
   return (
