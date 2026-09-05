@@ -27,38 +27,65 @@ Where a theme genuinely needs a layer that values cannot reach — a paper grain
 a vignette — the base CSS pre-declares the slot and the theme fills it. The rule
 is always ours.
 
-## Writing a theme
+## Themes, per product
+
+A theme is part of a product's identity the way its mark is, so it lives
+here, in its product's module, and the gallery photographs it:
 
 ```ts
-import { applyTheme, defineTheme } from '@wtfalch/design'
-
-export const brand = defineTheme({
-  name: 'Brand',
-  note: 'Warm, roomy, and slower than the default',
-  scheme: 'light',
-  tokens: {
-    '--bg': '#faf7f2',
-    '--panel': '#ffffff',
-    '--accent': '#7c3aed',
-    '--on-accent': '#ffffff',
-    '--density': '1.15',      // every --space-* step follows
-    '--font-size': '15px',    // every --text-* step follows
-    '--dur-md': '320ms',
-  },
-})
-
-applyTheme(brand)                      // the object, straight from defineTheme
-applyTheme(brand, myEl)                // or on a subtree
-applyTheme('paper')                    // or a built-in, by name
+import '@wtfalch/design/tokens.css'         // the vocabulary and its base values
+import '@wtfalch/design/styles.css'         // the components
+import '@wtfalch/design/themes/valet.css'   // this product's palettes, and nobody else's
 ```
 
-Name the tokens you change; the rest inherit from `tokens.css`. A theme naming
-three tokens is valid.
+The CSS is generated at build time from the theme objects, one
+`:root[data-theme='<id>']` rule each, so the paint before React has the same
+values the contrast test measured. Set `data-theme` on `<html>` before the
+bundle loads and nothing flashes:
+
+```html
+<html data-theme="valet">
+<script>
+  try {
+    var t = localStorage.getItem('theme')
+    if (t) document.documentElement.dataset.theme = t
+  } catch (e) {}
+</script>
+```
+
+The objects are there too, for a picker or a canvas that cannot read a CSS
+variable:
+
+```ts
+import { applyTheme } from '@wtfalch/design'
+import { VALET_THEMES, valetNight } from '@wtfalch/design/themes/valet'
+
+applyTheme(valetNight)                 // the object
+applyTheme('valet-night')              // or its id, from the registry of every product
+applyTheme(valetNight, myEl)           // or on a subtree
+```
+
+`@wtfalch/design/themes/tf` holds tf's three the same way, and `THEMES` on the
+main entry is the union, which is what the gallery's picker and the contrast
+test read.
+
+### Writing one
+
+A theme is a `Partial<ThemeTokens>` with a name, a note and a scheme: name the
+tokens you change, the rest inherit from `tokens.css`. A theme naming three
+tokens is valid. A product's themes go in `src/themes/<product>.ts`, keyed by
+the id `applyTheme` derives from the name (lowercased, spaces to hyphens), and
+`themes.test.ts` refuses a key that disagrees. Add the product to
+`build-themes.mjs` and its CSS ships beside the module.
 
 **A typo is a compile error.** `tokens` is a `Partial<ThemeTokens>`, so
 `'--densty'` fails to build rather than silently doing nothing — which is the
-failure a string-keyed map produces at run time, invisibly. This is the main
-reason the type is exported at all.
+failure a string-keyed map produces at run time, invisibly.
+
+**A theme names its font and does not ship it.** valet's `--font` reads a
+`--font-sans` variable the app defines with whatever loads its fonts, and
+falls back to the family by name. The gallery vendors the two families valet
+names so the specimens are photographed in them.
 
 ## The three kinds of token
 
@@ -116,20 +143,39 @@ loads:
 
 Your server stays the source of truth. `localStorage` only beats the paint.
 
-## Built-ins
+## Art, per product
 
-`system`, `night` and `paper` ship as **examples, not as the menu** — an app
-that installs this is expected to bring its own. `system` is a theme rather than
-a mode: it is the only one scoped to `prefers-color-scheme`, so choosing a dark
-theme on a light-mode laptop is not silently repainted.
+Icons, illustrations and marks are values a product supplies, the same seam a
+theme is. The components stay the package's and carry the rules: an icon
+drawn at its measured view, an illustration that takes `currentColor` and the
+panel it sits on, a mark in one stroke.
+
+```ts
+import { ArtProvider, bindArt, checkArt, defineArt } from '@wtfalch/design'
+import { tfArt } from '@wtfalch/design/art/tf'
+
+// Your own icons, tf's figures for now.
+export const art = defineArt({ ...tfArt, icons: { ...tfArt.icons, ledger: { view: '…', d: ['…'] } } })
+export const { ArtProvider: Art, Icon, Illustration, Brand } = bindArt(art)
+```
+
+`<Art>` goes at the root once, and every component, including the ones the
+package draws for itself, draws the pack's. `bindArt` returns the three
+components typed to the pack's names, so `<Icon name="ledgr">` fails to build.
+A pack has to hold the seven icons the package's own components draw
+(`SYSTEM_ICONS`), and `checkArt(pack)` says what else is wrong, in the words
+`icons.test.ts` and `illustrations.test.ts` hold tf's art to. With no
+provider, everything draws tf's art, which is the right default for a product
+that has not drawn its own.
 
 ## Status
 
-`0.2.0`. Twenty-eight components, every one of the 70 gallery specimens
+`0.3.0`. Twenty-eight components, every one of the 70 gallery specimens
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
 It came out of [tf](https://github.com/wtfalch/tf), which is its first consumer;
-`Brand` holds every product's mark by name, tf's first.
+valet is the second. Themes and art are per product: tf's and valet's palettes
+ship here, and tf's art is the pack every product starts from.
 
 Requires React 19. Behaviour comes from
 [React Aria Components](https://react-spectrum.adobe.com/react-aria/); every

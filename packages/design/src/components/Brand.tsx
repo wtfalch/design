@@ -1,3 +1,4 @@
+import { useArt } from '../artContext'
 import { BRAND_MARKS, type BrandName } from './brandMarks'
 
 /**
@@ -20,8 +21,8 @@ import { BRAND_MARKS, type BrandName } from './brandMarks'
  * from.
  */
 export default function Brand({
-  name = 'tf',
-  title = name,
+  name,
+  title,
   className,
 }: {
   /** Which product's mark. */
@@ -31,16 +32,24 @@ export default function Brand({
   title?: string
   className?: string
 }) {
-  const mark = BRAND_MARKS[name]
+  /* The installed pack's marks, or tf's. With no name the first mark in the
+     pack is the product's, which is `tf` for the default pack and the one
+     mark a single-product pack holds. */
+  const marks: Record<string, { view: string; d: string; stroke: number }> =
+    useArt()?.marks ?? BRAND_MARKS
+  const key = name ?? Object.keys(marks)[0]
+  const mark = key ? marks[key] : undefined
+  if (!mark) return null
+  const said = title ?? key
   return (
     <svg
       className={`brand${className ? ` ${className}` : ''}`}
       viewBox={mark.view}
       fill="none"
       role="img"
-      aria-label={title}
+      aria-label={said}
     >
-      <title>{title}</title>
+      <title>{said}</title>
       <path
         d={mark.d}
         stroke="currentColor"

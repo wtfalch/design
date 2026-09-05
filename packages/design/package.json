@@ -1,6 +1,6 @@
 {
   "name": "@wtfalch/design",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "wtfalch's design system: themeable components on a fixed token vocabulary.",
   "keywords": [
     "design-system",
@@ -34,8 +34,22 @@
       "default": "./dist/index.js"
     },
     "./themes": {
-      "types": "./dist/themes.d.ts",
-      "default": "./dist/themes.js"
+      "types": "./dist/themes/index.d.ts",
+      "default": "./dist/themes/index.js"
+    },
+    "./themes/tf": {
+      "types": "./dist/themes/tf.d.ts",
+      "default": "./dist/themes/tf.js"
+    },
+    "./themes/valet": {
+      "types": "./dist/themes/valet.d.ts",
+      "default": "./dist/themes/valet.js"
+    },
+    "./themes/tf.css": "./dist/themes/tf.css",
+    "./themes/valet.css": "./dist/themes/valet.css",
+    "./art/tf": {
+      "types": "./dist/art/tf.d.ts",
+      "default": "./dist/art/tf.js"
     },
     "./tokens.css": "./dist/tokens.css",
     "./styles.css": "./dist/styles/index.css"
@@ -45,7 +59,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/copy-css.mjs && node scripts/build-themes.mjs",
     "prepack": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

@@ -238,6 +238,23 @@
    only ever passed because none of them sets a duration. "Outranks every
    theme" has to be true of a theme written by somebody who never read this
    file, and the cascade is the only thing that can make it so. */
+/*
+ * Three tokens derived from colour tokens, re-derived wherever a theme lands.
+ *
+ * Declared on `:root` alone, `--control`, `--illo-paper` and `--focus-ring`
+ * resolve their `var()` against the root's palette and are inherited as
+ * finished values. A theme applied to a subtree with `applyTheme(theme, el)`
+ * then gets the root's control surface and the root's focus ring under its own
+ * panels: found on 2026-09-05 as black inputs and a teal ring on a light theme
+ * painted beside a dark one. `data-theme` is the attribute `applyTheme` sets,
+ * so a themed element derives them again from its own values.
+ */
+[data-theme] {
+  --control: color-mix(in srgb, var(--panel-2) 62%, var(--panel));
+  --illo-paper: var(--panel);
+  --focus-ring: 0 0 0 2px var(--accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-fast: 0s !important;

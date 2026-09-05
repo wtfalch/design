@@ -14,6 +14,7 @@ import { createRoot } from 'react-dom/client'
 // loads them. A gallery with its own styles is a gallery that lies.
 import '@wtfalch/design/tokens.css'
 import '@wtfalch/design/styles.css'
+import './fonts.css'
 import './gallery.css'
 
 import Gallery from './Gallery'
