@@ -894,7 +894,7 @@ test.describe('Toggle · async', () => {
       await row(page, 0)
         .locator('.toggle')
         .evaluate((el) => getComputedStyle(el, '::after').animationName),
-    ).toBe('toggle-pulse-selected')
+    ).toBe('toggle-pulse')
 
     /* A second press while busy is refused: the state does not flip back. */
     await row(page, 0).click()
@@ -925,7 +925,7 @@ test.describe('Toggle · async', () => {
     await expect(row(page, 1)).not.toHaveAttribute('data-pending', 'true')
   })
 
-  test('the knob travels on the spring over --dur-md', async ({ page }) => {
+  test('the knob travels on the spring over --dur-fast, with the track', async ({ page }) => {
     await page.goto(specimenUrl(ASYNC, 'system'))
     await themeApplied(page, 'system')
     const t = await row(page, 0)
@@ -934,7 +934,7 @@ test.describe('Toggle · async', () => {
         const s = getComputedStyle(el, '::after')
         return { duration: s.transitionDuration, easing: s.transitionTimingFunction }
       })
-    expect(t.duration).toBe('0.2s')
+    expect(t.duration).toBe('0.12s')
     expect(t.easing.startsWith('linear(')).toBe(true)
   })
 })
