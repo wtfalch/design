@@ -189,41 +189,53 @@ input[type='radio']:active:not(:disabled) {
 
 .switch-row[data-selected] .toggle[data-held]:not([data-dragging])::after { left: calc(100% - 18px); }
 
-/* Pending: the track works like the indeterminate `Progress` bar while
-   `onChange`'s promise is out.
-   The first design was chef-monorepo's ring around the rim, and at 30x18 it
-   was faint in every theme, twice: a 2px rim outside the track reads against
-   the page rather than the control, and a tint chosen against the track was
-   white on a white page. So the indicator moved inside. The track is already
-   a small bar; the system already says "working, duration unknown" with a
-   band travelling along a bar -- `tf-bar`, the keyframes `Progress` uses, at
-   the same timing -- and a switch that is saving is exactly that. The band is
-   `--on-accent` on the accent track and `--text` on the plain one, the two
-   colours the vocabulary guarantees to contrast with those surfaces, at a
-   strength that reads as a highlight moving over the track rather than a
-   second colour -- and strong enough to be seen at a glance, which the first
-   two attempts at this indicator were not. The knob paints above it. Under reduced motion the band
-   stands still across the middle of the track: `aria-busy` says what it
-   means, and a still band says it without a loop. */
-.toggle-busy {
-  position: absolute; inset: 0;
-  border-radius: 999px;
-  overflow: hidden;
-  pointer-events: none;
+/* Pending: the knob says "working", not the track.
+   Designed by the ux-designer pass on 2026-09-05 after three attempts had
+   spent the indicator on the track and failed: a rim outside a 30x18 pill,
+   swept and then solid, stayed faint against the page; a band travelling
+   inside it was called ugly. The knob is the piece that already moved to its
+   answer when the press landed, and a ring drawn at its own 10-16px edge is a
+   far bigger gesture, relative to what it sits on, than a rim ever was on the
+   whole shape. It pings rather than travels or spins -- expand and fade on a
+   loop, the shape a recording light uses, not a progress bar's or a spinner's,
+   neither of which is true here: the value is decided and only the
+   confirmation is outstanding.
+   The same two colours the band used, because they are the pair the
+   vocabulary guarantees against these two surfaces: `--text` on the grey
+   track, `--on-accent` on the accent one. It rides on the knob's own
+   `box-shadow`, so on a `.card` surface it stands in for the static edge ring
+   that surface draws -- an accepted trade, pending being transient and the
+   ping at least as visible as the ring it briefly replaces. `box-shadow` is
+   paint only: nothing in the row moves or resizes. */
+.switch-row[data-pending] .toggle::after {
+  animation: toggle-pulse 1.2s var(--ease) infinite;
 }
 
-.toggle-busy::before {
-  content: '';
-  position: absolute; top: 0; bottom: 0; left: 0;
-  width: 55%;
-  border-radius: 999px;
-  --band: color-mix(in oklab, var(--text) 32%, transparent);
-  background: var(--band);
-  animation: tf-bar 1.2s var(--ease) infinite;
+.switch-row[data-selected][data-pending] .toggle::after { animation-name: toggle-pulse-selected; }
+
+@keyframes toggle-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--text) 55%, transparent); }
+  70% { box-shadow: 0 0 0 5px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
 }
 
-.switch-row[data-selected] .toggle-busy::before { --band: color-mix(in oklab, var(--on-accent) 62%, transparent); }
+@keyframes toggle-pulse-selected {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--on-accent) 65%, transparent); }
+  70% { box-shadow: 0 0 0 5px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
 
+/* Reduced motion: `aria-busy` already tells a screen reader what this means.
+   Visually the ring stops rather than vanishes -- held at mid-expansion, so a
+   still control still reads as waiting rather than as settled. */
 @media (prefers-reduced-motion: reduce) {
-  .toggle-busy::before { animation: none; left: 22.5%; }
+  .switch-row[data-pending] .toggle::after {
+    animation: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--text) 40%, transparent);
+  }
+
+  .switch-row[data-selected][data-pending] .toggle::after {
+    animation: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--on-accent) 45%, transparent);
+  }
 }

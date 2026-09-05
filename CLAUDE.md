@@ -173,8 +173,8 @@ allowed to, once, explained in the commit.
   to a mouse, which is how all eight of tf's hand-built modals once shipped
   without either. Both are keyboard tests now rather than rules on trust.
 - **`Toggle` owns the request it applies.** An `onChange` that returns a
-  promise moves the knob at once, marks the row busy (`aria-busy`, a band
-  travelling the track, no second press) until it settles, puts the knob back on
+  promise moves the knob at once, marks the row busy (`aria-busy`, a ring
+  pulsing from the knob, no second press) until it settles, puts the knob back on
   rejection and HOLDS on resolution until `checked` catches up -- a resolved
   save is not yet a refetched one, and clearing on resolve snaps the knob back
   and forward. Copied from chef-monorepo's `Toggle`, whose plan records why the
