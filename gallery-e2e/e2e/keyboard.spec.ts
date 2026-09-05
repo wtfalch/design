@@ -869,3 +869,63 @@ test.describe('Toggle · pointer', () => {
     expect(await track(page).getAttribute('data-dragging')).toBeNull()
   })
 })
+
+test.describe('Toggle · async', () => {
+  const ASYNC = { c: 'toggle', v: 'Async' }
+  const row = (page: import('@playwright/test').Page, n: number) =>
+    page.locator('.switch-row').nth(n)
+  const on = (page: import('@playwright/test').Page, n: number) =>
+    row(page, n).locator('[role=switch]').isChecked()
+
+  test('a resolving handler moves the knob at once, is busy until it settles, then holds', async ({
+    page,
+  }) => {
+    await page.clock.install()
+    await page.goto(specimenUrl(ASYNC, 'system'))
+    await themeApplied(page, 'system')
+    expect(await on(page, 0)).toBe(false)
+
+    await row(page, 0).click()
+    expect(await on(page, 0), 'moved before the request landed').toBe(true)
+    await expect(row(page, 0)).toHaveAttribute('data-pending', 'true')
+    await expect(row(page, 0).locator('[role=switch]')).toHaveAttribute('aria-busy', 'true')
+    await expect(row(page, 0).locator('.toggle-sweep')).toHaveCount(1)
+
+    /* A second press while busy is refused: the state does not flip back. */
+    await row(page, 0).click()
+    expect(await on(page, 0)).toBe(true)
+
+    await page.clock.runFor(1300)
+    await expect(row(page, 0)).not.toHaveAttribute('data-pending', 'true')
+    await expect(row(page, 0).locator('.toggle-sweep')).toHaveCount(0)
+    expect(await on(page, 0), 'held after the request landed').toBe(true)
+  })
+
+  test('a rejecting handler puts the knob back', async ({ page }) => {
+    await page.clock.install()
+    await page.goto(specimenUrl(ASYNC, 'system'))
+    await themeApplied(page, 'system')
+    expect(await on(page, 1)).toBe(true)
+
+    await row(page, 1).click()
+    expect(await on(page, 1), 'moved before the request was refused').toBe(false)
+    await expect(row(page, 1)).toHaveAttribute('data-pending', 'true')
+
+    await page.clock.runFor(1300)
+    expect(await on(page, 1), 'back where it was').toBe(true)
+    await expect(row(page, 1)).not.toHaveAttribute('data-pending', 'true')
+  })
+
+  test('the knob travels on the spring over --dur-md', async ({ page }) => {
+    await page.goto(specimenUrl(ASYNC, 'system'))
+    await themeApplied(page, 'system')
+    const t = await row(page, 0)
+      .locator('.toggle')
+      .evaluate((el) => {
+        const s = getComputedStyle(el, '::after')
+        return { duration: s.transitionDuration, easing: s.transitionTimingFunction }
+      })
+    expect(t.duration).toBe('0.2s')
+    expect(t.easing.startsWith('linear(')).toBe(true)
+  })
+})

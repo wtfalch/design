@@ -111,6 +111,7 @@ export interface ThemeTokens {
   '--dur-drag': string
   '--ease': string
   '--ease-out': string
+  '--ease-spring': string
 
   /* ---- interaction -------------------------------------------------- */
   '--hover-lift': string
@@ -219,6 +220,7 @@ export const TOKEN_KEYS = [
   '--dur-drag',
   '--ease',
   '--ease-out',
+  '--ease-spring',
   '--hover-lift',
   '--hover-scale',
   '--press-scale',

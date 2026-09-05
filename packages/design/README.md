@@ -64,7 +64,7 @@ reason the type is exported at all.
 
 | | |
 |---|---|
-| **themeable** (46) | A theme may set it. `TOKEN_KEYS`, and the keys of `ThemeTokens`. |
+| **themeable** (47) | A theme may set it. `TOKEN_KEYS`, and the keys of `ThemeTokens`. |
 | **derived** (16) | `calc()` off a themeable token, and **not** settable. `--text-*` follow `--font-size`; `--space-*` follow `--density`. Move the input, not the output — a step written as a literal is a scale that stopped scaling. |
 | **fixed** (3) | Not themeable. `--tile-control` is geometry other things are measured against, `--nudge` is optical alignment rather than spacing, and `--tick-mask` is a glyph — an arbitrary SVG from a theme is a theme shipping markup. |
 

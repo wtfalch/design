@@ -129,7 +129,11 @@
   transform: translateY(-50%);
   width: 12px; height: 12px; border-radius: 50%;
   background: var(--panel);
-  transition: left var(--dur-fast);
+  /* A spring over `--dur-md`, not an ease over `--dur-fast`: the knob is a
+     thing with mass sliding to a stop, and `--ease-spring` is that curve.
+     Copied from chef-monorepo's switch on 2026-09-05 along with its async
+     state. Under reduced motion the duration is zero and the curve is moot. */
+  transition: left var(--dur-md) var(--ease-spring);
 }
 
 /* Accent rather than green. Green reads as "this is the safe one", and the
@@ -184,3 +188,43 @@ input[type='radio']:active:not(:disabled) {
 .switch-row .toggle[data-held]:not([data-dragging])::after { width: 16px; transition: width var(--dur-fast); }
 
 .switch-row[data-selected] .toggle[data-held]:not([data-dragging])::after { left: calc(100% - 18px); }
+
+/* Pending: a sweep around the rim while `onChange`'s promise is out.
+   chef-monorepo's design, copied 2026-09-05. A ring 2px outside the track
+   (`inset: -2px`, a transparent 2px border) with a mask that keeps only the
+   rim -- the border box less the padding box -- and inside it a square twice
+   the size, painted as a conic gradient that is transparent for two thirds of
+   the turn, spinning once a second. On the accent track the sweep is panel-
+   coloured, on the plain track accent-coloured; a single tint reads as a radar
+   on one of the two. Under reduced motion the ring stands still and dims to a
+   steady tint: `aria-busy` says what it means, and a still ring says it
+   without a loop. */
+.toggle-sweep {
+  position: absolute; inset: -2px;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.toggle-sweep::before {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  width: 220%; height: 220%;
+  translate: -50% -50%;
+  --sweep: color-mix(in oklab, var(--accent) 70%, transparent);
+  background: conic-gradient(from 0deg, transparent 0deg 60deg, var(--sweep) 180deg, transparent 300deg 360deg);
+  animation: tf-spin 1s linear infinite;
+}
+
+.switch-row[data-selected] .toggle-sweep::before { --sweep: color-mix(in oklab, var(--panel) 70%, transparent); }
+
+@keyframes tf-spin { to { rotate: 1turn; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .toggle-sweep::before { animation: none; background: color-mix(in oklab, var(--accent) 45%, transparent); }
+  .switch-row[data-selected] .toggle-sweep::before { background: color-mix(in oklab, var(--panel) 55%, transparent); }
+}

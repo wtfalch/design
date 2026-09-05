@@ -265,6 +265,10 @@
   },
   {
     "c": "toggle",
+    "v": "Async"
+  },
+  {
+    "c": "toggle",
     "v": "Default"
   },
   {

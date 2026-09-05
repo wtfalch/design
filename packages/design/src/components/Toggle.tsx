@@ -29,7 +29,7 @@
  * `Checkbox`.
  */
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Switch } from 'react-aria-components'
 
 /** The knob's diameter per size, as `toggle.css` draws it. The drag needs it
@@ -54,7 +54,10 @@ export default function Toggle({
    *  column, so a long explanation does not push the switch off its row. */
   hint?: React.ReactNode
   checked: boolean
-  onChange: (on: boolean) => void
+  /** Returning a promise moves the knob at once and marks the row busy until it
+   *  settles: a rejection puts the knob back, a resolution holds it until
+   *  `checked` catches up. A plain return leaves everything to the caller. */
+  onChange: (on: boolean) => void | Promise<void>
   disabled?: boolean
   /** The state in words, beside the switch.
    *
@@ -96,6 +99,59 @@ export default function Toggle({
      back where it started -- a consumer that saves on change must not see a
      drag as two saves. The keyboard is untouched: the input is still the
      switch. */
+  /* The optimistic half, copied from chef-monorepo's `Toggle` on 2026-09-05.
+
+     A switch applies as it moves, and what it applies is usually a request.
+     Waiting for the reply before moving the knob makes every switch feel
+     broken for the length of a round trip; moving it and forgetting makes a
+     failed request look like a success. So: if `onChange` returns a promise,
+     the knob moves now and the row is busy -- `aria-busy` on the input, a
+     sweep around the track, no second press -- until it settles. A rejection
+     puts the knob back. A resolution HOLDS the optimistic value until `checked`
+     changes, because a resolved save does not mean the caller's state has
+     caught up (a refetch is a second round trip), and clearing on resolve
+     would snap the knob back and forward again. An optimistic value can outlive
+     a successful save and never a failed one. `onChange` returning nothing is
+     the old contract, untouched. */
+  const [optimistic, setOptimistic] = useState<boolean | null>(null)
+  const [pending, setPending] = useState(false)
+  const [seen, setSeen] = useState(checked)
+  if (checked !== seen) {
+    setSeen(checked)
+    if (optimistic !== null) setOptimistic(null)
+  }
+  const shown = optimistic ?? checked
+  const commit = (on: boolean) => {
+    const result = onChange(on)
+    if (!(result instanceof Promise)) return
+    setOptimistic(on)
+    setPending(true)
+    result.then(
+      () => setPending(false),
+      () => {
+        setPending(false)
+        setOptimistic(null)
+      },
+    )
+  }
+
+  /* `aria-busy` on the input and `data-pending` on the row, set on the elements
+     because React Aria's `filterDOMProps` drops both in silence -- the trap
+     `Button` documents for `aria-busy`. */
+  const rowRef = useRef<HTMLLabelElement>(null)
+  useEffect(() => {
+    const row = rowRef.current
+    const input = row?.querySelector('input')
+    if (!row || !input) return
+    if (pending) {
+      row.setAttribute('data-pending', 'true')
+      input.setAttribute('aria-busy', 'true')
+    } else {
+      row.removeAttribute('data-pending')
+      input.removeAttribute('aria-busy')
+    }
+  }, [pending])
+
   const [knob, setKnob] = useState<number | null>(null)
   const [held, setHeld] = useState(false)
   const gesture = useRef<{ id: number; startX: number; from: number; moved: boolean } | null>(null)
@@ -108,10 +164,15 @@ export default function Toggle({
 
   return (
     <Switch
+      ref={rowRef}
       className={`switch-row switch-${size}`}
-      isSelected={checked}
-      onChange={onChange}
+      isSelected={shown}
+      onChange={commit}
       isDisabled={disabled}
+      /* Read-only, not disabled, while a request is out: focus stays where it
+         is and the row does not dim, it just refuses a second answer until
+         the first has been taken. */
+      isReadOnly={pending}
     >
       <span className={labelHidden ? 'sr-only' : 'switch-body'}>
         <span className="switch-label">{label}</span>
@@ -126,13 +187,13 @@ export default function Toggle({
         data-dragging={knob === null ? undefined : true}
         style={knob === null ? undefined : ({ '--knob-x': knob } as React.CSSProperties)}
         onPointerDown={(e) => {
-          if (disabled || e.button !== 0) return
+          if (disabled || pending || e.button !== 0) return
           e.stopPropagation()
           e.currentTarget.setPointerCapture(e.pointerId)
           gesture.current = {
             id: e.pointerId,
             startX: e.clientX,
-            from: checked ? 1 : 0,
+            from: shown ? 1 : 0,
             moved: false,
           }
           setHeld(true)
@@ -151,8 +212,8 @@ export default function Toggle({
           setHeld(false)
           setKnob(null)
           swallowClick.current = true
-          const on = g.moved ? position(e.currentTarget, g, e.clientX) > 0.5 : !checked
-          if (on !== checked) onChange(on)
+          const on = g.moved ? position(e.currentTarget, g, e.clientX) > 0.5 : !shown
+          if (on !== shown) commit(on)
         }}
         onPointerCancel={() => {
           gesture.current = null
@@ -165,7 +226,9 @@ export default function Toggle({
           e.preventDefault()
           e.stopPropagation()
         }}
-      />
+      >
+        {pending && <span className="toggle-sweep" />}
+      </span>
     </Switch>
   )
 }

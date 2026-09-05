@@ -195,6 +195,13 @@
   --dur-drag: 180ms;
   --ease: cubic-bezier(0.2, 0, 0, 1);
   --ease-out: ease-out;
+  /* A spring, sampled: stiffness 170, damping 26, no overshoot -- what a knob
+     does under a thumb rather than what a fade does. Written as `linear()` so
+     a consumer needs no animation engine, and the same curve `chef`'s design
+     system calls `spring/gentle`; it arrived here 2026-09-05 with the switch's
+     async state, so the knob's travel could be copied rather than approximated.
+     Played over `--dur-md`. A theme may replace it with any easing. */
+  --ease-spring: linear(0, 0.0315, 0.1058, 0.2003, 0.3012, 0.4, 0.4917, 0.5741, 0.6464, 0.7086, 0.7614, 0.8057, 0.8425, 0.8729, 0.8979, 0.9182, 0.9346, 0.9479, 0.9586, 0.9672, 0.9741, 0.9795, 0.9839, 0.9873, 1);
 
   /* ---- interaction -------------------------------------------------- */
   --hover-lift: 0px;

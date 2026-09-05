@@ -84,7 +84,7 @@ allowed to, once, explained in the commit.
 ## The vocabulary
 
 - **Three kinds of token, and `tokens.test.ts` holds all three lists to
-  `tokens.css` in both directions.** 46 themeable, 16 derived, 3 fixed. A token
+  `tokens.css` in both directions.** 47 themeable, 16 derived, 3 fixed. A token
   added to the stylesheet and to no list fails the suite rather than becoming a
   fourth, undocumented category. The split is what turned "twenty tokens no
   theme can name" from an omission into a decision: `--text-*` and `--space-*`
@@ -172,6 +172,15 @@ allowed to, once, explained in the commit.
 - **A modal traps focus, and focus returns to the opener.** Both are invisible
   to a mouse, which is how all eight of tf's hand-built modals once shipped
   without either. Both are keyboard tests now rather than rules on trust.
+- **`Toggle` owns the request it applies.** An `onChange` that returns a
+  promise moves the knob at once, marks the row busy (`aria-busy`, a sweep
+  around the track, no second press) until it settles, puts the knob back on
+  rejection and HOLDS on resolution until `checked` catches up -- a resolved
+  save is not yet a refetched one, and clearing on resolve snaps the knob back
+  and forward. Copied from chef-monorepo's `Toggle`, whose plan records why the
+  old prop-watching hook could never roll back a failure that left the server
+  value unchanged. The knob also drags; taps and drags on the knob are the
+  track's own pointer, since React Aria's press is a press.
 - **`Table`, `Rows` and `Slider` stay native** unless a call site wants sorting,
   selection or arrow-key navigation. A migration that makes the catalogue agree
   with itself and the app worse is a regression.

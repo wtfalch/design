@@ -371,6 +371,43 @@ function ToggleSizesDemo() {
   )
 }
 
+/* Two requests that take 1.2s: one that lands, one that fails. The failing one
+   never changes `checked`, which is the case the old optimistic hook could not
+   roll back from -- it inferred "finished" from the prop moving. */
+const SETTLE_MS = 1200
+const settle = (rejects: boolean) =>
+  new Promise<void>((resolve, reject) => {
+    setTimeout(() => (rejects ? reject(new Error('the request failed')) : resolve()), SETTLE_MS)
+  })
+
+function ToggleAsyncDemo() {
+  const [saved, setSaved] = useState(false)
+  const [doomed, setDoomed] = useState(true)
+  return (
+    <div style={{ maxWidth: 420 }}>
+      <Toggle
+        label="Saves after 1.2 s"
+        hint="Moves now, busy until the request lands, then stays."
+        checked={saved}
+        onChange={async (on) => {
+          await settle(false)
+          setSaved(on)
+        }}
+        said={saved ? 'on' : 'off'}
+      />
+      <Toggle
+        label="Fails after 1.2 s"
+        hint="Moves now, then comes back when the request is refused."
+        checked={doomed}
+        onChange={async () => {
+          await settle(true)
+        }}
+        said={doomed ? 'on' : 'off'}
+      />
+    </div>
+  )
+}
+
 function ToggleDemo() {
   const [net, setNet] = useState(false)
   const [on, setOn] = useState(true)
@@ -750,6 +787,16 @@ export const COMPONENTS: Component[] = [
           'applies now. The whole row is the label, because 30×18 is under every ' +
           'target minimum there is.',
         render: () => <ToggleDemo />,
+      },
+      {
+        name: 'Async',
+        note:
+          'Return a promise from `onChange` and the knob moves at once, the row is ' +
+          'busy until it settles — `aria-busy`, a sweep around the track, no second ' +
+          'press — and a rejection puts the knob back. A resolution holds the knob ' +
+          'until `checked` catches up, because a saved request is not yet a refetched ' +
+          'one. Copied from chef-monorepo.',
+        render: () => <ToggleAsyncDemo />,
       },
       {
         name: 'Sizes',
