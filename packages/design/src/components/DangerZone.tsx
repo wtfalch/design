@@ -24,12 +24,14 @@ export default function DangerZone({
   /** Which of these can be taken back, said before anything is pressed. */
   note,
   children,
+  className,
 }: {
   note: string
   children: ReactNode
+  className?: string
 }) {
   return (
-    <section className="danger-zone">
+    <section className={`danger-zone${className ? ` ${className}` : ''}`}>
       <div className="danger-zone-head">
         <h3>Danger zone</h3>
         <p className="set-hint">{note}</p>
@@ -52,10 +54,10 @@ export default function DangerZone({
  *   confirmation that requires having read what it is.
  */
 export function DangerAction({
-  heading,
-  body,
+  title,
+  description,
   /** Not destructive at all — rename, edit. No confirmation, no red. */
-  tone = 'destructive',
+  kind = 'destructive',
   confirm = 'click',
   /** What must be typed, when `confirm` is `type`. */
   match,
@@ -67,9 +69,12 @@ export function DangerAction({
   /** Rendered instead of the controls, saying why this cannot be done. */
   unavailable,
 }: {
-  heading: string
-  body: ReactNode
-  tone?: 'destructive' | 'plain'
+  /** `title` and `description`, the words `Card`, `Modal` and `Dialog` use;
+   *  they were `heading` and `body`. */
+  title: string
+  description: ReactNode
+  /** `kind`, like `Button`: a role, not a colour. */
+  kind?: 'destructive' | 'plain'
   confirm?: 'click' | 'type' | 'none'
   match?: string
   label: string
@@ -83,9 +88,9 @@ export function DangerAction({
   const [typed, setTyped] = useState('')
 
   return (
-    <div className={`danger-act${tone === 'plain' ? ' plain' : ''}`}>
-      <h4>{heading}</h4>
-      <div className="set-hint">{body}</div>
+    <div className={`danger-act${kind === 'plain' ? ' plain' : ''}`}>
+      <h4>{title}</h4>
+      <div className="set-hint">{description}</div>
 
       {unavailable ? (
         <div className="set-hint danger-unavailable">{unavailable}</div>
@@ -113,7 +118,7 @@ export function DangerAction({
               )}
             </Field>
             <Button
-              tone="danger"
+              kind="danger"
               isDisabled={disabled || busy || typed.trim() !== match}
               onPress={onConfirm}
             >
@@ -124,7 +129,7 @@ export function DangerAction({
       ) : confirm === 'none' ? (
         <div className="row danger-row">
           <Button
-            tone={tone === 'plain' ? 'primary' : 'danger'}
+            kind={kind === 'plain' ? 'primary' : 'danger'}
             isDisabled={disabled || busy}
             onPress={onConfirm}
           >
@@ -133,7 +138,7 @@ export function DangerAction({
         </div>
       ) : asking ? (
         <div className="row danger-row">
-          <Button tone="danger" isDisabled={disabled || busy} onPress={onConfirm}>
+          <Button kind="danger" isDisabled={disabled || busy} onPress={onConfirm}>
             {busy ? (busyLabel ?? '…') : label}
           </Button>
           <Button isDisabled={disabled || busy} onPress={() => setAsking(false)}>
@@ -142,7 +147,7 @@ export function DangerAction({
         </div>
       ) : (
         <div className="row danger-row">
-          <Button tone="danger" isDisabled={disabled || busy} onPress={() => setAsking(true)}>
+          <Button kind="danger" isDisabled={disabled || busy} onPress={() => setAsking(true)}>
             {label}
           </Button>
         </div>

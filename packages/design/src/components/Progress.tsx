@@ -25,7 +25,8 @@ export default function Progress({
   max,
   label,
   detail,
-  tone = 'accent',
+  tone,
+  className,
 }: {
   /** How far. Omit for indeterminate — the work has started, the size has not
    *  arrived. */
@@ -36,13 +37,15 @@ export default function Progress({
   /** The human sentence, shown beside the bar and announced instead of the
    *  percentage. */
   detail?: string
-  tone?: 'accent' | 'good' | 'bad'
+  /** A subset of the tone words; the default fill is the accent and is not a tone. */
+  tone?: 'good' | 'bad'
+  className?: string
 }) {
   const indeterminate = value === undefined || !max
   const pct = indeterminate ? 0 : Math.max(0, Math.min(100, (value / max) * 100))
 
   return (
-    <div className="progress">
+    <div className={`progress${className ? ` ${className}` : ''}`}>
       {(label || detail) && (
         <div className="progress-head">
           <span className="progress-label">{label}</span>
@@ -52,7 +55,7 @@ export default function Progress({
       )}
       {/* biome-ignore lint/a11y/useFocusableInteractive: a progressbar is not interactive; there is nothing to focus and nothing to press. */}
       <div
-        className={`bar bar-${tone}${indeterminate ? ' bar-indeterminate' : ''}`}
+        className={`bar${tone ? ` bar-${tone}` : ''}${indeterminate ? ' bar-indeterminate' : ''}`}
         role="progressbar"
         aria-label={label}
         // Absent on an indeterminate bar, which is what tells a screen reader

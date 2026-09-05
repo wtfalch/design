@@ -50,6 +50,7 @@ export default function Slider({
   labelHidden,
   size = 'md',
   danger,
+  className,
 }: {
   label: React.ReactNode
   /** What it decides, or what the ends of it mean. */
@@ -78,6 +79,7 @@ export default function Slider({
    * ceiling somebody may raise past what was measured.
    */
   danger?: { from: number; to?: number }
+  className?: string
 }) {
   const id = useId()
   // What the knob is at while it is being dragged. The prop is what was
@@ -119,7 +121,9 @@ export default function Slider({
     : 0
 
   return (
-    <div className={`slider-row slider-${size}${disabled ? ' is-disabled' : ''}`}>
+    <div
+      className={`slider-row slider-${size}${disabled ? ' is-disabled' : ''}${className ? ` ${className}` : ''}`}
+    >
       <label htmlFor={id} className={labelHidden ? 'sr-only' : 'slider-body'}>
         <span className="slider-label">{label}</span>
         {hint && <span className="slider-hint">{hint}</span>}

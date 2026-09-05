@@ -13,6 +13,7 @@ marked.setOptions({ gfm: true, breaks: true })
 export default function Markdown({
   text,
   sanitize,
+  className,
 }: {
   text: string
   /**
@@ -25,6 +26,7 @@ export default function Markdown({
    * what is "trusted" is a fact about the app, not the component.
    */
   sanitize?: Parameters<typeof DOMPurify.sanitize>[1]
+  className?: string
 }) {
   const html = useMemo(() => {
     if (!text) return ''
@@ -38,6 +40,11 @@ export default function Markdown({
   }, [text, sanitize])
 
   if (!text) return null
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: the string is DOMPurify output, with the config above.
-  return <div className="md" dangerouslySetInnerHTML={{ __html: html }} />
+  return (
+    <div
+      className={`md${className ? ` ${className}` : ''}`}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: the string is DOMPurify output, with the config above.
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
 }

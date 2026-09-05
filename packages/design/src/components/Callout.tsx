@@ -45,6 +45,7 @@ export default function Callout({
   icon,
   timed,
   onDismiss,
+  className,
 }: {
   tone?: 'info' | 'good' | 'warn' | 'bad'
   children: React.ReactNode
@@ -58,6 +59,7 @@ export default function Callout({
    *  Requiring a callback to make a timer work is a bar that counts down to
    *  nothing when somebody forgets one. */
   onDismiss?: () => void
+  className?: string
 }) {
   const total = typeof timed === 'number' ? timed : CALLOUT_TIMEOUT
   const [gone, setGone] = useState(false)
@@ -87,7 +89,7 @@ export default function Callout({
 
   return (
     <div
-      className={`callout${tone ? ` callout-${tone}` : ''}${running ? ' callout-timed' : ''}`}
+      className={`callout${tone ? ` callout-${tone}` : ''}${running ? ' callout-timed' : ''}${className ? ` ${className}` : ''}`}
       /* An alert interrupts whatever is being read, which is right for bad news
          and rude for "saved". */
       role={tone === 'bad' ? 'alert' : 'status'}

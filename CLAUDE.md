@@ -198,6 +198,28 @@ allowed to, once, explained in the commit.
   consumer wrote `<DangerAction>` and TypeScript refused it. The bare consumer
   in the release check typechecks the tarball; it does not render it.
 
+## The API, one word per concept
+
+Reviewed across all 28 components on 2026-09-05, before the first publish,
+because a rename after it is a breaking change for everyone.
+
+- **`kind` is a role, `tone` is a colour.** `Button` and `DangerZone` take
+  `kind` (`primary`, `ghost`, `danger`; `destructive`, `plain`). `Callout`,
+  `Pill`, `Toast`, `Progress`, `Card`, `Dialog` and `Rows` take `tone`, always a
+  subset of the same four words: `info`, `good`, `warn`, `bad`. `Button` used
+  to say `tone` for its role and `Progress` counted the accent fill as a tone,
+  so one prop name meant three vocabularies.
+- **`title` and `description`**, never `heading` and `body`. `DangerZone` was
+  the exception.
+- **`label` and `hint`** for the name of a control and the line under it.
+  `Checkbox` said `why`.
+- **`disabled`**, the plain word, on every control. React Aria spells it
+  `isDisabled` and `Button` accepts both, so a consumer never has to remember
+  which component wants which.
+- **`size` is `sm` / `md` / `lg`** wherever a control has one.
+- **`className` on every component's root.** A consumer positions things; a
+  root that cannot take a class forces a wrapper.
+
 ## The gallery
 
 - **It imports `@wtfalch/design` by its public entry, never `../src`.** A gallery

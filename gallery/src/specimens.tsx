@@ -147,7 +147,7 @@ function ToastDemo() {
       <Button onPress={() => toast('Settings saved')}>Info</Button>
       <Button onPress={() => toast('Model removed', 'good')}>Good</Button>
       <Button onPress={() => toast('Disk is nearly full', 'warn')}>Warn</Button>
-      <Button tone="danger" onPress={() => toast('The download failed', 'bad')}>
+      <Button kind="danger" onPress={() => toast('The download failed', 'bad')}>
         Bad
       </Button>
     </Row>
@@ -165,10 +165,10 @@ function DialogDemo() {
           onCancel={() => setOpen(false)}
           actions={
             <>
-              <Button tone="ghost" onPress={() => setOpen(false)}>
+              <Button kind="ghost" onPress={() => setOpen(false)}>
                 Not now
               </Button>
-              <Button tone="primary" onPress={() => setOpen(false)}>
+              <Button kind="primary" onPress={() => setOpen(false)}>
                 Allow
               </Button>
             </>
@@ -212,10 +212,10 @@ function ModalDemo() {
           width="min(520px, 100%)"
           footer={
             <>
-              <Button tone="ghost" onPress={() => setOpen(false)}>
+              <Button kind="ghost" onPress={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button tone="primary" onPress={() => setOpen(false)}>
+              <Button kind="primary" onPress={() => setOpen(false)}>
                 Save
               </Button>
             </>
@@ -501,7 +501,7 @@ function CheckboxDemo() {
         <Checkbox
           key={k}
           label={<span className="mono">{k}</span>}
-          why={why}
+          hint={why}
           checked={on.includes(k)}
           onChange={() => flip(k)}
         />
@@ -587,7 +587,7 @@ export const COMPONENTS: Component[] = [
           'window-sized dashed rectangle reads as a layout that failed — and the ' +
           'box centres itself in whatever it was dropped into.',
         render: () => (
-          <Empty illustration="uhm" action={<Button tone="primary">New applet</Button>}>
+          <Empty illustration="uhm" action={<Button kind="primary">New applet</Button>}>
             Nothing on this view yet. An applet is a small thing a model writes for you and keeps
             here.
           </Empty>
@@ -741,7 +741,7 @@ export const COMPONENTS: Component[] = [
                 header: 'Actions',
                 quiet: true,
                 cell: () => (
-                  <Button tone="danger" size="sm">
+                  <Button kind="danger" size="sm">
                     Remove
                   </Button>
                 ),
@@ -1007,9 +1007,9 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <Row>
             <Button>Default</Button>
-            <Button tone="primary">Primary</Button>
-            <Button tone="ghost">Ghost</Button>
-            <Button tone="danger">Danger</Button>
+            <Button kind="primary">Primary</Button>
+            <Button kind="ghost">Ghost</Button>
+            <Button kind="danger">Danger</Button>
           </Row>
         ),
       },
@@ -1019,13 +1019,13 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <Row>
             <Button isDisabled>Default</Button>
-            <Button tone="primary" isDisabled>
+            <Button kind="primary" isDisabled>
               Primary
             </Button>
-            <Button tone="ghost" isDisabled>
+            <Button kind="ghost" isDisabled>
               Ghost
             </Button>
-            <Button tone="danger" isDisabled>
+            <Button kind="danger" isDisabled>
               Danger
             </Button>
           </Row>
@@ -1036,7 +1036,7 @@ export const COMPONENTS: Component[] = [
         note: 'Working, not disabled. On `aria-busy`, so the styling and the screen reader read the same attribute; holds still under prefers-reduced-motion.',
         render: () => (
           <Row>
-            <Button tone="primary" busy>
+            <Button kind="primary" busy>
               Installing…
             </Button>
             <Button busy>Removing…</Button>
@@ -1051,7 +1051,7 @@ export const COMPONENTS: Component[] = [
             <Button size="sm">Small</Button>
             <Button size="md">Medium</Button>
             <Button size="lg">Large</Button>
-            <Button tone="primary" size="lg">
+            <Button kind="primary" size="lg">
               Install
             </Button>
           </Row>
@@ -1271,20 +1271,20 @@ export const COMPONENTS: Component[] = [
             <Checkbox label="Just a name" checked onChange={() => {}} />
             <Checkbox
               label="With a reason"
-              why="What choosing it means, or what it costs."
+              hint="What choosing it means, or what it costs."
               checked={false}
               onChange={() => {}}
             />
             <Checkbox
               label="With a third line"
-              why="A quieter one — a path, a size, an id."
+              hint="A quieter one — a path, a size, an id."
               meta="~/models/qwen"
               checked
               onChange={() => {}}
             />
             <Checkbox
               label="Disabled"
-              why="Cannot be chosen here."
+              hint="Cannot be chosen here."
               checked={false}
               disabled
               onChange={() => {}}
@@ -1469,7 +1469,7 @@ export const COMPONENTS: Component[] = [
               title="A model to talk to"
               description="The one that answers questions and writes things. Start here if you are only picking one."
             >
-              <Button tone="primary" block>
+              <Button kind="primary" block>
                 Choose one
               </Button>
             </Card>
@@ -1495,7 +1495,7 @@ export const COMPONENTS: Component[] = [
               <span className="grow">
                 ollama<div className="set-hint">v0.33.2 · running</div>
               </span>
-              <Button tone="ghost" size="sm">
+              <Button kind="ghost" size="sm">
                 Remove
               </Button>
             </div>
@@ -1503,7 +1503,7 @@ export const COMPONENTS: Component[] = [
               <span className="grow">
                 stable-diffusion.cpp<div className="set-hint">not installed</div>
               </span>
-              <Button tone="primary" size="sm">
+              <Button kind="primary" size="sm">
                 Install
               </Button>
             </div>
@@ -1531,7 +1531,7 @@ export const COMPONENTS: Component[] = [
                   Hugging Face answered 404
                 </div>
               </div>
-              <Button tone="ghost">Retry</Button>
+              <Button kind="ghost">Retry</Button>
             </div>
           </Card>
         ),
@@ -1620,7 +1620,7 @@ export const COMPONENTS: Component[] = [
             </div>
             <footer className="set-actions first-run-actions">
               <span className="grow" />
-              <Button tone="primary" isDisabled>
+              <Button kind="primary" isDisabled>
                 Next
               </Button>
             </footer>
@@ -1742,10 +1742,10 @@ export const COMPONENTS: Component[] = [
             <Button iconOnly aria-label="Chat">
               <Icon name="chat" />
             </Button>
-            <Button tone="danger">
+            <Button kind="danger">
               <Icon name="close" size={15} /> Remove
             </Button>
-            <Button tone="primary">
+            <Button kind="primary">
               <Icon name="download" size={15} /> Install
             </Button>
           </Row>
@@ -1758,7 +1758,7 @@ export const COMPONENTS: Component[] = [
           <Row>
             <Icon name="spinner" className="spin" />
             <Icon name="spinner" className="spin" size={22} />
-            <Button tone="primary" busy>
+            <Button kind="primary" busy>
               <Icon name="spinner" className="spin" size={15} /> Installing…
             </Button>
           </Row>

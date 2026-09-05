@@ -48,6 +48,7 @@ export default function Toggle({
   said,
   labelHidden,
   size = 'md',
+  className,
 }: {
   label: React.ReactNode
   /** What it does, or what turning it off costs. Under the label, in the same
@@ -72,6 +73,7 @@ export default function Toggle({
   /** The same three the rest of the controls take. `sm` for a switch in a
    *  toolbar or a dense row; `lg` where it is the only thing on the screen. */
   size?: 'sm' | 'md' | 'lg'
+  className?: string
 }) {
   /* React Aria's `Switch` is the `<label>`: it owns a visually-hidden
      `<input type="checkbox" role="switch">` and stamps `data-selected`,
@@ -166,7 +168,7 @@ export default function Toggle({
   return (
     <Switch
       ref={rowRef}
-      className={`switch-row switch-${size}`}
+      className={`switch-row switch-${size}${className ? ` ${className}` : ''}`}
       isSelected={shown}
       onChange={commit}
       isDisabled={disabled}

@@ -28,15 +28,21 @@ import { Button as AriaButton, type ButtonProps } from 'react-aria-components'
 
 export interface Props extends Omit<ButtonProps, 'className' | 'style' | 'children'> {
   children?: React.ReactNode
+  /** The same word every other control in the package uses. React Aria spells
+   *  it `isDisabled`, and that still works; this one exists so a consumer does
+   *  not have to remember which of the two a given component wants. */
+  disabled?: boolean
   /**
-   * What kind of thing pressing it does.
+   * What kind of thing pressing it does. `kind`, not `tone`: across the
+   * package `tone` is a semantic colour -- info, good, warn, bad -- and a
+   * button's primary/ghost/danger is a role, not a colour.
    *
    * `primary` is the one action the panel is for, and there is at most one.
    * `ghost` is a secondary action that should not compete. `danger` is red
    * before you hover it, because hover is the one moment it is too late to be
    * told.
    */
-  tone?: 'default' | 'primary' | 'ghost' | 'danger'
+  kind?: 'default' | 'primary' | 'ghost' | 'danger'
   /** Asked for, never inherited. Size used to come from a descendant selector,
    *  which made a button's size a fact about where somebody had put it. */
   size?: 'sm' | 'md' | 'lg'
@@ -59,7 +65,8 @@ export interface Props extends Omit<ButtonProps, 'className' | 'style' | 'childr
 }
 
 export default function Button({
-  tone = 'default',
+  kind = 'default',
+  disabled,
   size = 'md',
   busy,
   block,
@@ -70,7 +77,7 @@ export default function Button({
 }: Props) {
   const classes = [
     iconOnly ? 'icon-btn' : '',
-    tone === 'default' ? '' : tone,
+    kind === 'default' ? '' : kind,
     size === 'md' ? '' : `size-${size}`,
     block ? 'block' : '',
     className ?? '',
@@ -110,6 +117,7 @@ export default function Button({
          inherited from a library the caller has not read. */
       type="button"
       {...rest}
+      isDisabled={rest.isDisabled ?? disabled}
       /* Always a string, never undefined. React Aria stamps its own
          `react-aria-Button` class when `className` is absent, so an untoned
          button arrived carrying a class from a library the stylesheet has never

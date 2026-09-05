@@ -46,6 +46,7 @@ export default function Field({
   children,
   labelHidden,
   layout = 'stack',
+  className,
 }: {
   /** What the field is. Always given -- there is no unlabelled case, only
    *  fields whose label is hidden. */
@@ -66,13 +67,16 @@ export default function Field({
    *  thing that changes is where the label sits. */
   layout?: 'stack' | 'row'
   children: (field: FieldWiring) => React.ReactNode
+  className?: string
 }) {
   const id = useId()
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
 
   return (
-    <div className={`field field-${layout}-layout${error ? ' field-bad' : ''}`}>
+    <div
+      className={`field field-${layout}-layout${error ? ' field-bad' : ''}${className ? ` ${className}` : ''}`}
+    >
       <label className={labelHidden ? 'sr-only' : 'field-label'} htmlFor={id}>
         {label}
         {/* An asterisk on its own is a convention, not a word. The text is for

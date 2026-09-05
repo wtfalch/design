@@ -39,6 +39,7 @@ export default function Table<T>({
   rows,
   keyOf,
   empty,
+  className,
 }: {
   /** What the table is. Rendered as a real `<caption>`, which is the one place
    *  a table's name belongs. */
@@ -47,12 +48,13 @@ export default function Table<T>({
   rows: T[]
   keyOf: (item: T) => string
   empty?: React.ReactNode
+  className?: string
 }) {
   if (!rows.length) {
     return empty ? <div className="set-hint rows-empty">{empty}</div> : null
   }
   return (
-    <div className="table-scroll">
+    <div className={`table-scroll${className ? ` ${className}` : ''}`}>
       <table className="table">
         {/* Visually hidden rather than absent: the table still needs a name,
             and a heading above it in the markup is not attached to it. */}

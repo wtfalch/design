@@ -145,10 +145,10 @@ export default function Tour({ stops, onDone }: { stops: TourStop[]; onDone: () 
             {at + 1} of {live.length}
           </span>
           <span className="grow" />
-          <Button tone="ghost" size="sm" onPress={finish}>
+          <Button kind="ghost" size="sm" onPress={finish}>
             Skip
           </Button>
-          <Button tone="primary" size="sm" onPress={next}>
+          <Button kind="primary" size="sm" onPress={next}>
             {at + 1 < live.length ? 'Next' : 'Done'}
           </Button>
         </div>

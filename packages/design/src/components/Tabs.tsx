@@ -66,6 +66,7 @@ export default function Tabs({
   label,
   orientation = 'horizontal',
   groups = [],
+  className,
 }: {
   tabs: Tab[]
   value: string
@@ -79,6 +80,7 @@ export default function Tabs({
   /** The headings a vertical rail draws above runs of tabs that name them in
    *  `Tab.group`. A group no tab names is not drawn. */
   groups?: TabGroup[]
+  className?: string
 }) {
   const strip = useRef<HTMLDivElement>(null)
   const grouped = orientation === 'vertical' && groups.length > 0
@@ -100,7 +102,7 @@ export default function Tabs({
 
   return (
     <div
-      className={`tabs tabs-${orientation}`}
+      className={`tabs tabs-${orientation}${className ? ` ${className}` : ''}`}
       role="tablist"
       aria-label={label}
       aria-orientation={orientation}

@@ -23,20 +23,23 @@ import { Checkbox as AriaCheckbox } from 'react-aria-components'
 
 export default function Checkbox({
   label,
-  why,
+  hint,
   meta,
   checked,
   onChange,
   disabled,
+  className,
 }: {
   label: React.ReactNode
-  /** What choosing it means, or what it costs. Under the name. */
-  why?: React.ReactNode
+  /** What choosing it means, or what it costs. Under the name. `hint`, the
+   *  word `Toggle`, `Slider` and `Field` use for the same line; it was `why`. */
+  hint?: React.ReactNode
   /** A quieter third line — a path, a size, an id. */
   meta?: React.ReactNode
   checked: boolean
   onChange: (on: boolean) => void
   disabled?: boolean
+  className?: string
 }) {
   /* React Aria's `Checkbox` is the `<label>`. It keeps the real input in the
      markup and visually hidden -- exactly the arrangement this component
@@ -45,10 +48,15 @@ export default function Checkbox({
      the row's `::after` and `::before`; `checkbox.css` now reads the state off
      those attributes instead of `:has(input:checked)`. */
   return (
-    <AriaCheckbox className="choice" isSelected={checked} onChange={onChange} isDisabled={disabled}>
+    <AriaCheckbox
+      className={`choice${className ? ` ${className}` : ''}`}
+      isSelected={checked}
+      onChange={onChange}
+      isDisabled={disabled}
+    >
       <span className="choice-body">
         <span className="choice-name">{label}</span>
-        {why && <span className="choice-why">{why}</span>}
+        {hint && <span className="choice-why">{hint}</span>}
         {meta && <span className="choice-meta">{meta}</span>}
       </span>
     </AriaCheckbox>

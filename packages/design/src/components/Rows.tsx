@@ -39,6 +39,7 @@ export function Rows({
   empty,
   label,
   look = 'list',
+  className,
 }: {
   /** Absent is the empty case too: a caller mapping over nothing renders
    *  nothing, and that has to reach `empty` rather than an empty bordered box. */
@@ -64,6 +65,7 @@ export function Rows({
    * way, and only the surface differs.
    */
   look?: 'list' | 'pick'
+  className?: string
 }) {
   const items = Array.isArray(children) ? children.filter(Boolean) : children
   const none = Array.isArray(items) ? items.length === 0 : !items
@@ -72,8 +74,12 @@ export function Rows({
     return empty ? <div className="set-hint rows-empty">{empty}</div> : null
   }
   return (
-    // biome-ignore lint/a11y/useSemanticElements: valid ARIA on a div; a <ul> brings the browser's list reset and the stylesheet and 204 baselines key on `div.rows`.
-    <div className={`rows${look === 'pick' ? ' rows-pick' : ''}`} role="list" aria-label={label}>
+    <div
+      className={`rows${look === 'pick' ? ' rows-pick' : ''}${className ? ` ${className}` : ''}`}
+      // biome-ignore lint/a11y/useSemanticElements: valid ARIA on a div; a <ul> brings the browser's list reset and the stylesheet and 204 baselines key on `div.rows`.
+      role="list"
+      aria-label={label}
+    >
       {items}
     </div>
   )
@@ -92,6 +98,7 @@ export function Row({
   loading,
   waiting,
   align = 'center',
+  className,
 }: {
   /** The subject. Truncates -- it is the only part that may. */
   name: React.ReactNode
@@ -128,6 +135,7 @@ export function Row({
   /** `start` when the row has enough text that vertically centred buttons drift
    *  away from the name they belong to. */
   align?: 'center' | 'start'
+  className?: string
 }) {
   const body = (
     <>
@@ -144,15 +152,16 @@ export function Row({
     </>
   )
 
-  const className =
+  const rowClass =
     `set-row rows-row${tone ? ` rows-${tone}` : ''}` +
     `${align === 'start' ? ' rows-top' : ''}${picked ? ' is-picked' : ''}` +
-    `${loading ? ' is-loading' : ''}${waiting ? ' is-waiting' : ''}`
+    `${loading ? ' is-loading' : ''}${waiting ? ' is-waiting' : ''}` +
+    `${className ? ` ${className}` : ''}`
 
   return (
     <>
       {/* biome-ignore lint/a11y/useSemanticElements: see `Rows` -- same reason, one level down. */}
-      <div className={className} role="listitem">
+      <div className={rowClass} role="listitem">
         {onClick ? (
           <button type="button" className="row-hit" disabled={waiting} onClick={onClick}>
             {body}
