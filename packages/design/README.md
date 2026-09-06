@@ -169,7 +169,7 @@ case nobody has had; when it comes, the product entry is where to bind it.
 
 ## Status
 
-`0.3.0`. Twenty-eight components, every one of the 70 gallery specimens
+`0.3.1`. Twenty-eight components, every one of the 70 gallery specimens
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
 It came out of [tf](https://github.com/wtfalch/tf), which is its first consumer;

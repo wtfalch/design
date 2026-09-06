@@ -16,9 +16,9 @@ import type { Theme, ThemeTokens } from './index'
  * which is `system`, gets no block: its palette is the base, and its light
  * half is the `prefers-color-scheme` block `base.css` scopes to it.
  *
- * No imports but a type, on purpose: `build-products.mjs` loads the compiled
- * copy of this file in plain Node, which cannot follow the package's
- * extensionless relative imports.
+ * `build-products.mjs` loads the compiled copy of this file in plain Node.
+ * Until 0.3.1 that meant it could import nothing but a type, because the build
+ * emitted relative imports without extensions; the build writes them now.
  */
 
 /** The name `applyTheme` derives for a theme object. */
