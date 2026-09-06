@@ -1,6 +1,6 @@
 {
   "name": "@wtfalch/design",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "wtfalch's design system: themeable components on a fixed token vocabulary.",
   "keywords": [
     "design-system",

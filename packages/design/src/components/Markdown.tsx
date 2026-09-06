@@ -1,6 +1,6 @@
 import DOMPurify from 'dompurify'
 import { marked } from 'marked'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 marked.setOptions({ gfm: true, breaks: true })
 
@@ -9,6 +9,14 @@ marked.setOptions({ gfm: true, breaks: true })
  *
  * Sanitised without exception: this is text produced by a model, which may be
  * echoing content it read from a file, so it is never trusted HTML.
+ *
+ * **On the server, the text itself.** DOMPurify sanitises through a DOM, and a
+ * server rendering React has none: `sanitize` is not even a function there,
+ * and the first app to server-render a comment found out. Rather than a second
+ * sanitiser for the server, which would be two behaviours for one string, the
+ * server (and the first client paint, so hydration agrees) renders the text
+ * escaped by React, and the sanitised HTML takes its place once mounted. What
+ * reaches a browser is never HTML that DOMPurify has not seen.
  */
 export default function Markdown({
   text,
@@ -28,8 +36,11 @@ export default function Markdown({
   sanitize?: Parameters<typeof DOMPurify.sanitize>[1]
   className?: string
 }) {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
   const html = useMemo(() => {
-    if (!text) return ''
+    if (!text || !mounted) return null
     const raw = marked.parse(text, { async: false }) as string
     return DOMPurify.sanitize(raw, {
       // No iframes, no forms, no event handlers -- prose, code and tables only.
@@ -37,12 +48,21 @@ export default function Markdown({
       FORBID_ATTR: ['style', 'onerror', 'onload', 'onclick'],
       ...sanitize,
     })
-  }, [text, sanitize])
+  }, [text, mounted, sanitize])
 
   if (!text) return null
+  const classes = `md${className ? ` ${className}` : ''}`
+  if (html === null) {
+    // The server, and the client until its first effect: the words, escaped.
+    return (
+      <div className={classes} data-md="plain">
+        <p>{text}</p>
+      </div>
+    )
+  }
   return (
     <div
-      className={`md${className ? ` ${className}` : ''}`}
+      className={classes}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: the string is DOMPurify output, with the config above.
       dangerouslySetInnerHTML={{ __html: html }}
     />
