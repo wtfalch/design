@@ -33,23 +33,19 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./tf": {
+      "types": "./dist/tf.d.ts",
+      "default": "./dist/tf.js"
+    },
+    "./valet": {
+      "types": "./dist/valet.d.ts",
+      "default": "./dist/valet.js"
+    },
+    "./tf.css": "./dist/tf.css",
+    "./valet.css": "./dist/valet.css",
     "./themes": {
       "types": "./dist/themes/index.d.ts",
       "default": "./dist/themes/index.js"
-    },
-    "./themes/tf": {
-      "types": "./dist/themes/tf.d.ts",
-      "default": "./dist/themes/tf.js"
-    },
-    "./themes/valet": {
-      "types": "./dist/themes/valet.d.ts",
-      "default": "./dist/themes/valet.js"
-    },
-    "./themes/tf.css": "./dist/themes/tf.css",
-    "./themes/valet.css": "./dist/themes/valet.css",
-    "./art/tf": {
-      "types": "./dist/art/tf.d.ts",
-      "default": "./dist/art/tf.js"
     },
     "./tokens.css": "./dist/tokens.css",
     "./styles.css": "./dist/styles/index.css"
@@ -59,7 +55,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/copy-css.mjs && node scripts/build-themes.mjs",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/copy-css.mjs && node scripts/build-products.mjs",
     "prepack": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

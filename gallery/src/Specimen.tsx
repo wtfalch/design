@@ -23,17 +23,16 @@
  */
 import { useEffect } from 'react'
 
-import { applyTheme } from '@wtfalch/design'
-import { brand } from './brand'
 import type { Target } from './specimenTarget'
 import { COMPONENTS } from './specimens'
+import { applyGalleryTheme } from './theme'
 
 export default function Specimen({ target }: { target: Target }) {
   const component = COMPONENTS.find((c) => c.id === target.component)
   const variant = component?.variants.find((v) => v.name === target.variant)
 
   useEffect(() => {
-    applyTheme(target.theme === 'brand' ? brand : target.theme)
+    applyGalleryTheme(target.theme)
   }, [target.theme])
 
   /* A missing specimen renders as a message rather than nothing at all. An

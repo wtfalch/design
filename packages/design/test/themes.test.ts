@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
+import { TF_THEMES } from '../src/products/tf'
+import { VALET_THEMES } from '../src/products/valet'
 import { THEMES, TOKEN_KEYS, applyTheme } from '../src/themes'
 import { productCss, themeId } from '../src/themes/css'
-import { TF_THEMES } from '../src/themes/tf'
-import { VALET_THEMES } from '../src/themes/valet'
 
 /**
  * A theme is applied by name, and the name has to mean the same thing to

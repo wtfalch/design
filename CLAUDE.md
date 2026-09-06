@@ -125,13 +125,21 @@ allowed to, once, explained in the commit.
   and a control outline have different thresholds and cannot share a value.
   They did, and the value could only be right for one of them.
 
-- **Themes are per product, and the CSS is generated.** `src/themes/<product>.ts`
-  holds a product's palettes, `THEMES` is the union, and `build-themes.mjs`
-  writes `dist/themes/<product>.css` from the objects at build time. A
-  consumer imports its own product's CSS and bundles nobody else's; nobody
-  writes a `:root[data-theme]` rule by hand, because a copy drifts from the
-  object the contrast test measured. Before 0.3.0 valet kept its theme in its
-  own repo and re-derived first paint, the measurement and a review page there.
+- **A product is a layer between the system and a theme, and it ships as one
+  entry.** `src/products/<name>.ts` holds a product's identity (the tokens
+  that make it itself under every theme: font, shape, density), its themes and
+  its default; `build-products.mjs` writes `dist/<name>.css` (tokens, identity
+  on `:root`, the default theme until one is picked, the components, one rule
+  per theme) and `src/<name>.ts` is the entry whose `Brand`, `THEMES` and
+  `applyTheme` are the product's. A site imports its product and nothing of
+  anyone else's. The identity layer exists because valet's two palettes each
+  restated valet's font and corners, and a theme shared between products would
+  otherwise fall back to tf's font wherever it kept quiet: a theme is a sparse
+  map, and what it is sparse *over* has to be the product, not the base.
+  Nobody writes a `:root[data-theme]` rule by hand, because a copy drifts from
+  the object the contrast test measured. Before 0.3.0 valet kept its theme in
+  its own repo and re-derived first paint, the measurement and a review page
+  there.
 - **Three derived tokens are re-derived under `[data-theme]`.** `--control`,
   `--illo-paper` and `--focus-ring` are `var()` expressions, and declared on
   `:root` alone they resolve against the root's palette and inherit as finished
@@ -178,14 +186,21 @@ allowed to, once, explained in the commit.
   built on), and a `length > 2` filter that took `.md` with it. That is the
   argument for baselining first, in one paragraph.
 
-- **Art is per product, through one provider.** Icons, illustrations and marks
-  are values in an `ArtPack`; `Icon`, `Illustration` and `Brand` read the
-  installed pack from context and fall back to tf's, which is
-  `@wtfalch/design/art/tf`. `bindArt(pack)` returns the three typed to the
-  pack's names. A pack has to hold `SYSTEM_ICONS`, the seven the package's own
-  components draw, and `checkArt` holds it to the rules `icons.test.ts` and
-  `illustrations.test.ts` hold tf's art to. The glyph table with its measured
-  views is `art/tf-icons.ts` now; `Icon.tsx` keeps the reasons.
+- **Icons and illustrations are the system's; the mark is the product's.**
+  `brandMarks.ts` is the table of every product's mark by name, stroked (tf,
+  one line at a weight) or filled (valet, a badge with the shirt cut out and
+  the bow inside the cut, one path under `evenodd` so the shirt is a hole the
+  surface shows through); `Brand` draws either, and a product entry's `Brand`
+  defaults to its own. tf's `brandMark.test.ts` reads tf's row out of the
+  compiled table, so the table stays where it is. The glyph table with its
+  measured views is `components/icons.ts`; `Icon.tsx` keeps the reasons. 0.3.0
+  briefly had an `ArtProvider` that put a per-product pack of icons,
+  illustrations and marks into React context so a product could swap the
+  seven icons the package draws inside Callout, Modal and the password field.
+  No product wanted that, the first real per-product art (valet's mark) did
+  not need it, and it went before the tag made it public API. If a theme ever
+  wants its own icon set, the shape is one indirection in `Icon` that
+  `applyTheme` sets, not a provider.
 
 ## The components
 
