@@ -52,9 +52,8 @@
   file      file
  */
 
-import { TF_ICONS } from '../art/tf-icons'
-import { useArt } from '../artContext'
 import type { IconName } from './iconNames'
+import { ICONS } from './icons'
 
 export type { IconName }
 
@@ -72,10 +71,8 @@ export default function Icon({
    *  repeats is decoration, and decoration announced twice is noise. */
   title?: string
 }) {
-  /* The installed pack's glyph, or tf's. The table with its measured views
-     is `art/tf-icons.ts`; a product with its own icons hands a pack to
-     `ArtProvider` and the same component draws theirs. */
-  const g = (useArt()?.icons ?? TF_ICONS)[name]
+  /* The table with its measured views is `icons.ts`, beside this file. */
+  const g = ICONS[name]
   if (!g) return null
   return (
     <svg

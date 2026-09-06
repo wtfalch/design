@@ -24,7 +24,6 @@
  * message, which so far it never is.
  */
 
-import { useArt } from '../artContext'
 import { ILLUSTRATION_SVG, type IllustrationName } from '../illustrations'
 
 export type { IllustrationName }
@@ -53,8 +52,7 @@ export default function Illustration({
   alt?: string
   className?: string
 }) {
-  // The installed pack's drawing, or tf's. Both are strings off disk at build time.
-  const svg = (useArt()?.illustrations ?? (ILLUSTRATION_SVG as Record<string, string>))[name]
+  const svg = ILLUSTRATION_SVG[name]
   if (!svg) return null
 
   return (

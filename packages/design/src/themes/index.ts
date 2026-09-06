@@ -38,8 +38,8 @@
  * becoming a fourth, undocumented category.
  */
 
-import { TF_THEMES } from './tf'
-import { VALET_THEMES } from './valet'
+import { TF_THEMES } from '../products/tf'
+import { VALET_THEMES } from '../products/valet'
 
 /** Every token a theme may set. */
 export interface ThemeTokens {
@@ -277,11 +277,11 @@ export function defineTheme(theme: Theme): Theme {
  * mark is, and 0.2.0 already made `Brand` the home of every product's mark by
  * name; keeping each product's palette in its own repo meant each repo
  * re-deriving first paint, the contrast measurement and a page to look at it
- * on. So `themes/tf.ts` holds tf's three and `themes/valet.ts` valet's two,
+ * on. So `products/tf.ts` holds tf's three and `products/valet.ts` valet's two,
  * this is the union, and the contrast test and the gallery read the union.
  *
  * A consumer that wants only its own imports the product module, or the CSS
- * `build-themes.mjs` generates from it, and bundles nobody else's.
+ * `build-products.mjs` generates from it, and bundles nobody else's.
  */
 export const THEMES: Record<string, Theme> = { ...TF_THEMES, ...VALET_THEMES }
 

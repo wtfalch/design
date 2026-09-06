@@ -27,65 +27,70 @@ Where a theme genuinely needs a layer that values cannot reach — a paper grain
 a vignette — the base CSS pre-declares the slot and the theme fills it. The rule
 is always ours.
 
-## Themes, per product
+## Products
 
-A theme is part of a product's identity the way its mark is, so it lives
-here, in its product's module, and the gallery photographs it:
-
-```ts
-import '@wtfalch/design/tokens.css'         // the vocabulary and its base values
-import '@wtfalch/design/styles.css'         // the components
-import '@wtfalch/design/themes/valet.css'   // this product's palettes, and nobody else's
-```
-
-The CSS is generated at build time from the theme objects, one
-`:root[data-theme='<id>']` rule each, so the paint before React has the same
-values the contrast test measured. Set `data-theme` on `<html>` before the
-bundle loads and nothing flashes:
-
-```html
-<html data-theme="valet">
-<script>
-  try {
-    var t = localStorage.getItem('theme')
-    if (t) document.documentElement.dataset.theme = t
-  } catch (e) {}
-</script>
-```
-
-The objects are there too, for a picker or a canvas that cannot read a CSS
-variable:
+A site is one product, so it imports its product and everything it touches is
+its own:
 
 ```ts
-import { applyTheme } from '@wtfalch/design'
-import { VALET_THEMES, valetNight } from '@wtfalch/design/themes/valet'
-
-applyTheme(valetNight)                 // the object
-applyTheme('valet-night')              // or its id, from the registry of every product
-applyTheme(valetNight, myEl)           // or on a subtree
+import '@wtfalch/design/valet.css'   // the vocabulary, valet's identity, the components, valet's themes
+import { Brand, Button, applyTheme } from '@wtfalch/design/valet'
+// the same components; Brand is valet's badge, applyTheme knows valet's themes
 ```
 
-`@wtfalch/design/themes/tf` holds tf's three the same way, and `THEMES` on the
-main entry is the union, which is what the gallery's picker and the contrast
-test read.
+Three layers, each falling back to the one under it:
 
-### Writing one
+| | |
+|---|---|
+| **the system** | The components, the base values in `tokens.css`, the shared icons and illustrations. |
+| **the product** | Its mark, and its identity: the tokens that make it itself under every theme — font, shape, density. On `:root` in the product's stylesheet, so a theme that is silent on them gets the product, not tf. `src/products/<name>.ts`. |
+| **the theme** | A palette and a colour scheme, plus anything it deliberately changes. One `:root[data-theme='<id>']` rule each, generated from the object. |
+
+The middle layer is what lets a theme be shared between products: it names its
+colours and inherits the identity of whichever product wears it. Before it
+existed, valet's two palettes each restated valet's font and corners, and a
+palette written for two products would have shown tf's font on valet wherever
+it kept quiet.
+
+The product's default theme is also written on `:root` when no `data-theme` is
+set, so the first paint is right with no attribute at all; set the attribute
+before the bundle loads only to restore a theme somebody picked (see First
+paint). tf's default is `system`, a `prefers-color-scheme` rule rather than a
+palette, so tf still sets the attribute.
+
+The main entry is the neutral view of all of it: `PRODUCTS` by name, `THEMES`
+as the union every product's picker and the contrast test read,
+`productTheme(product, id)` for a theme as a product wears it, `bindProduct`
+for a product defined outside this package, and `productStylesheet` for its
+CSS.
+
+```ts
+import { PRODUCTS, applyTheme, productTheme } from '@wtfalch/design'
+
+applyTheme(productTheme(PRODUCTS.valet, 'valet-night'))   // valet night, on valet's identity
+applyTheme('valet-night')                                  // the palette alone, over the base
+applyTheme(productTheme(PRODUCTS.valet), myEl)             // valet's default, on a subtree
+```
+
+### Writing a theme
 
 A theme is a `Partial<ThemeTokens>` with a name, a note and a scheme: name the
-tokens you change, the rest inherit from `tokens.css`. A theme naming three
-tokens is valid. A product's themes go in `src/themes/<product>.ts`, keyed by
-the id `applyTheme` derives from the name (lowercased, spaces to hyphens), and
-`themes.test.ts` refuses a key that disagrees. Add the product to
-`build-themes.mjs` and its CSS ships beside the module.
+tokens you change, the rest inherit from the product's identity and then from
+`tokens.css`. A theme naming three tokens is valid. A product's themes go in
+`src/products/<name>.ts` beside its identity, keyed by the id `applyTheme`
+derives from the name (lowercased, spaces to hyphens); `products.test.ts`
+refuses a key that disagrees, a palette that restates its product's identity,
+and a default that is not one of the product's themes. `build-products.mjs`
+writes `dist/<name>.css` from the objects at build time.
 
 **A typo is a compile error.** `tokens` is a `Partial<ThemeTokens>`, so
 `'--densty'` fails to build rather than silently doing nothing — which is the
 failure a string-keyed map produces at run time, invisibly.
 
-**A theme names its font and does not ship it.** valet's `--font` reads a
-`--font-sans` variable the app defines with whatever loads its fonts, and
-falls back to the family by name. The gallery vendors the two families valet
-names so the specimens are photographed in them.
+**A product names its font and does not ship it.** valet's identity sets
+`--font` to read a `--font-sans` variable the app defines with whatever loads
+its fonts, and falls back to the family by name. The gallery vendors the two
+families valet names so the specimens are photographed in them.
 
 ## The three kinds of token
 
@@ -128,9 +133,10 @@ share a value.
 
 ## First paint
 
-React mounts after the stylesheet, so a theme applied in an effect flashes the
-default. Cache the name and apply it from a blocking script before the bundle
-loads:
+Your product's stylesheet paints its default theme with no attribute set, so
+this is for restoring a choice. React mounts after the stylesheet, so a theme
+applied in an effect flashes the default. Cache the name and apply it from a
+blocking script before the bundle loads:
 
 ```html
 <script>
@@ -143,30 +149,23 @@ loads:
 
 Your server stays the source of truth. `localStorage` only beats the paint.
 
-## Art, per product
+## Marks
 
-Icons, illustrations and marks are values a product supplies, the same seam a
-theme is. The components stay the package's and carry the rules: an icon
-drawn at its measured view, an illustration that takes `currentColor` and the
-panel it sits on, a mark in one stroke.
+Every product's mark, by name, in `brandMarks.ts`. tf's is one stroke. valet's
+is a filled badge: the jacket with the shirt cut out of it and a bow tie in the
+cut, one path under `evenodd` so the surface shows through the shirt. Both are
+`currentColor`, so the stylesheet decides the colour and a theme can move it.
 
-```ts
-import { ArtProvider, bindArt, checkArt, defineArt } from '@wtfalch/design'
-import { tfArt } from '@wtfalch/design/art/tf'
+```tsx
+import { BRAND_MARKS, Brand } from '@wtfalch/design'
 
-// Your own icons, tf's figures for now.
-export const art = defineArt({ ...tfArt, icons: { ...tfArt.icons, ledger: { view: '…', d: ['…'] } } })
-export const { ArtProvider: Art, Icon, Illustration, Brand } = bindArt(art)
+<Brand name="valet" />   // anywhere; a product entry's Brand defaults to its own
+BRAND_MARKS.valet.d      // the path, for a favicon or an app icon cut from the same drawing
 ```
 
-`<Art>` goes at the root once, and every component, including the ones the
-package draws for itself, draws the pack's. `bindArt` returns the three
-components typed to the pack's names, so `<Icon name="ledgr">` fails to build.
-A pack has to hold the seven icons the package's own components draw
-(`SYSTEM_ICONS`), and `checkArt(pack)` says what else is wrong, in the words
-`icons.test.ts` and `illustrations.test.ts` hold tf's art to. With no
-provider, everything draws tf's art, which is the right default for a product
-that has not drawn its own.
+Icons and illustrations are the system's, shared by every product the way
+`Button` is. A product wanting its own inside the package's components is a
+case nobody has had; when it comes, the product entry is where to bind it.
 
 ## Status
 
@@ -174,8 +173,9 @@ that has not drawn its own.
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
 It came out of [tf](https://github.com/wtfalch/tf), which is its first consumer;
-valet is the second. Themes and art are per product: tf's and valet's palettes
-ship here, and tf's art is the pack every product starts from.
+valet is the second. A product is a layer: tf and valet each ship as one
+stylesheet and one entry, with their identity under their themes and their
+mark in the table.
 
 Requires React 19. Behaviour comes from
 [React Aria Components](https://react-spectrum.adobe.com/react-aria/); every

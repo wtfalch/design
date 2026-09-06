@@ -1,4 +1,5 @@
-import type { Theme } from './index'
+import type { Theme, ThemeTokens } from '../themes'
+import type { Product } from './index'
 
 /**
  * valet's two palettes.
@@ -12,10 +13,12 @@ import type { Theme } from './index'
  * Every colour is measured, not judged: `contrast.test.ts` holds both palettes
  * to the same pairs as tf's.
  *
- * The fonts are named, not shipped. `--font` reads a `--font-sans` variable
- * the app defines with whatever loads its fonts, and falls back to the family
- * by name; the gallery loads both families from `gallery/public/fonts` so the
- * specimens are photographed in them.
+ * The palettes name colours and nothing else. What makes valet valet under
+ * either of them -- the type and the corners -- is the identity below, on
+ * `:root` in valet's stylesheet and under every palette `applyTheme` lays on.
+ * Both palettes used to restate it, which is the shape that breaks the moment
+ * a theme is shared between products: silent on the font, it would have fallen
+ * back to tf's.
  */
 
 const FONT =
@@ -23,16 +26,26 @@ const FONT =
 const FONT_MONO =
   'var(--font-mono, "JetBrains Mono"), ui-monospace, SFMono-Regular, Menlo, monospace'
 
-// Sharper corners than the package default. A console is read in rows and
-// columns, and a large radius rounds the grid away.
-const SHAPE = {
+/**
+ * valet's identity: what it is under every theme.
+ *
+ * The fonts are named, not shipped. `--font` reads a `--font-sans` variable
+ * the app defines with whatever loads its fonts, and falls back to the family
+ * by name; the gallery loads both families from `gallery/public/fonts` so the
+ * specimens are photographed in them. Sharper corners than the package
+ * default, because a console is read in rows and columns and a large radius
+ * rounds the grid away.
+ */
+export const VALET_IDENTITY: Partial<ThemeTokens> = {
+  '--font': FONT,
+  '--font-mono': FONT_MONO,
   '--radius-sm': '2px',
   '--radius': '4px',
   '--radius-md': '6px',
   '--radius-lg': '10px',
-} as const
+}
 
-export const valet: Theme = {
+export const light: Theme = {
   name: 'valet',
   note: 'Light. Ink on paper, indigo where you act.',
   scheme: 'light',
@@ -57,13 +70,10 @@ export const valet: Theme = {
     '--shadow-2': '0 8px 24px rgba(23, 26, 33, 0.10)',
     '--shadow-3': '0 12px 32px rgba(23, 26, 33, 0.12)',
     '--scrim': 'rgba(23, 26, 33, 0.32)',
-    '--font': FONT,
-    '--font-mono': FONT_MONO,
-    ...SHAPE,
   },
 }
 
-export const valetNight: Theme = {
+export const night: Theme = {
   name: 'valet night',
   note: 'Dark. The same ink, lit from behind.',
   scheme: 'dark',
@@ -88,11 +98,17 @@ export const valetNight: Theme = {
     '--shadow-2': '0 8px 28px rgba(0, 0, 0, 0.34)',
     '--shadow-3': '0 10px 34px rgba(0, 0, 0, 0.38)',
     '--scrim': 'rgba(0, 0, 0, 0.5)',
-    '--font': FONT,
-    '--font-mono': FONT_MONO,
-    ...SHAPE,
   },
 }
 
 /** Keyed by the name `applyTheme` takes: `name` lowercased, spaces to hyphens. */
-export const VALET_THEMES = { valet, 'valet-night': valetNight } as const
+export const VALET_THEMES = { valet: light, 'valet-night': night } as const
+
+/** valet, the product: its badge in `brandMarks.ts`, the identity above, the
+ *  two palettes, and light until somebody picks. */
+export const valet: Product = {
+  name: 'valet',
+  identity: VALET_IDENTITY,
+  themes: VALET_THEMES,
+  defaultTheme: 'valet',
+}

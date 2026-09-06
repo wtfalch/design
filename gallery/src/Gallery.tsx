@@ -19,9 +19,9 @@
 
 import { useEffect, useState } from 'react'
 
-import { Brand, Select, THEMES, TOKEN_KEYS, applyTheme } from '@wtfalch/design'
-import { brand } from './brand'
+import { Brand, Select, TOKEN_KEYS } from '@wtfalch/design'
 import { COMPONENTS } from './specimens'
+import { applyGalleryTheme, galleryThemes } from './theme'
 
 /** The one page that is not a component. Tokens earn a page because every
  *  component is made of them; a list of panels we chose not to draw did not --
@@ -193,7 +193,7 @@ export default function Gallery() {
   const tokens = useTokens(theme)
 
   useEffect(() => {
-    applyTheme(theme === 'brand' ? brand : theme)
+    applyGalleryTheme(theme)
   }, [theme])
 
   useEffect(() => {
@@ -238,9 +238,9 @@ export default function Gallery() {
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
           >
-            {[...Object.entries(THEMES), ['brand', brand] as const].map(([id, t]) => (
+            {galleryThemes().map(({ id, label }) => (
               <option key={id} value={id}>
-                {t.name}
+                {label}
               </option>
             ))}
           </Select>

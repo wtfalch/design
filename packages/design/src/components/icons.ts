@@ -1,7 +1,19 @@
-import type { Glyph } from '../art'
-import type { IconName } from '../components/iconNames'
+import type { IconName } from './iconNames'
+
+/** A glyph, with the viewBox it is drawn *at* rather than the one it shipped in. */
+export interface Glyph {
+  /** `x y w h`, measured. Not the source viewBox. */
+  view: string
+  /** Filled outline paths. */
+  d: string[]
+  /** Dots drawn as circles, for a glyph that has them. */
+  dots?: [number, number, number][]
+}
 
 /**
+ * The icon set, as data. The system's, shared by every product the way
+ * Button is; `Icon.tsx` keeps the reasons for the set and its weight.
+ *
  * A glyph, with the viewBox it is drawn *at* rather than the one it shipped in.
  *
  * **This is the whole reason there is a `view` per icon.** Pepicons does not
@@ -24,7 +36,7 @@ import type { IconName } from '../components/iconNames'
  * an icon, measure it the same way; a viewBox copied from the source file will
  * be the wrong size and only slightly, which is the hardest kind to notice.
  */
-export const TF_ICONS: Record<IconName, Glyph> = {
+export const ICONS: Record<IconName, Glyph> = {
   chat: {
     view: '-0.9 -0.9 21.79 21.79',
     d: [

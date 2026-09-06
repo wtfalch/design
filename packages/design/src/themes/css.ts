@@ -1,4 +1,4 @@
-import type { Theme } from './index'
+import type { Theme, ThemeTokens } from './index'
 
 /**
  * A theme as CSS, for the paint before React.
@@ -16,7 +16,7 @@ import type { Theme } from './index'
  * which is `system`, gets no block: its palette is the base, and its light
  * half is the `prefers-color-scheme` block `base.css` scopes to it.
  *
- * No imports but a type, on purpose: `build-themes.mjs` loads the compiled
+ * No imports but a type, on purpose: `build-products.mjs` loads the compiled
  * copy of this file in plain Node, which cannot follow the package's
  * extensionless relative imports.
  */
@@ -26,10 +26,16 @@ export function themeId(theme: Theme): string {
   return theme.name.toLowerCase().replace(/\s+/g, '-')
 }
 
+/** The declarations of a token map, as one line. */
+function declarations(tokens: Partial<ThemeTokens>): string {
+  return Object.entries(tokens)
+    .map(([key, value]) => `${key}:${value}`)
+    .join(';')
+}
+
 export function themeCss(id: string, theme: Theme): string {
-  const entries = Object.entries(theme.tokens)
-  if (entries.length === 0) return ''
-  const rules = entries.map(([key, value]) => `${key}:${value}`).join(';')
+  const rules = declarations(theme.tokens)
+  if (!rules) return ''
   return `:root[data-theme='${id}']{${rules};color-scheme:${theme.scheme}}`
 }
 
@@ -46,4 +52,57 @@ export function productCss(themes: Record<string, Theme>): string {
     })
     .filter(Boolean)
     .join('\n')
+}
+
+/**
+ * A product's stylesheet, whole: the one file a site imports.
+ *
+ * In cascade order: the vocabulary; the product's identity on `:root`, so it
+ * wins over the base values by coming later at the same specificity; the
+ * default theme on `:root:not([data-theme])`, so the first paint is right with
+ * no attribute at all; the components; and one rule per theme. A default with
+ * no tokens -- tf's `system`, which is a media query rather than a palette --
+ * writes no default rule, and neither does an empty identity.
+ *
+ * Structural, not typed to `Product`: that type lives beside the React
+ * binding, and this module has to stay loadable in plain Node for the build.
+ */
+export function productStylesheet(
+  product: {
+    name: string
+    identity: Partial<ThemeTokens>
+    themes: Record<string, Theme>
+    defaultTheme: string
+  },
+  tokens: string,
+  components: string,
+): string {
+  const parts = ['/* ---- tokens.css ---- */', tokens.trimEnd()]
+  const identity = declarations(product.identity)
+  if (identity) {
+    parts.push(
+      `/* ---- ${product.name}: the identity, under every theme ---- */`,
+      `:root{${identity}}`,
+    )
+  }
+  const fallback = product.themes[product.defaultTheme]
+  if (!fallback) {
+    throw new Error(
+      `product "${product.name}" defaults to "${product.defaultTheme}", which is not one of its themes`,
+    )
+  }
+  const rules = declarations(fallback.tokens)
+  if (rules) {
+    parts.push(
+      `/* ---- ${product.name}: ${product.defaultTheme}, until a theme is picked ---- */`,
+      `:root:not([data-theme]){${rules};color-scheme:${fallback.scheme}}`,
+    )
+  }
+  parts.push(
+    '/* ---- styles.css ---- */',
+    components.trimEnd(),
+    `/* ---- ${product.name}: the themes ---- */`,
+    productCss(product.themes),
+  )
+  return `${parts.join('\n')}\n`
 }

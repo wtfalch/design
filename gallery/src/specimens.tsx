@@ -519,8 +519,10 @@ export const COMPONENTS: Component[] = [
       'adding a product is adding a row. tf is the first: a lowercase tf in one ' +
       'unbroken stroke, the same path its app icon is rendered from, held to it ' +
       "by tf's `brandMark.test.ts`. Still, on purpose: tf's cog-morph is tf's " +
-      'own component, layered over this path. `currentColor`, so `.brand` decides ' +
-      'the green and a theme can move it through `--good`.',
+      'own component, layered over this path. valet is the second: a filled badge, ' +
+      'the jacket with the shirt cut out of it and a bow tie in the cut, one path ' +
+      'under `evenodd`. `currentColor`, so `.brand` decides the green and a theme ' +
+      'can move it through `--good`.',
     variants: [
       {
         name: 'In the header',
@@ -529,6 +531,14 @@ export const COMPONENTS: Component[] = [
           'old wordmark occupied — so the header kept its height when the letters ' +
           'became a drawing. The width follows the viewBox.',
         render: () => <Brand />,
+      },
+      {
+        name: 'valet',
+        note:
+          "The second product's mark, filled where tf's is stroked. Drawn 24-first, " +
+          'which is this size: the sliver of jacket over the bow is the pixel that ' +
+          'keeps it a bow rather than a notch in the edge.',
+        render: () => <Brand name="valet" />,
       },
     ],
   },

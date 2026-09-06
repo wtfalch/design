@@ -14,7 +14,7 @@ import { describe, expect, it } from 'vitest'
 import { ICON_NAMES } from '../src/components/iconNames'
 
 const here = dirname(fileURLToPath(import.meta.url))
-const src = readFileSync(resolve(here, '../src/art/tf-icons.ts'), 'utf8')
+const src = readFileSync(resolve(here, '../src/components/icons.ts'), 'utf8')
 const gallery = readFileSync(resolve(here, '../../../gallery/src/specimens.tsx'), 'utf8')
 
 /* `name: {` and then the nearest `view: '…'` before the entry closes. tf's

@@ -17,10 +17,11 @@
  * that shipped. They are worth more than the code around them.
  */
 
-export { default as ArtProvider } from './components/ArtProvider'
 export { default as Brand } from './components/Brand'
-export { BRAND_NAMES } from './components/brandMarks'
-export type { BrandName } from './components/brandMarks'
+/** Every product's mark by name, and the path itself for an icon cut from
+ *  the same drawing. */
+export { BRAND_MARKS, BRAND_NAMES } from './components/brandMarks'
+export type { BrandName, FillMark, Mark, StrokeMark } from './components/brandMarks'
 export { default as Button } from './components/Button'
 export type { Props as ButtonProps } from './components/Button'
 export { default as Callout } from './components/Callout'
@@ -89,13 +90,14 @@ export {
 } from './themes'
 export type { Theme, ThemeTokens } from './themes'
 /** A theme as the rule a consumer ships for first paint, generated so it
- *  cannot drift from the object. */
-export { productCss, themeCss, themeId } from './themes/css'
+ *  cannot drift from the object; and a product's whole stylesheet the same way. */
+export { productCss, productStylesheet, themeCss, themeId } from './themes/css'
 
 /** The measurement behind the contrast rule, for a theme that is yours. */
 export { luminance, ratio } from './contrast'
 
-/** A product's art as values, and the components typed to it. tf's pack is
- *  `@wtfalch/design/art/tf`, and the default when none is installed. */
-export { SYSTEM_ICONS, bindArt, checkArt, defineArt } from './art'
-export type { ArtPack, Glyph, Mark, SystemIconName } from './art'
+/** The products: the layer between the system and a theme. Each also ships
+ *  as its own entry, `@wtfalch/design/<name>` and `<name>.css`, where `Brand`,
+ *  `THEMES` and `applyTheme` are that product's. */
+export { PRODUCTS, bindProduct, defineProduct, productTheme } from './products'
+export type { Product } from './products'

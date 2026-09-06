@@ -1,4 +1,5 @@
-import type { Theme, ThemeTokens } from './index'
+import type { Theme, ThemeTokens } from '../themes'
+import type { Product } from './index'
 
 /**
  * tf's themes: the three the package shipped with, and the ones the gallery
@@ -92,3 +93,20 @@ export const paper: Theme = {
 
 /** Keyed by the name `applyTheme` takes, which is `name` lowercased. */
 export const TF_THEMES = { system, night, paper } as const
+
+/**
+ * tf, the product.
+ *
+ * Its identity is empty on purpose: `tokens.css` carries tf's font, shape and
+ * density as the base values, so there is nothing to lay over them. `system`
+ * is the default because following the OS is the choice a tool open all day
+ * should make for you -- and because it is a `prefers-color-scheme` rule
+ * rather than a palette, tf's stylesheet writes no default on `:root`; tf sets
+ * `data-theme` before the bundle loads, as it always has.
+ */
+export const tf: Product = {
+  name: 'tf',
+  identity: {},
+  themes: TF_THEMES,
+  defaultTheme: 'system',
+}
