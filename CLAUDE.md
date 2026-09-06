@@ -290,3 +290,14 @@ runs, and stops if the tag disagrees with `package.json`. A markup change after
 publication is breaking for anyone who styled against the first version.
 `files: ["dist"]`; `pnpm pack` in `packages/design` makes the tarball a consumer
 can install by path, which is how tf runs until `0.1.0` is on npm.
+
+**`dist` carries file extensions, and the build writes them.** `tsc` emits
+relative imports as the sources write them, `./Brand`, which a bundler resolves
+and native Node ESM refuses. Three releases shipped that way, because nothing in
+this repo imported the built files without a bundler: `import
+'@wtfalch/design'` under a consumer's vitest died on the first relative import,
+and both consumers read the built marks table with a regex to get round it.
+`scripts/fix-extensions.mjs` rewrites every `./x` to `./x.js` (or
+`./x/index.js`) in `.js` and `.d.ts` alike, and `dist.test.ts` imports the
+built entries in a child Node, which is why the gate builds before it tests.
+Found 2026-09-06, fixed in 0.3.1.
