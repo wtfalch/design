@@ -16,7 +16,7 @@
   padding: var(--space-1);
   outline: none;
   display: grid;
-  gap: 1px;
+  gap: var(--border-width);
 }
 
 .menu-item {
@@ -41,7 +41,7 @@
 .menu-item[data-focused] { background: var(--panel-2); }
 .menu-item[data-disabled] { color: var(--muted); opacity: 0.6; }
 
-.menu-icon { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.menu-icon { flex: none; width: var(--space-4); height: var(--space-4); color: var(--muted); }
 .menu-item[data-focused] .menu-icon { color: var(--text); }
 
 .menu-text { flex: 1 1 auto; min-width: 0; display: grid; }

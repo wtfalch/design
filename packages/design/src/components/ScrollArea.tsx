@@ -27,6 +27,12 @@ import { useCallback, useEffect, useRef } from 'react'
  * the whole application away. In a split view that is disorienting rather than
  * merely untidy.
  *
+ * **Pad the content, not the box.** Padding on the scroller itself insets the
+ * fade and the scrollbar along with everything else, so the gradient stops
+ * short of the sides and the bar floats in from the edge; and vertical padding
+ * on a box whose rows already have their own reads as extra space above the
+ * first item, because it is. Put the inset on the child.
+ *
  * Not a virtualiser. Ten thousand rows still cost ten thousand nodes; this
  * decides how the box behaves, not how much is in it.
  */

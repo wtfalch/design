@@ -35,7 +35,7 @@
   border-bottom: var(--border-width) solid var(--border);
 }
 
-.cmd-mark { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.cmd-mark { flex: none; width: var(--space-4); height: var(--space-4); color: var(--muted); }
 
 /* No border, no focus ring on the input itself: the whole surface is the
    field, focus is already in it when it opens, and a ring around a box that
@@ -97,11 +97,11 @@
 .cmd-item[data-focused] { background: var(--panel-2); }
 
 .cmd-item[data-focused] {
-  box-shadow: inset 2px 0 0 var(--accent);
+  box-shadow: inset calc(var(--border-width) * 2) 0 0 var(--accent);
 }
 .cmd-item[data-disabled] { color: var(--muted); opacity: 0.6; }
 
-.cmd-icon { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.cmd-icon { flex: none; width: var(--space-4); height: var(--space-4); color: var(--muted); }
 .cmd-item[data-focused] .cmd-icon { color: var(--text); }
 
 .cmd-text { flex: 1 1 auto; min-width: 0; display: grid; }

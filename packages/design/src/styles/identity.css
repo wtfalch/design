@@ -21,20 +21,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: var(--space-8);
+  height: var(--space-8);
+  border-radius: var(--radius-pill);
   background: color-mix(in srgb, hsl(var(--ident-hue) 60% 50%) 22%, var(--panel));
   border: var(--border-width) solid color-mix(in srgb, hsl(var(--ident-hue) 60% 50%) 45%, transparent);
   color: var(--text);
   font-size: var(--text-2xs);
   font-weight: var(--weight-strong);
-  letter-spacing: 0;
+  letter-spacing: normal;
   text-transform: uppercase;
   user-select: none;
 }
 
-.ident.size-sm .ident-disc { width: 22px; height: 22px; font-size: 9px; }
+.ident.size-sm .ident-disc {
+  width: var(--space-6);
+  height: var(--space-6);
+  font-size: var(--text-2xs);
+}
 
 .ident-text { display: grid; min-width: 0; }
 
@@ -58,7 +62,7 @@
 /* A chip in a composer's To field: boxed, tighter, removable. */
 .ident.kind-chip {
   gap: var(--space-1);
-  padding: 2px var(--space-1) 2px 2px;
+  padding: var(--space-1);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-pill);
   background: var(--panel-2);
@@ -66,21 +70,25 @@
   max-width: 100%;
 }
 
-.ident.kind-chip .ident-disc { width: 20px; height: 20px; font-size: 9px; }
+.ident.kind-chip .ident-disc {
+  width: var(--space-5);
+  height: var(--space-5);
+  font-size: var(--text-2xs);
+}
 
 .ident-remove {
   flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* 20px of button around a 12px glyph. The cross is the smallest thing on a
-     composer and it is next to the text somebody is typing, so it needs the
-     target even though it does not look like it does. */
-  width: 20px;
-  height: 20px;
+  /* `--space-5` of button around a `--space-3` glyph. The cross is the
+     smallest thing on a composer and it sits next to text somebody is typing,
+     so it needs the target even though it does not look like it does. */
+  width: var(--space-5);
+  height: var(--space-5);
   padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--muted);
   cursor: pointer;

@@ -27,10 +27,10 @@
 .split-first { flex: 0 0 var(--split); }
 .split-second { flex: 1 1 0; }
 
-/* The handle is wider than it looks: a 1px line is a correct-looking divider
-   and an impossible pointer target. The border is the line, the padding is the
-   target, and 44px of the pointer's travel either side is what makes it feel
-   like it grabs. */
+/* The handle is wider than it looks: a hairline is a correct-looking divider
+   and an impossible pointer target. The grip is the line, drawn at
+   `--border-width` down the middle of a `--space-3` strip, and the strip is
+   the thing the pointer has to hit. */
 .split-handle {
   flex: none;
   position: relative;

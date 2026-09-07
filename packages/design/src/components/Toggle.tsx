@@ -102,6 +102,16 @@ export default function Toggle({
      is stopped at the track a tap on the knob no longer reaches the input by
      itself (measured, in `keyboard.spec.ts`).
 
+     **The knob goes where the pointer is, not where the pointer has been.**
+     This measured the drag as a delta from the knob's resting side, which made
+     a click that drifted a few pixels answer the opposite of the click: press
+     the far side of an off switch, wander seven pixels, and the delta is about
+     zero, so it resolves to off -- it refuses the very thing you pressed. And
+     it refuses *silently*, because the knob is back where it started and
+     nothing on screen says a gesture was even seen. Reading the pointer's
+     position on the track instead means a press and a press-with-a-wobble give
+     the same answer, which is the one the pointer is over.
+
      `onChange` is called once per gesture, or not at all if the knob was put
      back where it started -- a consumer that saves on change must not see a
      drag as two saves. The keyboard is untouched: the input is still the
@@ -166,14 +176,19 @@ export default function Toggle({
     id: number
     startX: number
     startY: number
-    from: number
     moved: boolean
   } | null>(null)
   const swallowClick = useRef(false)
 
-  const position = (track: HTMLSpanElement, g: NonNullable<typeof gesture.current>, x: number) => {
-    const travel = track.clientWidth - KNOB[size] - 4
-    return Math.min(1, Math.max(0, g.from + (x - g.startX) / travel))
+  /** Where the knob would sit, 0 to 1, if its centre were under `x`. The
+   *  2px and the knob's width are the inset `toggle.css` draws it at:
+   *  `left: calc(2px + var(--knob-x) * var(--knob-travel))`. */
+  const position = (track: HTMLSpanElement, x: number) => {
+    const box = track.getBoundingClientRect()
+    const knobWidth = KNOB[size]
+    const travel = box.width - knobWidth - 4
+    if (travel <= 0) return 0
+    return Math.min(1, Math.max(0, (x - box.left - 2 - knobWidth / 2) / travel))
   }
 
   return (
@@ -208,7 +223,6 @@ export default function Toggle({
             id: e.pointerId,
             startX: e.clientX,
             startY: e.clientY,
-            from: shown ? 1 : 0,
             moved: false,
           }
           setHeld(true)
@@ -219,15 +233,14 @@ export default function Toggle({
           if (!g.moved) {
             const dx = e.clientX - g.startX
             const dy = e.clientY - g.startY
-            /* Mostly sideways and past the slop, or it is still a press. A
-               drag begins where the threshold was crossed, not where the
-               pointer first landed, so the knob starts from rest instead of
-               jumping the slop's width the moment it engages. */
+            /* Mostly sideways and past the slop, or it is still a press. The
+               slop is what keeps a click a click: under it nothing is drawn
+               and nothing moves, so a hand that is not quite still does not
+               turn a press into a drag. */
             if (Math.abs(dx) < SLOP || Math.abs(dx) <= Math.abs(dy)) return
             g.moved = true
-            g.startX = e.clientX
           }
-          setKnob(position(e.currentTarget, g, e.clientX))
+          setKnob(position(e.currentTarget, e.clientX))
         }}
         onPointerUp={(e) => {
           const g = gesture.current
@@ -236,7 +249,7 @@ export default function Toggle({
           setHeld(false)
           setKnob(null)
           swallowClick.current = true
-          const on = g.moved ? position(e.currentTarget, g, e.clientX) > 0.5 : !shown
+          const on = g.moved ? position(e.currentTarget, e.clientX) > 0.5 : !shown
           if (on !== shown) commit(on)
         }}
         onPointerCancel={() => {

@@ -23,8 +23,8 @@
   /* Square, and 32px rather than the text's height: these are hit repeatedly
      and in sequence, and a target the size of its glyph is a target that gets
      missed on the fourth press. */
-  min-width: 32px;
-  height: 32px;
+  min-width: var(--space-8);
+  height: var(--space-8);
   padding: 0 var(--space-2);
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-sm);
@@ -83,8 +83,8 @@
    component, so the row does not change size when the field is typed into --
    the same reason `pageWindow` holds seven slots at the ends. */
 .pager-jump {
-  width: max(32px, calc(var(--digits, 2) * 0.62em + 18px));
-  height: 32px;
+  width: max(var(--space-8), calc(var(--digits, 2) * 0.62em + var(--space-5)));
+  height: var(--space-8);
   padding: 0 var(--space-1);
   border: var(--border-width) solid transparent;
   border-radius: var(--radius-sm);

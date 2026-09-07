@@ -25,14 +25,14 @@
 .scroller.axis-x { overflow-x: auto; overflow-y: hidden; }
 .scroller.axis-both { overflow: auto; }
 
-.scroller::-webkit-scrollbar { width: 10px; height: 10px; }
+.scroller::-webkit-scrollbar { width: var(--space-3); height: var(--space-3); }
 .scroller::-webkit-scrollbar-track { background: transparent; }
 .scroller::-webkit-scrollbar-thumb {
   background: var(--border-strong);
   /* Inset by a transparent border rather than by width, so the thumb is thin
-     while the grab target stays the full 10px. A 4px scrollbar looks right
-     and cannot be hit. */
-  border: 3px solid transparent;
+     while the grab target stays the full `--space-3`. A bar drawn at the
+     thumb's width looks right and cannot be hit. */
+  border: var(--space-1) solid transparent;
   background-clip: padding-box;
   border-radius: var(--radius-pill);
 }

@@ -123,6 +123,74 @@ test.describe('Toggle', () => {
     await expect(first, 'Space flips it back').toBeChecked({ checked: was })
   })
 
+  test('a press that wobbles still answers the side it was pressed on', async ({ page }) => {
+    /* The bug this pins: the drag used to be measured as a delta from the
+       knob's resting side, so pressing the far end of an off switch and
+       moving a few pixels resolved to about zero -- off -- and refused the
+       very thing that had been pressed, silently. The pointer's position on
+       the track is the answer now, so a press and a press-with-a-wobble agree.
+
+       `SLOP` is 6px, so 10px is past the threshold and this is the drag path,
+       not the tap path. */
+    await page.goto(specimenUrl({ c: 'toggle', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+
+    const box = page.getByRole('switch').first()
+    const track = page.locator('.switch-row .toggle').first()
+    const rect = await track.boundingBox()
+    if (!rect) throw new Error('the track has no box')
+
+    // Start from off.
+    if (await box.isChecked()) {
+      await track.click()
+      await expect(box).not.toBeChecked()
+    }
+
+    // Press the far right of an off switch and wobble left, past the slop.
+    await page.mouse.move(rect.x + rect.width - 3, rect.y + rect.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(rect.x + rect.width - 13, rect.y + rect.height / 2, { steps: 4 })
+    await page.mouse.up()
+    await expect(box, 'a wobble on the right half turns it on').toBeChecked()
+
+    // And the other way: press the far left of an on switch and wobble right.
+    await page.mouse.move(rect.x + 3, rect.y + rect.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(rect.x + 13, rect.y + rect.height / 2, { steps: 4 })
+    await page.mouse.up()
+    await expect(box, 'a wobble on the left half turns it off').not.toBeChecked()
+  })
+
+  test('a real drag across the track lands on the side it is released over', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'toggle', v: 'Default' }, 'system'))
+    await themeApplied(page, 'system')
+
+    const box = page.getByRole('switch').first()
+    const track = page.locator('.switch-row .toggle').first()
+    const rect = await track.boundingBox()
+    if (!rect) throw new Error('the track has no box')
+    if (await box.isChecked()) {
+      await track.click()
+      await expect(box).not.toBeChecked()
+    }
+
+    // Grab the knob at rest on the left and drag it all the way across.
+    await page.mouse.move(rect.x + 4, rect.y + rect.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(rect.x + rect.width - 2, rect.y + rect.height / 2, { steps: 8 })
+    await page.mouse.up()
+    await expect(box, 'dragged across, it is on').toBeChecked()
+
+    /* Dragged out and put back: `onChange` must not fire, because a consumer
+       that saves on change would otherwise see one gesture as two saves. */
+    await page.mouse.move(rect.x + rect.width - 4, rect.y + rect.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(rect.x + 4, rect.y + rect.height / 2, { steps: 6 })
+    await page.mouse.move(rect.x + rect.width - 4, rect.y + rect.height / 2, { steps: 6 })
+    await page.mouse.up()
+    await expect(box, 'put back where it started, it is unchanged').toBeChecked()
+  })
+
   test('the focus ring is painted on the track, not the hidden input', async ({ page }) => {
     await page.goto(specimenUrl(SIZES, 'system'))
     await themeApplied(page, 'system')
