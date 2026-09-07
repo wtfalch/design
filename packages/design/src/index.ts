@@ -57,8 +57,7 @@ export { default as Modal } from './components/Modal'
  *  pages. `pageWindow` is the elision, exported because it is the arithmetic
  *  worth testing on its own. */
 export { default as Pagination } from './components/Pagination'
-export { isGap, pageWindow } from './components/pageWindow'
-export type { PageSlot } from './components/pageWindow'
+export { pageWindow } from './components/pageWindow'
 export { default as Pill } from './components/Pill'
 /** A small surface anchored to what opened it: the middle term between
  *  `Tooltip`, which only says something, and `Modal`, which takes the

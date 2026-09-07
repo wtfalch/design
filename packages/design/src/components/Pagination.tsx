@@ -18,13 +18,23 @@
  * enabled while a full page came back, which is the only honest thing it can
  * do: a page shorter than the limit is the end.
  *
+ * **The ellipsis is a field, not punctuation.** It stands for the pages you
+ * cannot see, so it is where you say which one you want: type a number, press
+ * Enter, and you are there. Drawn as a ghost -- no border, no background, the
+ * `…` as its placeholder -- so at rest the row looks exactly like a row of
+ * page buttons with an elision in it, and it becomes a control when you touch
+ * it. Without this, reaching page 17 of 26 is eleven presses of Next, and the
+ * middle of a row of live buttons is a dead spot.
+ *
  * **`nav` with a name**, so a screen reader can jump to it and so two pagers
  * on a page are distinguishable. The current page's button is
  * `aria-current="page"`, which is what tells a reader where they are without
  * relying on the colour that says it visually.
  */
 
-import { type PageSlot, isGap, pageWindow } from './pageWindow'
+import { useState } from 'react'
+
+import { pageWindow } from './pageWindow'
 
 export interface Props {
   /** Index of the first item shown, counting from zero -- the same number the
@@ -47,6 +57,62 @@ export interface Props {
 
 /** Group digits so a five-figure count can be read at a glance. */
 const group = (n: number) => n.toLocaleString('en-GB')
+
+/**
+ * The gap: a field you type a page into.
+ *
+ * Its own state, because a window can hold two of these and they are
+ * independent -- one for the pages before the current run and one for the
+ * pages after it. Hoisting the draft into `Pagination` would mean tracking
+ * which of the two is being edited, for no gain.
+ *
+ * Empty when it is not being typed into, so the placeholder shows and it
+ * reads as an elision. Escape and blur abandon; only Enter commits, because a
+ * pager that navigates while you are still typing takes you to page 1 on the
+ * way to page 17.
+ */
+function JumpField({ pages, onGo }: { pages: number; onGo: (page: number) => void }) {
+  const [draft, setDraft] = useState('')
+
+  const commit = () => {
+    const wanted = Number.parseInt(draft, 10)
+    setDraft('')
+    if (!Number.isFinite(wanted)) return
+    // Clamped rather than refused: somebody typing 400 into a 26-page list
+    // wants the end, and an error message here would be a bigger interruption
+    // than the thing it is guarding.
+    onGo(Math.min(pages, Math.max(1, wanted)))
+  }
+
+  return (
+    <input
+      className="pager-jump"
+      type="number"
+      inputMode="numeric"
+      min={1}
+      max={pages}
+      value={draft}
+      placeholder="…"
+      /* The width is set from how many digits the largest page has, so the
+         row does not change size when the field is typed into -- the same
+         reason `pageWindow` holds seven slots at the ends. */
+      style={{ '--digits': String(pages).length } as React.CSSProperties}
+      aria-label={`Go to page, 1 to ${pages}`}
+      onChange={(event) => setDraft(event.target.value)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault()
+          commit()
+          event.currentTarget.blur()
+        } else if (event.key === 'Escape') {
+          setDraft('')
+          event.currentTarget.blur()
+        }
+      }}
+      onBlur={() => setDraft('')}
+    />
+  )
+}
 
 function Chevron({ back }: { back?: boolean }) {
   return (
@@ -114,22 +180,14 @@ export default function Pagination({
 
         {pages !== undefined && (
           <ol className="pager-pages">
-            {pageWindow(page, pages).map((slot: PageSlot) =>
-              isGap(slot) ? (
-                /* A button, not punctuation. It stands for a run of pages and
-                   goes to the middle of that run, which is what makes page 17
-                   of 26 two presses away instead of eleven. Keyed by where it
-                   goes, which is unique: a window holds at most two gaps and
-                   they hide different runs. */
-                <li key={`gap-${slot.jumpTo}`}>
-                  <button
-                    type="button"
-                    className="pager-gap"
-                    onClick={() => onChange((slot.jumpTo - 1) * limit)}
-                    aria-label={`Jump to page ${slot.jumpTo}`}
-                  >
-                    …
-                  </button>
+            {pageWindow(page, pages).map((slot, index, slots) =>
+              slot === 'gap' ? (
+                /* Keyed by the page it follows rather than by its index: a
+                   window holds at most two gaps and they elide different runs,
+                   and an index key makes React reuse the wrong one -- which
+                   would carry a half-typed page number from one to the other. */
+                <li key={`gap-after-${slots[index - 1]}`}>
+                  <JumpField pages={pages} onGo={(wanted) => onChange((wanted - 1) * limit)} />
                 </li>
               ) : (
                 <li key={slot}>

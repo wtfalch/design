@@ -8,7 +8,7 @@
  */
 import { describe, expect, it } from 'vitest'
 
-import { isGap, pageWindow } from '../src/components/pageWindow'
+import { pageWindow } from '../src/components/pageWindow'
 
 describe('pageWindow', () => {
   it('lists every page when they fit', () => {
@@ -25,28 +25,23 @@ describe('pageWindow', () => {
   })
 
   it('elides with a gap rather than dropping pages silently', () => {
-    expect(pageWindow(13, 26)).toEqual([1, { jumpTo: 6 }, 12, 13, 14, { jumpTo: 20 }, 26])
+    expect(pageWindow(13, 26)).toEqual([1, 'gap', 12, 13, 14, 'gap', 26])
   })
 
-  it('sends each gap to the middle of the run it hides', () => {
-    // The only page an ellipsis standing for a range can honestly claim to be
-    // about, and what makes page 17 of 26 two presses away instead of eleven.
-    const [, left, , , , right] = pageWindow(13, 26)
-    expect(left).toEqual({ jumpTo: 6 }) // hides 2–11
-    expect(right).toEqual({ jumpTo: 20 }) // hides 15–25
-  })
-
-  it('never sends a gap to a page that is already drawn', () => {
+  it('puts a gap only where pages are actually missing', () => {
+    // The gap is where the pager draws its "go to page" field, so one over a
+    // run of nothing would be a field offering pages already on screen.
     for (const pages of [8, 12, 26, 400]) {
       for (const current of [1, 2, 5, Math.floor(pages / 2), pages - 1, pages]) {
         const window = pageWindow(current, pages)
-        const drawn = new Set(window.filter((slot): slot is number => !isGap(slot)))
-        for (const slot of window) {
-          if (!isGap(slot)) continue
-          expect(drawn.has(slot.jumpTo)).toBe(false)
-          expect(slot.jumpTo).toBeGreaterThanOrEqual(1)
-          expect(slot.jumpTo).toBeLessThanOrEqual(pages)
-        }
+        window.forEach((slot, index) => {
+          if (slot !== 'gap') return
+          const before = window[index - 1] as number
+          const after = window[index + 1] as number
+          expect(typeof before).toBe('number')
+          expect(typeof after).toBe('number')
+          expect(after - before).toBeGreaterThan(1)
+        })
       }
     }
   })
@@ -61,15 +56,15 @@ describe('pageWindow', () => {
   it('shows a run at the start and at the end rather than one page and a gap', () => {
     // Four rather than three, because an end has one gap instead of two and
     // the run has to be one longer to hold the row at seven.
-    expect(pageWindow(1, 26)).toEqual([1, 2, 3, 4, 5, { jumpTo: 15 }, 26])
-    expect(pageWindow(26, 26)).toEqual([1, { jumpTo: 11 }, 22, 23, 24, 25, 26])
+    expect(pageWindow(1, 26)).toEqual([1, 2, 3, 4, 5, 'gap', 26])
+    expect(pageWindow(26, 26)).toEqual([1, 'gap', 22, 23, 24, 25, 26])
   })
 
   it('never names a page that does not exist', () => {
     for (const pages of [8, 9, 12, 26, 400]) {
       for (const current of [1, 2, Math.floor(pages / 2), pages - 1, pages]) {
         for (const slot of pageWindow(current, pages)) {
-          if (isGap(slot)) continue
+          if (slot === 'gap') continue
           expect(slot).toBeGreaterThanOrEqual(1)
           expect(slot).toBeLessThanOrEqual(pages)
         }
@@ -78,7 +73,7 @@ describe('pageWindow', () => {
   })
 
   it('is strictly increasing, with no repeats', () => {
-    const pages = pageWindow(13, 26).filter((slot): slot is number => !isGap(slot))
+    const pages = pageWindow(13, 26).filter((slot): slot is number => slot !== 'gap')
     expect(pages).toEqual([...pages].sort((a, b) => a - b))
     expect(new Set(pages).size).toBe(pages.length)
   })

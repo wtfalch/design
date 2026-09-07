@@ -320,12 +320,16 @@
 /* Frames for the 0.4.0 demos. A scroller and a split pane have no size of
    their own — they fill what they are given — so the specimen has to give them
    one or the stage collapses to nothing and there is nothing to look at. */
+/* No padding. The rows bring their own 12px, so 8px of frame on top of it put
+   the first item 20px down while every later one sat 12px below its divider —
+   which reads as extra space above the first item, because it is. A list in a
+   scroller sits flush; the fade is what marks the edge. */
 .demo-scroll {
   height: 180px;
   background: var(--panel);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
-  padding: var(--space-2);
+  overflow: hidden;
 }
 
 .demo-split {

@@ -85,8 +85,8 @@
 .split-handle:focus-visible { outline: none; }
 .split-handle:focus-visible .split-grip {
   background: var(--accent);
-  outline: var(--focus-ring);
-  outline-offset: 1px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* While dragging. On the body, because the pointer crosses both panes and the

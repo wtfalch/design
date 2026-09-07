@@ -87,4 +87,4 @@
 }
 
 .ident-remove:hover { background: var(--panel); color: var(--text); }
-.ident-remove:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+.ident-remove:focus-visible { outline: none; box-shadow: var(--focus-ring); }

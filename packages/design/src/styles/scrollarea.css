@@ -16,6 +16,11 @@
   scrollbar-width: thin;
 }
 
+/* A labelled scroller is focusable, so it owes a visible focus indicator --
+   the same obligation the pager's buttons have. `--focus-ring` is a
+   box-shadow value, not an outline shorthand. */
+.scroller:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
 .scroller.axis-y { overflow-y: auto; overflow-x: hidden; }
 .scroller.axis-x { overflow-x: auto; overflow-y: hidden; }
 .scroller.axis-both { overflow: auto; }

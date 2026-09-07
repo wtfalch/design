@@ -2030,7 +2030,7 @@ export const COMPONENTS: Component[] = [
       {
         name: 'Nothing hidden',
         note: 'Short enough to fit: no fade at either edge, and no scrollbar.',
-        render: () => <ScrollDemo rows={3} />,
+        render: () => <ScrollDemo rows={2} />,
       },
       {
         name: 'Fade off',
@@ -2222,11 +2222,11 @@ export const COMPONENTS: Component[] = [
       {
         name: 'With a total',
         note:
-          'Never more than seven slots, the first and last always present, and the ' +
-          'width stays fixed as you move so the row does not resize under the ' +
-          'cursor. The ellipsis is a button: it stands for a run of pages and goes ' +
-          'to the middle of that run, which is what makes page 17 of 26 two ' +
-          'presses away rather than eleven.',
+          'The ellipsis is a field. Click it and type 17, press Enter, and you ' +
+          'are on page 17 — a ghost until you touch it, so at rest the row is ' +
+          'still a row of page buttons with an elision in it. Never more than ' +
+          'seven slots, first and last always present, and the width holds as you ' +
+          'move so the row does not resize under the cursor.',
         render: () => <PagerDemo total={1284} />,
       },
       {
