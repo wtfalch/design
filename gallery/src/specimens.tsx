@@ -71,18 +71,6 @@ export interface Component {
   name: string
   blurb?: string
   variants: Variant[]
-  /**
-   * A heading to file this under in the rail, instead of the main alphabetical
-   * run.
-   *
-   * The rail is one flat list on purpose -- a catalogue that groups by
-   * "layout" and "feedback" is a catalogue arguing with itself the first time
-   * something is both. This exists for the narrower case of a batch under
-   * review: eight new components landing at once are impossible to find among
-   * thirty, and a reviewer should not have to know their names to look at
-   * them. Drop the field and the component rejoins the alphabet.
-   */
-  section?: string
 }
 
 /** A row of things to compare, which is most of what a variant is. */
@@ -531,8 +519,6 @@ function CheckboxDemo() {
 
 /* The mail and forum shell, 0.4.0. Demos live above the catalogue because two
    of them need state and one needs a fake mailbox to be worth looking at. */
-
-const SECTION = 'New in 0.4.0'
 
 const PEOPLE = [
   { name: 'Ada Lovelace', address: 'ada@example.com' },
@@ -2010,7 +1996,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'scrollarea',
     name: 'ScrollArea',
-    section: SECTION,
     blurb:
       'A box that scrolls, and says so. A list that overflows with no mark at its ' +
       'edge reads as a list that ended — eleven of four hundred conversations look ' +
@@ -2044,7 +2029,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'splitpane',
     name: 'SplitPane',
-    section: SECTION,
     blurb:
       'Two panes and a handle. The handle is a real `separator` widget — focusable, ' +
       'announced with its percentage, moved with the arrows, Home and End to the ' +
@@ -2069,7 +2053,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'popover',
     name: 'Popover',
-    section: SECTION,
     blurb:
       'A small surface anchored to what opened it — the middle term between ' +
       '`Tooltip`, which only says something, and `Modal`, which takes the ' +
@@ -2110,7 +2093,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'menu',
     name: 'Menu',
-    section: SECTION,
     blurb:
       'A list of verbs — not `Select`, which is a value. Building one out of the ' +
       'other gets you a listbox announcing “selected” after somebody archives a ' +
@@ -2166,7 +2148,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'command',
     name: 'Command',
-    section: SECTION,
     blurb:
       'Type what you want to do. A search field over a listbox, not a text input ' +
       'with a div under it: focus stays in the field while the arrows move the ' +
@@ -2187,7 +2168,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'sheet',
     name: 'Sheet',
-    section: SECTION,
     blurb:
       'Not a component: `Modal` with `edge` set. A drawer differs from a window in ' +
       'the middle of the screen by where it is anchored and which way it slides, ' +
@@ -2211,7 +2191,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'pagination',
     name: 'Pagination',
-    section: SECTION,
     blurb:
       'It counts in items, not pages, because that is what the server answers and ' +
       'what the reader asks: “51–100 of 1,284”, not “page 2 of 26”. The count is ' +
@@ -2242,7 +2221,6 @@ export const COMPONENTS: Component[] = [
   {
     id: 'identity',
     name: 'Identity',
-    section: SECTION,
     blurb:
       'A person, said in one line. The colour is derived from the address rather ' +
       'than chosen, so the same person is the same colour in the list, in the ' +

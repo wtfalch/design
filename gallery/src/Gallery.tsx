@@ -208,18 +208,7 @@ export default function Gallery() {
      decided Callout is, and the answer to "where is Tabs" should be "under T".
      Tokens sits at the end because it is the one entry that is not a
      component. */
-  const sorted = [...COMPONENTS]
-    .filter((c) => !c.section)
-    .sort((a, b) => a.name.localeCompare(b.name))
-  /* Sections keep the order they are declared in, not the alphabet: a batch
-     under review is read in the order somebody decided to present it. */
-  const sections: { title: string; items: typeof COMPONENTS }[] = []
-  for (const component of COMPONENTS) {
-    if (!component.section) continue
-    const existing = sections.find((s) => s.title === component.section)
-    if (existing) existing.items.push(component)
-    else sections.push({ title: component.section, items: [component] })
-  }
+  const sorted = [...COMPONENTS].sort((a, b) => a.name.localeCompare(b.name))
   const shown = COMPONENTS.find((c) => c.id === current)
 
   const go = (id: string) => {
@@ -272,22 +261,6 @@ export default function Gallery() {
               {c.name}
               <span className="set-hint">{c.variants.length}</span>
             </button>
-          ))}
-          {sections.map((section) => (
-            <div key={section.title} className="spec-group">
-              <div className="spec-group-title set-hint">{section.title}</div>
-              {section.items.map((c) => (
-                <button
-                  type="button"
-                  key={c.id}
-                  className={`spec-link${c.id === current ? ' on' : ''}`}
-                  onClick={() => go(c.id)}
-                >
-                  {c.name}
-                  <span className="set-hint">{c.variants.length}</span>
-                </button>
-              ))}
-            </div>
           ))}
           <button
             type="button"

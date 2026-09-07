@@ -302,21 +302,6 @@
   border-radius: var(--radius);
 }
 
-/* A batch under review, kept together in the rail. The main run is one flat
-   alphabet; this is the exception for eight components arriving at once, which
-   are otherwise impossible to find among thirty. */
-.spec-group {
-  display: contents;
-}
-
-.spec-group-title {
-  margin: var(--space-4) 0 var(--space-1);
-  padding: 0 var(--space-2);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking);
-  font-size: var(--text-2xs);
-}
-
 /* Frames for the 0.4.0 demos. A scroller and a split pane have no size of
    their own — they fill what they are given — so the specimen has to give them
    one or the stage collapses to nothing and there is nothing to look at. */
