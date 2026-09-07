@@ -1,0 +1,79 @@
+/* Moving through a list that does not fit, and saying how far in you are. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-2) 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.pager-count { margin: 0; }
+.pager-count strong { color: var(--text); font-weight: var(--weight-strong); }
+
+.pager-controls { display: flex; align-items: center; gap: var(--space-1); }
+
+.pager-step,
+.pager-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Square, and 32px rather than the text's height: these are hit repeatedly
+     and in sequence, and a target the size of its glyph is a target that gets
+     missed on the fourth press. */
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.pager-step:hover:not(:disabled),
+.pager-page:hover:not(.on) { background: var(--panel-2); color: var(--text); }
+
+.pager-step:focus-visible,
+.pager-page:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
+
+/* Disabled rather than hidden. An arrow that disappears at the first page
+   moves every other control one step left, so the button under your cursor
+   changes identity between clicks. */
+.pager-step:disabled { opacity: 0.35; cursor: default; }
+
+.pager-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The current page. Border as well as tint, because tint alone is a colour
+   doing the work on its own -- and `aria-current` says it to a reader that
+   sees neither. */
+.pager-page.on {
+  color: var(--text);
+  background: var(--panel-2);
+  border-color: var(--border-strong);
+  font-weight: var(--weight-strong);
+}
+
+.pager-gap {
+  min-width: 24px;
+  text-align: center;
+  color: var(--muted);
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pager-step,
+  .pager-page { transition: none; }
+}

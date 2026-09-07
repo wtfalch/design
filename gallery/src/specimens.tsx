@@ -25,6 +25,7 @@ import {
   Callout,
   Card,
   Checkbox,
+  Command,
   Row as DataRow,
   Dialog,
   Empty,
@@ -32,17 +33,23 @@ import {
   ICON_NAMES,
   ILLUSTRATIONS,
   Icon,
+  Identity,
   Illustration,
   Input,
   Markdown,
+  Menu,
   Modal,
+  Pagination,
   Pill,
+  Popover,
   Progress,
   Rows,
+  ScrollArea,
   Select,
   SizeGrid,
   Skeleton,
   Slider,
+  SplitPane,
   Table,
   Tabs,
   Textarea,
@@ -64,6 +71,18 @@ export interface Component {
   name: string
   blurb?: string
   variants: Variant[]
+  /**
+   * A heading to file this under in the rail, instead of the main alphabetical
+   * run.
+   *
+   * The rail is one flat list on purpose -- a catalogue that groups by
+   * "layout" and "feedback" is a catalogue arguing with itself the first time
+   * something is both. This exists for the narrower case of a batch under
+   * review: eight new components landing at once are impossible to find among
+   * thirty, and a reviewer should not have to know their names to look at
+   * them. Drop the field and the component rejoins the alphabet.
+   */
+  section?: string
 }
 
 /** A row of things to compare, which is most of what a variant is. */
@@ -507,6 +526,204 @@ function CheckboxDemo() {
         />
       ))}
     </div>
+  )
+}
+
+/* The mail and forum shell, 0.4.0. Demos live above the catalogue because two
+   of them need state and one needs a fake mailbox to be worth looking at. */
+
+const SECTION = 'New in 0.4.0'
+
+const PEOPLE = [
+  { name: 'Ada Lovelace', address: 'ada@example.com' },
+  { name: 'Charles Babbage', address: 'charles@example.com' },
+  { name: null, address: 'noreply@notifications.example.org' },
+  { name: 'Luigi Menabrea', address: 'luigi@example.org' },
+  { name: "Grace O'Brien", address: 'grace@example.net' },
+]
+
+function ScrollDemo({ fade = true, rows = 12 }: { fade?: boolean; rows?: number }) {
+  return (
+    <ScrollArea fade={fade} className="demo-scroll" label="Messages">
+      <Rows>
+        {Array.from({ length: rows }, (_, i) => ({
+          number: i + 1,
+          person: PEOPLE[i % PEOPLE.length],
+        })).map(({ number, person }) => (
+          <DataRow key={number} name={`Message ${number}`} hint={person.address} />
+        ))}
+      </Rows>
+    </ScrollArea>
+  )
+}
+
+function SplitDemo({ direction = 'row' as 'row' | 'column' }) {
+  const [size, setSize] = useState(32)
+  return (
+    <div className="demo-split">
+      <SplitPane
+        direction={direction}
+        label="List width"
+        defaultSize={32}
+        min={20}
+        max={70}
+        onResize={setSize}
+      >
+        <div className="demo-pane">
+          <strong>Mailboxes</strong>
+          <p className="set-hint">
+            {Math.round(size)}% — drag the handle, or focus it and use the arrows.
+          </p>
+        </div>
+        <div className="demo-pane demo-pane-2">
+          <strong>Message</strong>
+          <p className="set-hint">Shift-arrow moves in tens. Enter collapses and restores.</p>
+        </div>
+      </SplitPane>
+    </div>
+  )
+}
+
+const MAIL_MENU = [
+  { id: 'reply', label: 'Reply', icon: 'back' as const, shortcut: 'R' },
+  { id: 'forward', label: 'Forward', icon: 'chat' as const, shortcut: 'F' },
+  {
+    id: 'move',
+    label: 'Move to',
+    icon: 'folder' as const,
+    items: [
+      { id: 'archive', label: 'Archive' },
+      { id: 'receipts', label: 'Receipts' },
+      { id: 'later', label: 'Read later' },
+    ],
+  },
+  {
+    id: 'delete',
+    label: 'Delete',
+    icon: 'close' as const,
+    shortcut: '⌫',
+    danger: true,
+    separated: true,
+  },
+]
+
+function CommandDemo() {
+  const [open, setOpen] = useState(false)
+  const [ran, setRan] = useState<string | null>(null)
+  return (
+    <div className="demo-stack">
+      <Button onClick={() => setOpen(true)}>Open palette</Button>
+      {ran && <span className="set-hint">Ran: {ran}</span>}
+      <Command
+        open={open}
+        onOpenChange={setOpen}
+        groups={[
+          {
+            title: 'Message',
+            commands: [
+              {
+                id: 'reply',
+                label: 'Reply',
+                icon: 'back',
+                shortcut: 'R',
+                onRun: () => setRan('Reply'),
+              },
+              {
+                id: 'archive',
+                label: 'Archive',
+                description: 'Move out of the inbox, keep it',
+                icon: 'folder',
+                keywords: ['file', 'store'],
+                onRun: () => setRan('Archive'),
+              },
+              {
+                id: 'delete',
+                label: 'Delete',
+                icon: 'close',
+                keywords: ['trash', 'bin', 'remove'],
+                onRun: () => setRan('Delete'),
+              },
+            ],
+          },
+          {
+            title: 'Go to',
+            commands: [
+              {
+                id: 'inbox',
+                label: 'Inbox',
+                icon: 'chat',
+                shortcut: 'G I',
+                onRun: () => setRan('Inbox'),
+              },
+              { id: 'sent', label: 'Sent', icon: 'download', onRun: () => setRan('Sent') },
+              { id: 'settings', label: 'Settings', icon: 'settings', disabled: true },
+            ],
+          },
+        ]}
+      />
+    </div>
+  )
+}
+
+function SheetDemo({ edge }: { edge: 'right' | 'bottom' }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="demo-stack">
+      <Button onClick={() => setOpen(true)}>Open {edge} sheet</Button>
+      {open && (
+        <Modal
+          edge={edge}
+          title="Message details"
+          description="The same window, anchored to an edge."
+          onClose={() => setOpen(false)}
+          footer={<Button onClick={() => setOpen(false)}>Close</Button>}
+        >
+          <Rows>
+            <DataRow
+              name="From"
+              trail={<Identity name="Ada Lovelace" address="ada@example.com" size="sm" />}
+            />
+            <DataRow name="Received" trail="1 September 2026, 09:14" />
+            <DataRow name="Size" trail="6.2 kB" />
+          </Rows>
+        </Modal>
+      )}
+    </div>
+  )
+}
+
+function PagerDemo({ total, unit = 'messages' }: { total?: number; unit?: string }) {
+  const [position, setPosition] = useState(0)
+  return (
+    <div className="demo-pager">
+      <Pagination
+        position={position}
+        limit={50}
+        total={total}
+        count={50}
+        onChange={setPosition}
+        label="Mailbox pages"
+        unit={unit}
+      />
+    </div>
+  )
+}
+
+function ChipsDemo() {
+  const [people, setPeople] = useState(PEOPLE.slice(0, 4))
+  return (
+    <Row>
+      {people.map((person) => (
+        <Identity
+          key={person.address}
+          kind="chip"
+          name={person.name}
+          address={person.address}
+          onRemove={() => setPeople((rest) => rest.filter((p) => p.address !== person.address))}
+        />
+      ))}
+      {people.length === 0 && <span className="set-hint">All removed. Reload to reset.</span>}
+    </Row>
   )
 }
 
@@ -1773,6 +1990,283 @@ export const COMPONENTS: Component[] = [
             </Button>
           </Row>
         ),
+      },
+    ],
+  },
+  {
+    id: 'scrollarea',
+    name: 'ScrollArea',
+    section: SECTION,
+    blurb:
+      'A box that scrolls, and says so. A list that overflows with no mark at its ' +
+      'edge reads as a list that ended — eleven of four hundred conversations look ' +
+      'exactly like a mailbox holding eleven, and on a trackpad there is no ' +
+      'scrollbar to contradict it. The fade appears only at an edge with more ' +
+      'behind it, so it is absent exactly when the list really has ended. The bar ' +
+      'is the theme’s rather than the platform’s, for the same reason `Select` ' +
+      'stopped being a native one.',
+    variants: [
+      {
+        name: 'More below',
+        note:
+          'The bottom edge is faded and the top is not, because there is nothing ' +
+          'above yet. Scroll and the two swap.',
+        render: () => <ScrollDemo />,
+      },
+      {
+        name: 'Nothing hidden',
+        note: 'Short enough to fit: no fade at either edge, and no scrollbar.',
+        render: () => <ScrollDemo rows={3} />,
+      },
+      {
+        name: 'Fade off',
+        note:
+          'For content that ends in something solid — a sticky footer, cards on a ' +
+          'coloured ground — where a gradient mixed towards `--panel` reads as a smudge.',
+        render: () => <ScrollDemo fade={false} />,
+      },
+    ],
+  },
+  {
+    id: 'splitpane',
+    name: 'SplitPane',
+    section: SECTION,
+    blurb:
+      'Two panes and a handle. The handle is a real `separator` widget — focusable, ' +
+      'announced with its percentage, moved with the arrows, Home and End to the ' +
+      'limits, Enter to collapse and restore — which is the part nearly every split ' +
+      'view on the web skips. Sizes are percentages so they survive a resized ' +
+      'window, and are remembered per browser when given a `storageKey`.',
+    variants: [
+      {
+        name: 'Side by side',
+        note:
+          'Drag it, or tab to it and press the arrows. Double-click puts it back ' +
+          'where it started, which is the undo a drag otherwise has none of.',
+        render: () => <SplitDemo />,
+      },
+      {
+        name: 'Stacked',
+        note: 'The same control turned: a horizontal handle, and up and down move it.',
+        render: () => <SplitDemo direction="column" />,
+      },
+    ],
+  },
+  {
+    id: 'popover',
+    name: 'Popover',
+    section: SECTION,
+    blurb:
+      'A small surface anchored to what opened it — the middle term between ' +
+      '`Tooltip`, which only says something, and `Modal`, which takes the ' +
+      'application away. It holds controls and the page behind it stays live, ' +
+      'because the point is to adjust something and watch it change. It is a real ' +
+      'dialog: focus moves in, returns to the trigger, Escape and an outside press ' +
+      'close it. And it flips when the edge is near, which is the failure the ' +
+      'hand-rolled version always ships with.',
+    variants: [
+      {
+        name: 'A pane of controls',
+        note: 'Focus moves inside on open and comes back to the button on close.',
+        render: () => (
+          <Popover label="Filter messages" trigger={<Button>Filter</Button>}>
+            <Rows>
+              <Toggle label="Unread only" checked onChange={() => {}} />
+              <Toggle label="Has attachment" checked={false} onChange={() => {}} />
+            </Rows>
+          </Popover>
+        ),
+      },
+      {
+        name: 'Dismissed by its own control',
+        note:
+          'The children may be a function, which receives `close`. A surface whose ' +
+          'buttons are the answer should not need the caller to hold open state.',
+        render: () => (
+          <Popover label="Move to mailbox" trigger={<Button>Move to…</Button>}>
+            {(close) => (
+              <div className="demo-stack">
+                <Button onClick={close}>Archive</Button>
+                <Button onClick={close}>Receipts</Button>
+                <Button onClick={close}>Read later</Button>
+              </div>
+            )}
+          </Popover>
+        ),
+      },
+    ],
+  },
+  {
+    id: 'menu',
+    name: 'Menu',
+    section: SECTION,
+    blurb:
+      'A list of verbs — not `Select`, which is a value. Building one out of the ' +
+      'other gets you a listbox announcing “selected” after somebody archives a ' +
+      'message. Destructive items are tinted and last, below a rule, in the same ' +
+      'vocabulary `DangerZone` uses. Shortcuts are shown and never bound: a menu is ' +
+      'where most people will ever learn the binding exists.',
+    variants: [
+      {
+        name: 'On a message',
+        note:
+          'One highlight for pointer and keyboard alike — React Aria sets ' +
+          '`data-focused` for whichever is driving, so a menu can never show two ' +
+          'highlighted rows at once.',
+        render: () => (
+          <Menu label="Message actions" trigger={<Button>Actions</Button>} items={MAIL_MENU} />
+        ),
+      },
+      {
+        name: 'Grouped, with a description',
+        note:
+          'A section names a group; `separated` rules one off without naming it. ' +
+          'The second line is wired with `aria-describedby`, so it is read after ' +
+          'the name rather than as a second item.',
+        render: () => (
+          <Menu
+            label="Mailbox actions"
+            trigger={<Button>Mailbox</Button>}
+            items={[
+              {
+                title: 'Read',
+                items: [
+                  { id: 'all', label: 'Mark all read', shortcut: '⇧R' },
+                  {
+                    id: 'unread',
+                    label: 'Mark unread',
+                    description: 'Puts it back in the count',
+                  },
+                ],
+              },
+              {
+                title: 'Mailbox',
+                items: [
+                  { id: 'rename', label: 'Rename…', icon: 'settings' },
+                  { id: 'empty', label: 'Empty mailbox', danger: true },
+                ],
+              },
+            ]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    id: 'command',
+    name: 'Command',
+    section: SECTION,
+    blurb:
+      'Type what you want to do. A search field over a listbox, not a text input ' +
+      'with a div under it: focus stays in the field while the arrows move the ' +
+      'selection, and `aria-activedescendant` reads the highlighted row out. ' +
+      'Filtering is substring with the locale’s collation — `resume` finds ' +
+      '`Résumé` — and deliberately not fuzzy, because a list that reorders itself ' +
+      'under your hands is a list you press the wrong row of.',
+    variants: [
+      {
+        name: 'Open it',
+        note:
+          'Type to narrow, arrows to move, Enter to run. “trash” finds Delete ' +
+          'through its keywords, which are searched and never shown.',
+        render: () => <CommandDemo />,
+      },
+    ],
+  },
+  {
+    id: 'sheet',
+    name: 'Sheet',
+    section: SECTION,
+    blurb:
+      'Not a component: `Modal` with `edge` set. A drawer differs from a window in ' +
+      'the middle of the screen by where it is anchored and which way it slides, ' +
+      'and in nothing else — same focus trap, same restore, same scrim, same ' +
+      'header, body and footer. A second component duplicating all of that to ' +
+      'change two properties is how a design system ends up with two windows that ' +
+      'drift, one of which gets the fix.',
+    variants: [
+      {
+        name: 'From the right',
+        note: 'The side panel: full height, a panel’s width, and it comes from the edge it is anchored to.',
+        render: () => <SheetDemo edge="right" />,
+      },
+      {
+        name: 'From the bottom',
+        note: 'Full width, as tall as its content, rounded at the top only — the bottom edge is the screen’s.',
+        render: () => <SheetDemo edge="bottom" />,
+      },
+    ],
+  },
+  {
+    id: 'pagination',
+    name: 'Pagination',
+    section: SECTION,
+    blurb:
+      'It counts in items, not pages, because that is what the server answers and ' +
+      'what the reader asks: “51–100 of 1,284”, not “page 2 of 26”. The count is ' +
+      'the point — two arrows tell you neither how far in you are nor how much is ' +
+      'left. A total is optional, because a server may refuse to count, and JMAP’s ' +
+      '`calculateTotal` is a request rather than a promise.',
+    variants: [
+      {
+        name: 'With a total',
+        note:
+          'Never more than seven slots, the first and last always present, a gap ' +
+          'for the elided run — and the width stays fixed as you move, so the row ' +
+          'does not resize under the cursor.',
+        render: () => <PagerDemo total={1284} />,
+      },
+      {
+        name: 'The server would not count',
+        note:
+          'No page numbers, because there is no last page to know. Next stays ' +
+          'enabled while a full page comes back, which is wrong exactly once — on ' +
+          'a list whose length is a multiple of the limit.',
+        render: () => <PagerDemo />,
+      },
+    ],
+  },
+  {
+    id: 'identity',
+    name: 'Identity',
+    section: SECTION,
+    blurb:
+      'A person, said in one line. The colour is derived from the address rather ' +
+      'than chosen, so the same person is the same colour in the list, in the ' +
+      'header and in the composer, with nothing stored — that consistency is the ' +
+      'only thing the colour is for. The disc is `aria-hidden`: “A L” is not a ' +
+      'name, and announcing it makes every row of a list longer to listen to for ' +
+      'no information.',
+    variants: [
+      {
+        name: 'In a row',
+        note:
+          'Initials from the first and last word of the name, or from the local ' +
+          'part when there is no name — which is most machine senders.',
+        render: () => (
+          <div className="demo-stack">
+            {PEOPLE.map((person) => (
+              <Identity key={person.address} name={person.name} address={person.address} />
+            ))}
+          </div>
+        ),
+      },
+      {
+        name: 'A message header',
+        note: '`full` puts the address under the name, and omits it when the name is the address.',
+        render: () => (
+          <div className="demo-stack">
+            <Identity kind="full" name="Ada Lovelace" address="ada@example.com" />
+            <Identity kind="full" address="noreply@notifications.example.org" />
+          </div>
+        ),
+      },
+      {
+        name: 'Composer chips',
+        note:
+          'Each remove button is named for its own recipient, because six buttons ' +
+          'all called “Remove” is a list a screen reader cannot choose from.',
+        render: () => <ChipsDemo />,
       },
     ],
   },

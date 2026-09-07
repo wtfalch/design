@@ -1,0 +1,134 @@
+/* The command palette: a field over the app and a list under it. */
+.cmd-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: var(--scrim);
+  display: flex;
+  justify-content: center;
+  /* Near the top rather than centred. The list grows downwards as you type,
+     and a centred palette moves its own first row every keystroke -- which is
+     the row you are aiming at. */
+  align-items: flex-start;
+  padding: 10vh var(--space-4) var(--space-4);
+}
+
+.cmd {
+  width: min(34rem, 100%);
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-3);
+  overflow: hidden;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cmd-body { outline: none; display: flex; flex-direction: column; min-height: 0; }
+
+.cmd-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+.cmd-mark { flex: none; width: 16px; height: 16px; color: var(--muted); }
+
+/* No border, no focus ring on the input itself: the whole surface is the
+   field, focus is already in it when it opens, and a ring around a box that
+   fills the top of the palette is a ring around the palette. */
+.cmd-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-md);
+}
+
+.cmd-input::placeholder { color: var(--muted); }
+
+.cmd-list {
+  padding: var(--space-2);
+  overflow: auto;
+  overscroll-behavior: contain;
+  outline: none;
+  min-height: 0;
+}
+
+.cmd-group-title {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking);
+  color: var(--muted);
+}
+
+.cmd-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--text);
+  cursor: default;
+  outline: none;
+}
+
+/* One highlight, pointer and keyboard alike. The arrows move this while focus
+   stays in the field, which is the behaviour the whole component is for. */
+.cmd-item[data-focused] { background: var(--panel-2); }
+.cmd-item[data-disabled] { color: var(--muted); opacity: 0.6; }
+
+.cmd-icon { flex: none; width: 16px; height: 16px; color: var(--muted); }
+.cmd-item[data-focused] .cmd-icon { color: var(--text); }
+
+.cmd-text { flex: 1 1 auto; min-width: 0; display: grid; }
+.cmd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmd-desc {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmd-key {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  letter-spacing: var(--tracking);
+}
+
+.cmd-empty {
+  margin: 0;
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.cmd-empty strong { color: var(--text); font-weight: var(--weight-strong); }
+
+.cmd-scrim[data-entering] { animation: cmd-scrim-in var(--dur-fast) var(--ease-out); }
+.cmd-scrim[data-exiting] { animation: cmd-scrim-in var(--dur-fast) var(--ease) reverse; }
+.cmd[data-entering] { animation: cmd-in var(--dur-md) var(--ease-out); }
+
+@keyframes cmd-scrim-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cmd-in {
+  from { opacity: 0; transform: translateY(calc(var(--nudge) * -1)) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmd-scrim[data-entering],
+  .cmd-scrim[data-exiting],
+  .cmd[data-entering] { animation: none; }
+}

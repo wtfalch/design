@@ -1,0 +1,87 @@
+/* A box that scrolls, with its edges drawn.
+   
+   The fades are `::before`/`::after` on the scroller itself, pinned with
+   `position: sticky` rather than `absolute`: an absolutely positioned overlay
+   inside a scrolling box scrolls with the content, so the gradient slides off
+   the top the moment anybody moves. Sticky keeps it against the padding edge
+   while the content runs underneath. */
+.scroller {
+  position: relative;
+  min-height: 0;
+  min-width: 0;
+  /* A scroll that reaches the end and carries on into the page behind it is
+     how a pane scrolls the whole app away. */
+  overscroll-behavior: contain;
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-width: thin;
+}
+
+.scroller.axis-y { overflow-y: auto; overflow-x: hidden; }
+.scroller.axis-x { overflow-x: auto; overflow-y: hidden; }
+.scroller.axis-both { overflow: auto; }
+
+.scroller::-webkit-scrollbar { width: 10px; height: 10px; }
+.scroller::-webkit-scrollbar-track { background: transparent; }
+.scroller::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  /* Inset by a transparent border rather than by width, so the thumb is thin
+     while the grab target stays the full 10px. A 4px scrollbar looks right
+     and cannot be hit. */
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: var(--radius-pill);
+}
+.scroller::-webkit-scrollbar-thumb:hover { background: var(--muted); background-clip: padding-box; }
+.scroller::-webkit-scrollbar-corner { background: transparent; }
+
+.scroller.barless { scrollbar-width: none; }
+.scroller.barless::-webkit-scrollbar { width: 0; height: 0; }
+
+/* The fades.
+   
+   Vertical only, and that is the whole point rather than a shortcut: the
+   misreading this exists to prevent is "the list ended", which is a claim
+   about the bottom edge. Content cut off at the right edge of a box already
+   reads as cut off -- a word sliced in half is its own affordance -- so a
+   horizontal scroller gets the scrollbar and nothing else.
+
+   `--panel` because that is what a scroller is nearly always sitting on;
+   `fade={false}` is the escape for when it is not. */
+.scroller.faded::before,
+.scroller.faded::after {
+  content: '';
+  position: sticky;
+  left: 0;
+  display: block;
+  height: var(--space-5);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  z-index: 1;
+}
+
+/* Negative margins on the far side, so neither strip takes a row of height
+   from the content it is drawn over. */
+.scroller.faded::before {
+  top: 0;
+  margin-bottom: calc(var(--space-5) * -1);
+  background: linear-gradient(to bottom, var(--panel), transparent);
+}
+
+.scroller.faded::after {
+  bottom: 0;
+  margin-top: calc(var(--space-5) * -1);
+  background: linear-gradient(to top, var(--panel), transparent);
+}
+
+.scroller.faded[data-top='true']::before { opacity: 1; }
+.scroller.faded[data-bottom='true']::after { opacity: 1; }
+
+/* A scroller that only goes sideways has no vertical edge to mark. */
+.scroller.faded.axis-x::before,
+.scroller.faded.axis-x::after { content: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroller.faded::before,
+  .scroller.faded::after { transition: none; }
+}

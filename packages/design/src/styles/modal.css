@@ -189,3 +189,58 @@
    never sees -- so the rule was left behind in tf's stylesheet by the split and
    the package shipped a `tone="bad"` prop that changed nothing. */
 .dialog-bad { border-color: color-mix(in oklab, var(--bad) 45%, var(--border)); }
+
+/* The sheet: the same window, anchored to an edge.
+   
+   Only placement and entry differ. The trap, the restore, the scrim and the
+   header/body/footer are the modal's, which is the point of it being a prop
+   rather than a second component. */
+.backdrop.sheeted { padding: 0; }
+.backdrop.sheeted.from-right { justify-content: flex-end; align-items: stretch; }
+.backdrop.sheeted.from-left { justify-content: flex-start; align-items: stretch; }
+.backdrop.sheeted.from-bottom { align-items: flex-end; justify-content: stretch; }
+
+.modal.sheet {
+  max-height: 100%;
+  border-radius: 0;
+  box-shadow: var(--shadow-3);
+}
+
+.modal.sheet.from-right,
+.modal.sheet.from-left {
+  height: 100%;
+  /* A default that is a panel rather than a window. `width` overrides it. */
+  width: min(26rem, 100vw);
+  max-width: 100vw;
+}
+
+.modal.sheet.from-right { border-left: var(--border-width) solid var(--border); }
+.modal.sheet.from-left { border-right: var(--border-width) solid var(--border); }
+
+.modal.sheet.from-bottom {
+  width: 100%;
+  max-width: 100%;
+  max-height: 85vh;
+  border-top: var(--border-width) solid var(--border);
+  /* Rounded at the top only: the bottom edge is the screen's. */
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+/* It comes from the edge it is anchored to. A sheet that fades in place is a
+   modal wearing a sheet's shape -- the movement is what says which way it
+   goes and where it will go back to. */
+.modal.sheet.from-right[data-entering] { animation: sheet-right var(--dur-md) var(--ease-out); }
+.modal.sheet.from-right[data-exiting] { animation: sheet-right var(--dur-fast) var(--ease) reverse; }
+.modal.sheet.from-left[data-entering] { animation: sheet-left var(--dur-md) var(--ease-out); }
+.modal.sheet.from-left[data-exiting] { animation: sheet-left var(--dur-fast) var(--ease) reverse; }
+.modal.sheet.from-bottom[data-entering] { animation: sheet-bottom var(--dur-md) var(--ease-out); }
+.modal.sheet.from-bottom[data-exiting] { animation: sheet-bottom var(--dur-fast) var(--ease) reverse; }
+
+@keyframes sheet-right { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes sheet-left { from { transform: translateX(-100%); } to { transform: none; } }
+@keyframes sheet-bottom { from { transform: translateY(100%); } to { transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .modal.sheet[data-entering],
+  .modal.sheet[data-exiting] { animation: none; }
+}

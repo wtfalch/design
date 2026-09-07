@@ -1,6 +1,6 @@
 {
   "name": "@wtfalch/design",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "wtfalch's design system: themeable components on a fixed token vocabulary.",
   "keywords": [
     "design-system",
@@ -24,7 +24,9 @@
   },
   "license": "MIT",
   "type": "module",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -50,7 +52,9 @@
     "./tokens.css": "./dist/tokens.css",
     "./styles.css": "./dist/styles/index.css"
   },
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "engines": {
     "node": ">=22.0.0"
   },

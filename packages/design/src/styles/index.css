@@ -29,3 +29,14 @@
 @import './illustration.css';
 @import './field.css';
 @import './tour.css';
+/* The mail and forum shell, added in 0.4.0. After the rest, because the
+   anchored surfaces (`.pop`, `.menu-sheet`, `.cmd`) sit over everything and a
+   rule of equal specificity that came earlier would lose to whatever the
+   sheets they cover happen to set. */
+@import './scrollarea.css';
+@import './splitpane.css';
+@import './popover.css';
+@import './menu.css';
+@import './command.css';
+@import './pagination.css';
+@import './identity.css';

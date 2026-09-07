@@ -1,0 +1,90 @@
+/* A person, said in one line: initials, name, sometimes the address. */
+.ident {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+/* The disc.
+   
+   `--ident-hue` comes from the address and is the only thing the component
+   sets inline; everything that decides how saturated and how light it is
+   lives here, so the discs stay in the theme rather than staying the same
+   colour on every theme. Mixed towards `--panel` for the same measured reason
+   `Pill` mixes: a full-strength hue behind text drops the contrast on the
+   light themes, and these carry two letters that have to be legible. */
+.ident-disc {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, hsl(var(--ident-hue) 60% 50%) 22%, var(--panel));
+  border: var(--border-width) solid color-mix(in srgb, hsl(var(--ident-hue) 60% 50%) 45%, transparent);
+  color: var(--text);
+  font-size: var(--text-2xs);
+  font-weight: var(--weight-strong);
+  letter-spacing: 0;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.ident.size-sm .ident-disc { width: 22px; height: 22px; font-size: 9px; }
+
+.ident-text { display: grid; min-width: 0; }
+
+.ident-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: var(--weight);
+}
+
+.ident-address {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.ident-aside { flex: none; color: var(--muted); font-size: var(--text-xs); }
+
+/* A chip in a composer's To field: boxed, tighter, removable. */
+.ident.kind-chip {
+  gap: var(--space-1);
+  padding: 2px var(--space-1) 2px 2px;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--panel-2);
+  font-size: var(--text-xs);
+  max-width: 100%;
+}
+
+.ident.kind-chip .ident-disc { width: 20px; height: 20px; font-size: 9px; }
+
+.ident-remove {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 20px of button around a 12px glyph. The cross is the smallest thing on a
+     composer and it is next to the text somebody is typing, so it needs the
+     target even though it does not look like it does. */
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.ident-remove:hover { background: var(--panel); color: var(--text); }
+.ident-remove:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }

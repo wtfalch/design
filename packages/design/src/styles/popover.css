@@ -1,0 +1,53 @@
+/* A small surface anchored to what opened it. Same sheet as the select's list,
+   because they are the same object -- something that appeared over the page,
+   attached to a control. */
+.pop {
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  max-width: min(22rem, calc(100vw - var(--space-6)));
+  /* React Aria writes `max-height` inline, to the space left in the viewport.
+     A surface that runs to the bottom of the screen is not a popover any more,
+     so the sheet caps it and scrolls instead. Same argument as the select
+     list's 280px cap, and the same number is not required -- a popover holds
+     controls rather than a list, and stops being one sooner. */
+  max-height: 24rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  /* React Aria positions this element inline; nothing here may set `position`,
+     `top` or `left` or it fights the measurement and lands in the corner. */
+  z-index: 60;
+}
+
+.pop-body {
+  padding: var(--space-3);
+  outline: none;
+  color: var(--text);
+  font-size: var(--text-sm);
+}
+
+/* Entry, and the direction it comes from. `data-placement` is React Aria's,
+   set to where the surface actually went rather than where it was asked to go,
+   so the movement agrees with the flip. */
+.pop[data-entering] { animation: pop-in var(--dur-fast) var(--ease-out); }
+.pop[data-exiting] { animation: pop-in var(--dur-fast) var(--ease) reverse; }
+
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(calc(var(--nudge) * -1)); }
+  to { opacity: 1; transform: none; }
+}
+
+.pop[data-placement='top'][data-entering],
+.pop[data-placement='top left'][data-entering],
+.pop[data-placement='top right'][data-entering] { animation-name: pop-in-up; }
+
+@keyframes pop-in-up {
+  from { opacity: 0; transform: translateY(var(--nudge)); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop[data-entering],
+  .pop[data-exiting] { animation: none; }
+}

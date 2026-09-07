@@ -22,6 +22,14 @@
  * this -- same trap, same restore, stricter about the scrim, because for "may
  * this applet write to your files" a stray click on the background is a way of
  * answering by accident.
+ *
+ * **A sheet is this with `edge` set, not a second component.** A drawer from
+ * the side of the window differs from a window in the middle of it by where it
+ * is anchored and which way it slides -- and in nothing else. Same focus trap,
+ * same restore, same scrim, same header, body and footer. Writing a `Sheet`
+ * that duplicates all of that to change two CSS properties is how a design
+ * system ends up with two windows that drift: one of them gets the fix and
+ * nobody notices which.
  */
 
 import { useEffect, useId, useRef } from 'react'
@@ -44,6 +52,7 @@ export default function Modal({
   onClose,
   closeDisabled = false,
   width,
+  edge,
   bodyClass,
   className,
   dismissOnScrim = true,
@@ -71,6 +80,17 @@ export default function Modal({
   /** While something is saving, closing would abandon it mid-flight. */
   closeDisabled?: boolean
   width?: string
+  /**
+   * Anchor it to an edge of the window and slide it in from there, rather
+   * than centring it. This is the sheet.
+   *
+   * `right` and `left` run the full height at `width`; `bottom` runs the full
+   * width and is as tall as its content, which is the shape a phone expects.
+   * Use one where the window is a *side panel* on the thing behind it --
+   * message details, a filter pane -- and leave it off where the window
+   * replaces what is behind it.
+   */
+  edge?: 'left' | 'right' | 'bottom'
   /** For a body that is not a single column -- Settings' rail and pane. */
   bodyClass?: string
   className?: string
@@ -113,7 +133,7 @@ export default function Modal({
 
   return (
     <ModalOverlay
-      className="backdrop"
+      className={`backdrop${edge ? ` sheeted from-${edge}` : ''}`}
       isOpen
       isDismissable={canClose && dismissOnScrim}
       isKeyboardDismissDisabled={!canClose}
@@ -122,7 +142,7 @@ export default function Modal({
       }}
     >
       <AriaModal
-        className={`modal${className ? ` ${className}` : ''}`}
+        className={`modal${edge ? ` sheet from-${edge}` : ''}${className ? ` ${className}` : ''}`}
         style={width ? { width } : undefined}
       >
         {/* `Dialog` renders a `<section>` of its own inside the box and moves

@@ -1,0 +1,99 @@
+/* Two panes and the handle between them. */
+.split {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.split.dir-row { flex-direction: row; }
+.split.dir-column { flex-direction: column; }
+
+/* `min-width: 0` is the whole reason this file exists.
+   
+   A flex child will not shrink below the intrinsic width of its content, and
+   the intrinsic width of a mail list is the longest unbroken subject line in
+   it. Without this the handle stops partway across and nothing on screen says
+   why -- it just refuses, differently for every mailbox. */
+.split-pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.split-first { flex: 0 0 var(--split); }
+.split-second { flex: 1 1 0; }
+
+/* The handle is wider than it looks: a 1px line is a correct-looking divider
+   and an impossible pointer target. The border is the line, the padding is the
+   target, and 44px of the pointer's travel either side is what makes it feel
+   like it grabs. */
+.split-handle {
+  flex: none;
+  position: relative;
+  background: transparent;
+  border: none;
+  padding: 0;
+  touch-action: none;
+}
+
+.split.dir-row > .split-handle {
+  width: var(--space-3);
+  margin: 0 calc(var(--space-3) / -2);
+  cursor: col-resize;
+  z-index: 1;
+}
+
+.split.dir-column > .split-handle {
+  height: var(--space-3);
+  margin: calc(var(--space-3) / -2) 0;
+  cursor: row-resize;
+  z-index: 1;
+}
+
+/* The line itself, drawn in the middle of the target. */
+.split-grip {
+  position: absolute;
+  background: var(--border);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.split.dir-row .split-grip {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: var(--border-width);
+  transform: translateX(-50%);
+}
+
+.split.dir-column .split-grip {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: var(--border-width);
+  transform: translateY(-50%);
+}
+
+.split-handle:hover .split-grip,
+.split-handle:active .split-grip { background: var(--accent); }
+
+/* Focus is on the grip rather than the padded target: a ring around a 12px
+   transparent strip reads as a ring around nothing. */
+.split-handle:focus-visible { outline: none; }
+.split-handle:focus-visible .split-grip {
+  background: var(--accent);
+  outline: var(--focus-ring);
+  outline-offset: 1px;
+}
+
+/* While dragging. On the body, because the pointer crosses both panes and the
+   text in them would otherwise flip the cursor to an I-beam the whole way. */
+body.splitting { cursor: col-resize; user-select: none; }
+body.splitting * { cursor: inherit !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .split-grip { transition: none; }
+}
