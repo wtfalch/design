@@ -1,0 +1,127 @@
+/* Moving through a list that does not fit, and saying how far in you are. */
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-2) 0;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.pager-count { margin: 0; }
+.pager-count strong { color: var(--text); font-weight: var(--weight-strong); }
+
+.pager-controls { display: flex; align-items: center; gap: var(--space-1); }
+
+.pager-step,
+.pager-page {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Square, and 32px rather than the text's height: these are hit repeatedly
+     and in sequence, and a target the size of its glyph is a target that gets
+     missed on the fourth press. */
+  min-width: var(--space-8);
+  height: var(--space-8);
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.pager-step:hover:not(:disabled),
+.pager-page:hover:not(.on) { background: var(--panel-2); color: var(--text); }
+
+/* `--focus-ring` is a box-shadow value (`0 0 0 2px var(--accent)`), not an
+   outline shorthand — `outline: var(--focus-ring)` is invalid and drops
+   silently, which is how these shipped with no visible focus at all. Every
+   other stylesheet in the package uses `box-shadow`. */
+.pager-step:focus-visible,
+.pager-page:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Disabled rather than hidden. An arrow that disappears at the first page
+   moves every other control one step left, so the button under your cursor
+   changes identity between clicks. */
+.pager-step:disabled { opacity: 0.35; cursor: default; }
+
+.pager-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The current page. Border as well as tint, because tint alone is a colour
+   doing the work on its own -- and `aria-current` says it to a reader that
+   sees neither. */
+.pager-page.on {
+  color: var(--text);
+  background: var(--panel-2);
+  border-color: var(--border-strong);
+  font-weight: var(--weight-strong);
+}
+
+/* The gap is a field, drawn as a ghost.
+   
+   At rest it is the elision it replaces: no border, no background, the `…` as
+   its placeholder, sized and aligned like the page buttons beside it. Touch it
+   and it becomes a control. That order matters -- a visible "go to page" box
+   in a pager is a control almost nobody uses taking permanent space beside the
+   ones everybody does, and a control that looks like punctuation is one nobody
+   presses. This is punctuation until you press it.
+   
+   The width comes from how many digits the largest page has, set by the
+   component, so the row does not change size when the field is typed into --
+   the same reason `pageWindow` holds seven slots at the ends. */
+.pager-jump {
+  width: max(var(--space-8), calc(var(--digits, 2) * 0.62em + var(--space-5)));
+  height: var(--space-8);
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+/* Full strength, so the `…` is as legible as the numbers it sits between. */
+.pager-jump::placeholder { color: var(--muted); opacity: 1; }
+
+.pager-jump:hover { background: var(--panel-2); color: var(--text); }
+
+/* Typed into: it stops being an elision and becomes the control it always was.
+   The placeholder goes because the field now has a value to show. */
+.pager-jump:focus {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  background: var(--control);
+  border-color: var(--border-strong);
+  color: var(--text);
+  cursor: text;
+}
+
+/* The spinners are two 10px targets stacked inside a 32px box, and pressing
+   one by accident moves the page. The arrow keys still step the value. */
+.pager-jump { appearance: textfield; -moz-appearance: textfield; }
+.pager-jump::-webkit-outer-spin-button,
+.pager-jump::-webkit-inner-spin-button { appearance: none; margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pager-step,
+  .pager-page,
+  .pager-jump { transition: none; }
+}

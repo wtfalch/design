@@ -76,6 +76,10 @@
     "v": "The parts"
   },
   {
+    "c": "command",
+    "v": "Open it"
+  },
+  {
     "c": "dialog",
     "v": "Default"
   },
@@ -104,6 +108,18 @@
     "v": "Working"
   },
   {
+    "c": "identity",
+    "v": "A message header"
+  },
+  {
+    "c": "identity",
+    "v": "Composer chips"
+  },
+  {
+    "c": "identity",
+    "v": "In a row"
+  },
+  {
     "c": "illustration",
     "v": "All of them"
   },
@@ -128,12 +144,28 @@
     "v": "The parts"
   },
   {
+    "c": "menu",
+    "v": "Grouped, with a description"
+  },
+  {
+    "c": "menu",
+    "v": "On a message"
+  },
+  {
     "c": "modal",
     "v": "Default"
   },
   {
     "c": "modal",
     "v": "Shown inline"
+  },
+  {
+    "c": "pagination",
+    "v": "The server would not count"
+  },
+  {
+    "c": "pagination",
+    "v": "With a total"
   },
   {
     "c": "pill",
@@ -154,6 +186,14 @@
   {
     "c": "pill",
     "v": "When the name is too long"
+  },
+  {
+    "c": "popover",
+    "v": "A pane of controls"
+  },
+  {
+    "c": "popover",
+    "v": "Dismissed by its own control"
   },
   {
     "c": "progress",
@@ -188,6 +228,18 @@
     "v": "With a trailing column"
   },
   {
+    "c": "scrollarea",
+    "v": "Fade off"
+  },
+  {
+    "c": "scrollarea",
+    "v": "More below"
+  },
+  {
+    "c": "scrollarea",
+    "v": "Nothing hidden"
+  },
+  {
     "c": "select",
     "v": "Block"
   },
@@ -198,6 +250,14 @@
   {
     "c": "select",
     "v": "Disabled"
+  },
+  {
+    "c": "sheet",
+    "v": "From the bottom"
+  },
+  {
+    "c": "sheet",
+    "v": "From the right"
   },
   {
     "c": "sizegrid",
@@ -226,6 +286,14 @@
   {
     "c": "slider",
     "v": "Stepped, continuous, disabled"
+  },
+  {
+    "c": "splitpane",
+    "v": "Side by side"
+  },
+  {
+    "c": "splitpane",
+    "v": "Stacked"
   },
   {
     "c": "table",

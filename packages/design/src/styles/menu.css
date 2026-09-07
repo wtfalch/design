@@ -1,0 +1,101 @@
+/* A list of verbs, on the same sheet as every other anchored surface. */
+.menu-sheet {
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+  min-width: 12rem;
+  max-width: min(20rem, calc(100vw - var(--space-6)));
+  max-height: 24rem;
+  overflow: auto;
+  overscroll-behavior: contain;
+  z-index: 60;
+}
+
+.menu-list {
+  padding: var(--space-1);
+  outline: none;
+  display: grid;
+  gap: var(--border-width);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--text);
+  cursor: default;
+  outline: none;
+}
+
+/* One highlight for pointer and keyboard.
+   
+   React Aria sets `data-focused` for whichever is driving, so the row under
+   the cursor and the row the arrows are on are the same row drawn the same
+   way. Two separate treatments -- `:hover` plus a `.active` class -- is how a
+   menu ends up showing two highlighted rows at once, which is the state where
+   pressing Enter does something other than what it looks like it will do. */
+.menu-item[data-focused] { background: var(--panel-2); }
+.menu-item[data-disabled] { color: var(--muted); opacity: 0.6; }
+
+.menu-icon { flex: none; width: var(--space-4); height: var(--space-4); color: var(--muted); }
+.menu-item[data-focused] .menu-icon { color: var(--text); }
+
+.menu-text { flex: 1 1 auto; min-width: 0; display: grid; }
+.menu-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-desc {
+  font-size: var(--text-xs);
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The binding, set in the mono face at the size of the small print. Right of
+   the row and never the reason the row is wide: `flex: none` with the label
+   taking the slack. */
+.menu-key {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  letter-spacing: var(--tracking);
+}
+
+.menu-more { flex: none; color: var(--muted); }
+
+.menu-rule {
+  height: var(--border-width);
+  background: var(--border);
+  border: none;
+  margin: var(--space-1) 0;
+}
+
+.menu-section-title {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+  font-size: var(--text-2xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking);
+  color: var(--muted);
+}
+
+/* Destructive.
+   
+   Tinted into `--panel` at 10%, the same mix `Pill` uses, and for the same
+   measured reason: mixing a mid tone into the darker surface drags the
+   background towards the text and drops the row's contrast on a light theme.
+   Colour is never the only signal -- the row is also last, also below a rule. */
+.menu-item.danger { color: var(--bad); }
+.menu-item.danger .menu-icon { color: var(--bad); }
+.menu-item.danger[data-focused] { background: color-mix(in srgb, var(--bad) 10%, var(--panel)); }
+
+.menu-sheet[data-entering] { animation: pop-in var(--dur-fast) var(--ease-out); }
+.menu-sheet[data-exiting] { animation: pop-in var(--dur-fast) var(--ease) reverse; }
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-sheet[data-entering],
+  .menu-sheet[data-exiting] { animation: none; }
+}

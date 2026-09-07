@@ -27,6 +27,9 @@ export type { Props as ButtonProps } from './components/Button'
 export { default as Callout } from './components/Callout'
 export { default as Card } from './components/Card'
 export { default as Checkbox } from './components/Checkbox'
+/** Type what you want to do: the keyboard's front door over the application. */
+export { default as Command } from './components/Command'
+export type { Command as CommandItem, Group as CommandGroup } from './components/Command'
 /* `DangerAction` is a component -- a row inside the zone -- and was exported as
    a type until the first consumer wrote `<DangerAction>` and TypeScript refused
    it (TS1362). Nothing in this repo renders one, which is how it went unseen. */
@@ -36,20 +39,43 @@ export { default as Empty } from './components/Empty'
 export { default as Field } from './components/Field'
 export type { FieldWiring } from './components/Field'
 export { default as Icon } from './components/Icon'
+/** A person in one line -- initials, name, address -- and the two pure
+ *  functions behind the disc, exported so a caller colouring something else
+ *  by sender agrees with it. */
+export { default as Identity } from './components/Identity'
+export { hueOf, initialsOf } from './components/initials'
 export { ICON_NAMES } from './components/iconNames'
 export type { IconName } from './components/iconNames'
 export { default as Illustration } from './components/Illustration'
 export { default as Input } from './components/Input'
 export type { Props as InputProps } from './components/Input'
 export { default as Markdown } from './components/Markdown'
+export { default as Menu } from './components/Menu'
+export type { Item as MenuItem, Section as MenuSection } from './components/Menu'
 export { default as Modal } from './components/Modal'
+/** Moving through a list that does not fit, counted in items rather than
+ *  pages. `pageWindow` is the elision, exported because it is the arithmetic
+ *  worth testing on its own. */
+export { default as Pagination } from './components/Pagination'
+export { pageWindow } from './components/pageWindow'
 export { default as Pill } from './components/Pill'
+/** A small surface anchored to what opened it: the middle term between
+ *  `Tooltip`, which only says something, and `Modal`, which takes the
+ *  application away. */
+export { default as Popover } from './components/Popover'
 export { default as Progress } from './components/Progress'
 export { Row, Rows } from './components/Rows'
+/** A box that scrolls and says so. */
+export { default as ScrollArea } from './components/ScrollArea'
+export type { Props as ScrollAreaProps } from './components/ScrollArea'
 export { default as Select } from './components/Select'
 export { default as SizeGrid } from './components/SizeGrid'
 export { default as Skeleton } from './components/Skeleton'
 export { default as Slider } from './components/Slider'
+/** Two panes and a handle between them, the handle being a real `separator`
+ *  widget rather than a div with a mousedown listener. */
+export { default as SplitPane } from './components/SplitPane'
+export type { Props as SplitPaneProps } from './components/SplitPane'
 export { default as Table } from './components/Table'
 export type { Column } from './components/Table'
 export { default as Tabs } from './components/Tabs'
