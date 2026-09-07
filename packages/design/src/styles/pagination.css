@@ -66,14 +66,32 @@
   font-weight: var(--weight-strong);
 }
 
+/* The ellipsis is a button. It stands for a run of pages and goes to the
+   middle of it, so it is drawn like the page buttons rather than like text --
+   a control that looks like punctuation is a control nobody presses. */
 .pager-gap {
-  min-width: 24px;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
   color: var(--muted);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
   user-select: none;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
+
+.pager-gap:hover { background: var(--panel-2); color: var(--text); }
+.pager-gap:focus-visible { outline: var(--focus-ring); outline-offset: 1px; }
 
 @media (prefers-reduced-motion: reduce) {
   .pager-step,
-  .pager-page { transition: none; }
+  .pager-page,
+  .pager-gap { transition: none; }
 }

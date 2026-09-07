@@ -24,7 +24,7 @@
  * relying on the colour that says it visually.
  */
 
-import { pageWindow } from './pageWindow'
+import { type PageSlot, isGap, pageWindow } from './pageWindow'
 
 export interface Props {
   /** Index of the first item shown, counting from zero -- the same number the
@@ -114,13 +114,22 @@ export default function Pagination({
 
         {pages !== undefined && (
           <ol className="pager-pages">
-            {pageWindow(page, pages).map((slot, index, slots) =>
-              slot === 'gap' ? (
-                /* Keyed by the page it follows rather than by its index: a
-                   window can hold two gaps, and an index key makes React
-                   reuse the wrong one when the run they elide changes. */
-                <li key={`gap-after-${slots[index - 1]}`} className="pager-gap" aria-hidden="true">
-                  …
+            {pageWindow(page, pages).map((slot: PageSlot) =>
+              isGap(slot) ? (
+                /* A button, not punctuation. It stands for a run of pages and
+                   goes to the middle of that run, which is what makes page 17
+                   of 26 two presses away instead of eleven. Keyed by where it
+                   goes, which is unique: a window holds at most two gaps and
+                   they hide different runs. */
+                <li key={`gap-${slot.jumpTo}`}>
+                  <button
+                    type="button"
+                    className="pager-gap"
+                    onClick={() => onChange((slot.jumpTo - 1) * limit)}
+                    aria-label={`Jump to page ${slot.jumpTo}`}
+                  >
+                    …
+                  </button>
                 </li>
               ) : (
                 <li key={slot}>

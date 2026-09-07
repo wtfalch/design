@@ -81,9 +81,24 @@
   outline: none;
 }
 
-/* One highlight, pointer and keyboard alike. The arrows move this while focus
-   stays in the field, which is the behaviour the whole component is for. */
+/* Two pointers into the list, and they can disagree.
+   
+   React Aria's `Menu` unifies these -- hovering a row moves the keyboard's
+   focus to it -- but `ListBox` in 1.21 has no `shouldFocusOnHover` to turn
+   that on, so a hover sets `data-hovered` and the arrows set `data-focused`
+   independently. Styling only `data-focused`, which is what this did first,
+   means the pointer gets no feedback at all until somebody presses an arrow
+   key.
+   
+   Both are drawn, and the keyboard's row is marked as well, because when both
+   are showing they are two different answers to "what does Enter run" -- and
+   it is the focused one. The bar is the tell. */
+.cmd-item[data-hovered],
 .cmd-item[data-focused] { background: var(--panel-2); }
+
+.cmd-item[data-focused] {
+  box-shadow: inset 2px 0 0 var(--accent);
+}
 .cmd-item[data-disabled] { color: var(--muted); opacity: 0.6; }
 
 .cmd-icon { flex: none; width: 16px; height: 16px; color: var(--muted); }

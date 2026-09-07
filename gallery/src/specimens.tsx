@@ -607,6 +607,20 @@ const MAIL_MENU = [
   },
 ]
 
+function FilterToggles() {
+  /* Stateful, because a controlled `Toggle` with a no-op `onChange` never
+     moves -- the click lands, the handler does nothing, and the specimen
+     reads as a control that cannot be operated. */
+  const [unread, setUnread] = useState(true)
+  const [attachment, setAttachment] = useState(false)
+  return (
+    <Rows>
+      <Toggle label="Unread only" checked={unread} onChange={setUnread} />
+      <Toggle label="Has attachment" checked={attachment} onChange={setAttachment} />
+    </Rows>
+  )
+}
+
 function CommandDemo() {
   const [open, setOpen] = useState(false)
   const [ran, setRan] = useState<string | null>(null)
@@ -2070,10 +2084,7 @@ export const COMPONENTS: Component[] = [
         note: 'Focus moves inside on open and comes back to the button on close.',
         render: () => (
           <Popover label="Filter messages" trigger={<Button>Filter</Button>}>
-            <Rows>
-              <Toggle label="Unread only" checked onChange={() => {}} />
-              <Toggle label="Has attachment" checked={false} onChange={() => {}} />
-            </Rows>
+            <FilterToggles />
           </Popover>
         ),
       },
@@ -2211,9 +2222,11 @@ export const COMPONENTS: Component[] = [
       {
         name: 'With a total',
         note:
-          'Never more than seven slots, the first and last always present, a gap ' +
-          'for the elided run — and the width stays fixed as you move, so the row ' +
-          'does not resize under the cursor.',
+          'Never more than seven slots, the first and last always present, and the ' +
+          'width stays fixed as you move so the row does not resize under the ' +
+          'cursor. The ellipsis is a button: it stands for a run of pages and goes ' +
+          'to the middle of that run, which is what makes page 17 of 26 two ' +
+          'presses away rather than eleven.',
         render: () => <PagerDemo total={1284} />,
       },
       {
