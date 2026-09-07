@@ -24,9 +24,7 @@
   },
   "license": "MIT",
   "type": "module",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "publishConfig": {
     "access": "public"
   },
@@ -52,9 +50,7 @@
     "./tokens.css": "./dist/tokens.css",
     "./styles.css": "./dist/styles/index.css"
   },
-  "sideEffects": [
-    "*.css"
-  ],
+  "sideEffects": ["*.css"],
   "engines": {
     "node": ">=22.0.0"
   },
