@@ -1,12 +1,16 @@
 name: Release
 
-# A tag publishes. `@wtfalch/auth` publishes by hand with no workflow; this
-# package will have many more releases than auth, and a release that fails
-# should be red in Actions rather than a tarball that never appeared.
+# A `v*` tag publishes @wtfalch/design to npm.
 #
-# Nothing here deploys anything. It runs the same gates CI runs, then hands
-# the built package to npm with provenance, which ties the published tarball
-# to this commit and this workflow rather than to whoever held a token.
+# Authentication is OIDC trusted publishing: npm is configured to trust this
+# repository and this workflow filename, and the job exchanges a GitHub
+# identity token for a short-lived publish token. There is no NPM_TOKEN to
+# leak, rotate, or forget to set, and npm records a provenance attestation
+# tying the tarball to this run.
+#
+# Renaming this file breaks publishing until the trusted publisher on
+# npmjs.com is updated to match, because the filename is half of what npm
+# trusts.
 
 on:
   push:
@@ -14,16 +18,11 @@ on:
 
 permissions:
   contents: read
-  id-token: write   # provenance
+  id-token: write # required for OIDC; without it npm cannot mint a token
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Job-level on purpose: a step's `if` cannot see that step's own `env`, so
-    # the gate below read an empty string on every tag and skipped the publish
-    # while the run went green. v0.3.2 was the tag that showed it.
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -32,24 +31,33 @@ jobs:
           node-version: 22
           cache: pnpm
           registry-url: https://registry.npmjs.org
+
       - run: pnpm install --frozen-lockfile
+
+      # The same gates CI runs. A tag is not a reason to skip them: this is
+      # the one build other people install.
       - run: pnpm build
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+
       # The tag is the version. A tag that disagrees with package.json is a
       # release of the wrong thing, and this is where it stops.
-      - name: tag matches package.json
+      - name: the tag matches the manifest
         run: |
-          TAG="${GITHUB_REF_NAME#v}"
-          PKG="$(node -p "require('./packages/design/package.json').version")"
-          [ "$TAG" = "$PKG" ] || { echo "tag v$TAG != package $PKG"; exit 1; }
-      # No token, no publish -- and no red run. 0.1.0 and 0.2.0 went out from a
-      # laptop with a browser login, and a tag pushed afterwards should record
-      # the release without failing on a step it was never going to take.
-      - name: publish, if there is a token
-        if: env.NODE_AUTH_TOKEN != ''
-        run: pnpm --filter @wtfalch/design publish --access public --provenance --no-git-checks
-      - name: not published
-        if: env.NODE_AUTH_TOKEN == ''
-        run: echo "NPM_TOKEN is not set; gates passed, nothing published."
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          manifest="$(node -p "require('./packages/design/package.json').version")"
+          if [ "$tag" != "$manifest" ]; then
+            echo "tag $GITHUB_REF_NAME says $tag, package.json says $manifest" >&2
+            exit 1
+          fi
+          echo "publishing $manifest"
+
+      # npm 11.5.1+ is what understands OIDC. The runner's bundled npm can be
+      # older than that whatever the Node version, so pin it forward here.
+      - run: npm install -g npm@latest
+
+      - name: publish
+        run: npm publish --access public --provenance
+        working-directory: packages/design
