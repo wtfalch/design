@@ -5,8 +5,15 @@ name: Release
 # Authentication is OIDC trusted publishing: npm is configured to trust this
 # repository and this workflow filename, and the job exchanges a GitHub
 # identity token for a short-lived publish token. There is no NPM_TOKEN to
-# leak, rotate, or forget to set, and npm records a provenance attestation
-# tying the tarball to this run.
+# leak, rotate, or forget to set.
+#
+# No `--provenance`. npm verifies a provenance attestation against the source
+# repository and refuses one that points at a private repo ("Unsupported
+# GitHub Actions source repository visibility"), which is what every private
+# repo here is. The npm *package* is public; the repo behind it is not, and
+# provenance is about the second. It was never in effect on any of these
+# packages: the published tarballs carry no attestations. Add it back per repo
+# if one ever goes public.
 #
 # Renaming this file breaks publishing until the trusted publisher on
 # npmjs.com is updated to match, because the filename is half of what npm
@@ -59,5 +66,5 @@ jobs:
       - run: npm install -g npm@latest
 
       - name: publish
-        run: npm publish --access public --provenance
+        run: npm publish --access public
         working-directory: packages/design
