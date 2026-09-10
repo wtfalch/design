@@ -57,6 +57,31 @@ export const ICON_NAMES = [
   // is the wrong noun: you are handing over one file, not opening a place
   // that holds several.
   'file',
+  // A mail client's vocabulary, added for `@wtfalch/email`'s mailbox. The set
+  // had no noun for a message, a folder to file one in, or any of the four
+  // things you do to one, so the mailbox was drawing Inbox with `chat`, Sent
+  // with `download` and Deleted Items with `close` -- three right shapes for
+  // three wrong words. Measured the same way as the rest; see the `Glyph`
+  // docstring in `Icon.tsx`.
+  'mail',
+  'mail-open',
+  'pen',
+  'send',
+  'trash',
+  'paperclip',
+  // `star` is a rating or a flagged message; `stars` above it is the
+  // sparkles, and means generated. One letter apart and unrelated, which is
+  // worth the comment: reach for the wrong one and it still compiles.
+  'star',
+  'star-filled',
+  'search',
+  'more',
+  'menu',
+  // Diagonal arrows, which is what every minimal set draws reply and forward
+  // as. Pepicons has no curved corner arrow, and a horizontal `arrow-left`
+  // reads as going back rather than answering.
+  'reply',
+  'forward',
 ] as const
 
 export type IconName = (typeof ICON_NAMES)[number]
