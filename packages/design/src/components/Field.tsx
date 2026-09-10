@@ -36,6 +36,19 @@ export interface FieldWiring {
   id: string
   'aria-describedby': string | undefined
   'aria-invalid': boolean | undefined
+  /** The label element's own id, for a control a `<label for>` cannot name.
+   *
+   *  `htmlFor` is enough for an `<input>`, which is what almost every caller
+   *  wraps. It is not enough for `Select`, or for anything else built on a
+   *  `<button>`: a button takes its accessible name from its *contents*, and
+   *  a `<label for>` pointing at one is ignored by the name computation. A
+   *  caller that put a `Select` in a `Field` got a label on screen and a
+   *  control announcing only its current value — and the workaround was an
+   *  `aria-label` repeating the label string, which is two literals and two
+   *  chances to drift apart. That drift is exactly the bug this component
+   *  exists to prevent, so: pass this as `aria-labelledby` and there is one
+   *  string in one place. */
+  labelId: string
 }
 
 export default function Field({
@@ -72,12 +85,13 @@ export default function Field({
   const id = useId()
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
+  const labelId = `${id}-label`
 
   return (
     <div
       className={`field field-${layout}-layout${error ? ' field-bad' : ''}${className ? ` ${className}` : ''}`}
     >
-      <label className={labelHidden ? 'sr-only' : 'field-label'} htmlFor={id}>
+      <label id={labelId} className={labelHidden ? 'sr-only' : 'field-label'} htmlFor={id}>
         {label}
         {/* An asterisk on its own is a convention, not a word. The text is for
             anyone the convention was never explained to, which is most
@@ -98,6 +112,7 @@ export default function Field({
 
       {children({
         id,
+        labelId,
         /* Both, in reading order, when both are there. A field that has a rule
            and has broken it needs to say the rule too -- "must be a URL" on its
            own does not tell you what shape of URL. */
