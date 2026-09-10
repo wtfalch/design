@@ -47,6 +47,7 @@ import {
   Rows,
   ScrollArea,
   Select,
+  Shell,
   SizeGrid,
   Skeleton,
   Slider,
@@ -55,6 +56,7 @@ import {
   Table,
   Tabs,
   Textarea,
+  ThemeSwitch,
   ToastHost,
   Toggle,
   Tooltip,
@@ -124,6 +126,24 @@ function TabsDemo() {
 /** A badge that says what it means. Two of valet's admin tabs carried a mark
  *  nobody could resolve and it went into a visible line instead, which is a
  *  page working around a component. */
+/** The search box every consumer drew by hand: a glyph inside the left edge,
+ *  a key hint and a clear button inside the right. */
+function SearchInputDemo() {
+  const [q, setQ] = useState('northwind')
+  return (
+    <Input
+      aria-label="Search organisations"
+      icon="search"
+      placeholder="Search"
+      value={q}
+      onChange={(e) => setQ(e.target.value)}
+      onClear={() => setQ('')}
+      trailing={<Kbd>/</Kbd>}
+      block
+    />
+  )
+}
+
 function TabsBadgeDemo() {
   const [at, setAt] = useState('keys')
   return (
@@ -1652,6 +1672,48 @@ export const COMPONENTS: Component[] = [
         render: () => <FieldDemo />,
       },
       {
+        name: 'A search box',
+        note:
+          'A glyph inside the left edge, a key hint and a clear button inside the ' +
+          'right — four hand-written classes and an absolutely-positioned button in ' +
+          '`@wtfalch/email`. `onClear` is a callback, not a `clearable` flag: the ' +
+          'value is the caller’s, and a control that emptied itself would work ' +
+          'uncontrolled and silently do nothing controlled.',
+        render: () => (
+          <div style={{ maxWidth: 320 }}>
+            <SearchInputDemo />
+          </div>
+        ),
+      },
+      {
+        name: 'Plain children',
+        note:
+          'A function cannot cross the server boundary, so the render prop made ' +
+          'every page with a form a client component whether it needed to be or ' +
+          'not — which all three apps’ `design.ts` say, in the same sentence. ' +
+          'Plain children read the wiring from context instead. Explicit props ' +
+          'still win, so a caller that names an id means that id.',
+        render: () => (
+          <form
+            style={{ display: 'grid', gap: 12, maxWidth: 340 }}
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <Field label="Instance name" hint="Lowercase, no spaces.">
+              <Input name="instance" defaultValue="northwind" block />
+            </Field>
+            <Field label="Region" hint="Cannot be changed later.">
+              <Select name="region" defaultValue="sg" block>
+                <option value="sg">Singapore</option>
+                <option value="fra">Frankfurt</option>
+              </Select>
+            </Field>
+            <Field label="Notes" error="Say what this instance is for.">
+              <Textarea name="notes" rows={2} />
+            </Field>
+          </form>
+        ),
+      },
+      {
         name: 'The parts',
         note:
           'Both messages are wired to the input with `aria-describedby`, and an ' +
@@ -2231,6 +2293,87 @@ export const COMPONENTS: Component[] = [
             ]}
           />
         ),
+      },
+    ],
+  },
+  {
+    id: 'shell',
+    name: 'Shell',
+    blurb:
+      'Three apps have one, all called shell.tsx, all the same six elements. It ' +
+      'gates nothing, which is worth saying because a frame looks like the place ' +
+      'to: a layout cannot reliably stop the page beneath it rendering, so every ' +
+      'page decides for itself who may see it.',
+    variants: [
+      {
+        name: 'Default',
+        note: 'A `<header>` and a `<main>`, so the landmarks exist. `brand` and `who` are slots, so a user menu or a theme control stays the app’s own client boundary.',
+        render: () => (
+          <div style={{ height: 300, overflow: 'hidden', resize: 'none' }}>
+            <Shell
+              brand={<strong>Management</strong>}
+              who={
+                <>
+                  <span className="quiet">will@wtfalch.dev</span>
+                  <Button kind="ghost" size="sm">
+                    Sign out
+                  </Button>
+                </>
+              }
+            >
+              <h1 style={{ margin: 0 }}>Organisations</h1>
+              <p className="quiet">Every organisation on this estate.</p>
+            </Shell>
+          </div>
+        ),
+      },
+      {
+        name: 'With a nav, wide',
+        note: 'manage kept `head-inner-wide` and `main-wide` as separate classes and had to remember all three; the measure is one custom property now.',
+        render: () => (
+          <div style={{ height: 300, overflow: 'hidden' }}>
+            <Shell
+              wide
+              brand={<strong>Northwind</strong>}
+              who={<ThemeSwitch product="tf" labelHidden />}
+              nav={
+                <Row>
+                  <Pill quiet inRow>
+                    Roles
+                  </Pill>
+                  <Pill quiet inRow>
+                    Members
+                  </Pill>
+                  <Pill quiet inRow>
+                    Security
+                  </Pill>
+                </Row>
+              }
+            >
+              <h1 style={{ margin: 0 }}>Members</h1>
+            </Shell>
+          </div>
+        ),
+      },
+    ],
+  },
+  {
+    id: 'themeswitch',
+    name: 'ThemeSwitch',
+    blurb:
+      'All three apps had one and the first forty lines were identical: the ' +
+      'guarded read, the guarded write, the assignment to data-theme. Two of the ' +
+      'three first-paint scripts beside them are byte-for-byte the same file.',
+    variants: [
+      {
+        name: 'Labelled',
+        note: 'The apps passed `aria-label="Appearance"` beside a visible “Appearance” span — the same string twice, which is the drift `Field` exists to stop. The label is rendered and pointed at, or hidden and used as the name, never both.',
+        render: () => <ThemeSwitch product="tf" />,
+      },
+      {
+        name: 'In a header',
+        note: 'A subset, in the order to show them. An id the product does not offer is dropped rather than thrown on.',
+        render: () => <ThemeSwitch product="tf" only={['night', 'paper']} labelHidden />,
       },
     ],
   },

@@ -7,11 +7,14 @@
  * this component keeps it by rendering the element.
  *
  * Same contract as `Input`: a plain `<textarea>` so every element rule in the
- * stylesheet keeps working, and its `id`, `aria-describedby` and `aria-invalid`
- * come from `Field`'s render prop rather than from a context. On its own it
- * needs an `aria-label`, for the same reason `Input` does.
+ * stylesheet keeps working, and its `id`, `aria-describedby` and
+ * `aria-invalid` come from the `Field` above it -- handed in by a render
+ * prop, or read from context when the caller passed plain children. On its
+ * own it needs an `aria-label`, for the same reason `Input` does.
  */
 import { forwardRef } from 'react'
+
+import { useFieldWiring } from './fieldWiring'
 
 export interface Props
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'> {
@@ -30,7 +33,16 @@ const Textarea = forwardRef<HTMLTextAreaElement, Props>(function Textarea(
     .filter(Boolean)
     .join(' ')
 
-  return <textarea ref={ref} className={classes || undefined} {...rest} />
+  /* Explicit props win; this is the fallback. After `rest` in the spread,
+     because a key present with an undefined value still overwrites. */
+  const field = useFieldWiring()
+  const wired = {
+    id: rest.id ?? field?.id,
+    'aria-describedby': rest['aria-describedby'] ?? field?.['aria-describedby'],
+    'aria-invalid': rest['aria-invalid'] ?? field?.['aria-invalid'],
+  }
+
+  return <textarea ref={ref} className={classes || undefined} {...rest} {...wired} />
 })
 
 export default Textarea

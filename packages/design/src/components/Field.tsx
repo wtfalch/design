@@ -41,24 +41,14 @@
 
 import { useId } from 'react'
 
-export interface FieldWiring {
-  id: string
-  'aria-describedby': string | undefined
-  'aria-invalid': boolean | undefined
-  /** The label element's own id, for a control a `<label for>` cannot name.
-   *
-   *  `htmlFor` is enough for an `<input>`, which is what almost every caller
-   *  wraps. It is not enough for `Select`, or for anything else built on a
-   *  `<button>`: a button takes its accessible name from its *contents*, and
-   *  a `<label for>` pointing at one is ignored by the name computation. A
-   *  caller that put a `Select` in a `Field` got a label on screen and a
-   *  control announcing only its current value — and the workaround was an
-   *  `aria-label` repeating the label string, which is two literals and two
-   *  chances to drift apart. That drift is exactly the bug this component
-   *  exists to prevent, so: pass this as `aria-labelledby` and there is one
-   *  string in one place. */
-  labelId: string
-}
+import { type FieldWiring, FieldWiringContext } from './fieldWiring'
+
+/* Re-exported here as well as from `fieldWiring.ts`, because this is where a
+   caller looks for it and #12's test imports it from this module. A `export
+   type` re-export is not a value export, so `Field.tsx` keeps the Fast
+   Refresh boundary `fastRefresh.test.ts` holds it to -- which is what forced
+   the hook and the context out of this file in the first place. */
+export type { FieldWiring } from './fieldWiring'
 
 export default function Field({
   label,
@@ -88,13 +78,42 @@ export default function Field({
    *  form to fill in. Same element, same wiring, same guarantees -- the only
    *  thing that changes is where the label sits. */
   layout?: 'stack' | 'row'
-  children: (field: FieldWiring) => React.ReactNode
+  /**
+   * The control.
+   *
+   * **Elements, or a function.** Elements are the shape to reach for: a
+   * function cannot cross the server boundary, so a render prop made every
+   * page with a form a client component whether or not it needed to be, and
+   * all three apps' `design.ts` say so in the same sentence. Plain children
+   * read the wiring from context instead, and the package's own controls
+   * apply it when the caller has not named an `id`:
+   *
+   *     <Field label="Region" hint="Cannot be changed later">
+   *       <Select name="region" defaultValue="sg">…</Select>
+   *     </Field>
+   *
+   * The function form stays, unchanged and not deprecated. It is still the
+   * answer for a control the package does not own, or for a caller that
+   * needs the ids for something else -- a `<datalist>` to point at, a label
+   * rendered somewhere the provider does not reach.
+   */
+  children: React.ReactNode | ((field: FieldWiring) => React.ReactNode)
   className?: string
 }) {
   const id = useId()
   const hintId = `${id}-hint`
   const errorId = `${id}-error`
   const labelId = `${id}-label`
+
+  const wiring: FieldWiring = {
+    id,
+    labelId,
+    /* Both, in reading order, when both are there. A field that has a rule
+       and has broken it needs to say the rule too -- "must be a URL" on its
+       own does not tell you what shape of URL. */
+    'aria-describedby': [hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined,
+    'aria-invalid': error ? true : undefined,
+  }
 
   return (
     <div
@@ -119,16 +138,11 @@ export default function Field({
         </p>
       )}
 
-      {children({
-        id,
-        labelId,
-        /* Both, in reading order, when both are there. A field that has a rule
-           and has broken it needs to say the rule too -- "must be a URL" on its
-           own does not tell you what shape of URL. */
-        'aria-describedby':
-          [hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined,
-        'aria-invalid': error ? true : undefined,
-      })}
+      {typeof children === 'function' ? (
+        children(wiring)
+      ) : (
+        <FieldWiringContext.Provider value={wiring}>{children}</FieldWiringContext.Provider>
+      )}
 
       {/* `alert`, because this appears in response to something the reader just
           did and they are usually looking at the button, not the field. A

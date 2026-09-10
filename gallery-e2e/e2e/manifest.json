@@ -133,11 +133,19 @@
   },
   {
     "c": "input",
+    "v": "A search box"
+  },
+  {
+    "c": "input",
     "v": "Labelled"
   },
   {
     "c": "input",
     "v": "Password"
+  },
+  {
+    "c": "input",
+    "v": "Plain children"
   },
   {
     "c": "input",
@@ -276,6 +284,14 @@
     "v": "From the right"
   },
   {
+    "c": "shell",
+    "v": "Default"
+  },
+  {
+    "c": "shell",
+    "v": "With a nav, wide"
+  },
+  {
     "c": "sizegrid",
     "v": "Interactive"
   },
@@ -358,6 +374,14 @@
   {
     "c": "textarea",
     "v": "The bare control"
+  },
+  {
+    "c": "themeswitch",
+    "v": "In a header"
+  },
+  {
+    "c": "themeswitch",
+    "v": "Labelled"
   },
   {
     "c": "toast",

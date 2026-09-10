@@ -83,3 +83,67 @@
 }
 
 .secret-lg > .secret-eye { padding: var(--space-2); }
+
+/* An input with something inside its edges: a glyph on the left, a hint or a
+   clear button on the right. Same arrangement as `.secret` above, and for the
+   same reason -- one grid cell with everything stacked in it, and the room
+   reserved in the input's own padding, so nothing is positioned against a
+   height that changes with `size`. */
+.adorned { display: grid; align-items: center; }
+
+.adorned > input,
+.adorned > .adorned-mark,
+.adorned > .adorned-end { grid-area: 1 / 1; }
+
+.adorned.block { width: 100%; }
+
+.adorned > .adorned-mark {
+  justify-self: start;
+  margin-left: var(--space-2);
+  color: var(--muted);
+  /* The glyph is decoration over the box; clicks belong to the input under
+     it, which is otherwise unreachable in its own left edge. */
+  pointer-events: none;
+  /* Over the input, not under it. Both share one grid cell, the input has an
+     opaque `--control` background, and it comes later in the DOM -- so
+     without this the glyph is painted and then covered, which looks exactly
+     like an icon that failed to render. `.secret` never hit this because its
+     button is written after the input. */
+  z-index: 1;
+}
+
+/* Room for the glyph, on the scale, so a density change moves the text with
+   the mark rather than leaving one behind. `--space-8` is what `.secret`
+   reserves on the right for the same reason; the scale has no 7, and an
+   undefined custom property does not fall back -- the declaration computes
+   to 0 and the text sits under the glyph. */
+.adorned-icon > input { padding-left: var(--space-8); }
+
+/* No `--space-12` on the scale; two steps that are, added. Same arithmetic
+   as `.secret-lg`. */
+.adorned-icon.adorned-lg > input { padding-left: calc(var(--space-10) + var(--space-1)); }
+
+.adorned > .adorned-end {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-right: var(--space-1);
+}
+
+/* `:has`, not a sibling combinator: the input comes *before* the end cap in
+   the DOM, so `~` reads the wrong way and matches nothing. */
+.adorned:has(> .adorned-end) > input { padding-right: var(--space-8); }
+.adorned-lg:has(> .adorned-end) > input {
+  padding-right: calc(var(--space-10) + var(--space-1));
+}
+
+/* Sized from its glyph, not `.icon-btn`'s 34px tile, which would be taller
+   than a small input -- the note above `.secret-eye` in full. */
+.adorned-clear {
+  width: auto; height: auto;
+  padding: var(--space-1);
+  opacity: 1;
+}
+
+.adorned-lg .adorned-clear { padding: var(--space-2); }
