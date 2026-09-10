@@ -52,6 +52,9 @@ export type { IconName } from './components/iconNames'
 export { default as Illustration } from './components/Illustration'
 export { default as Input } from './components/Input'
 export type { Props as InputProps } from './components/Input'
+/** A key, or a chord. The rule `Menu` and `Command` each had a private copy
+ *  of, now one component a consumer can reach. */
+export { default as Kbd } from './components/Kbd'
 export { default as Markdown } from './components/Markdown'
 export { default as Menu } from './components/Menu'
 export type { Item as MenuItem, Section as MenuSection } from './components/Menu'

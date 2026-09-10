@@ -41,6 +41,27 @@ export interface Tab {
   label: string
   /** Shown after the label, for a count or a state. */
   badge?: string
+  /**
+   * What the badge means, on hover and to a screen reader.
+   *
+   * A badge is one or two characters by design, and a mark that terse either
+   * explains itself or does not. valet had two on its admin strip that did
+   * not, and moved them out of the badge into a visible line rather than ship
+   * a glyph nobody could resolve -- which is a page working around a
+   * component, not a page making a choice.
+   *
+   * On `title` plus `aria-label`, not `title` alone: `title` never appears on
+   * a touch screen and is inconsistently announced, so the accessible name is
+   * set explicitly. The badge becomes a labelled `<abbr>`-shaped thing rather
+   * than decoration, which is what it always was.
+   *
+   * Additive, deliberately. Without this the badge's own text stays part of
+   * the tab's accessible name, which is right for the count case the prop
+   * above was written for -- "Keys 3" is a useful thing to hear. Hiding an
+   * untitled badge would have been the tidier rule and would have taken that
+   * count away from everyone already relying on it.
+   */
+  badgeTitle?: string
   /** A line under the label, for a rail with room for one. Ignored in a
    *  horizontal strip, where there is none, and under a group, where the
    *  group's hint is the context. */
@@ -154,7 +175,11 @@ export default function Tabs({
             }}
           >
             <span className="tab-label">{t.label}</span>
-            {t.badge && <span className="tab-badge">{t.badge}</span>}
+            {t.badge && (
+              <span className="tab-badge" title={t.badgeTitle} aria-label={t.badgeTitle}>
+                {t.badge}
+              </span>
+            )}
             {t.hint && orientation === 'vertical' && !(grouped && t.group) && (
               <span className="tab-hint">{t.hint}</span>
             )}

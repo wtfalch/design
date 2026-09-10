@@ -148,6 +148,14 @@
     "v": "The parts"
   },
   {
+    "c": "kbd",
+    "v": "Beside a control"
+  },
+  {
+    "c": "kbd",
+    "v": "Default"
+  },
+  {
     "c": "menu",
     "v": "Grouped, with a description"
   },
@@ -256,6 +264,10 @@
     "v": "Disabled"
   },
   {
+    "c": "select",
+    "v": "In a form"
+  },
+  {
     "c": "sheet",
     "v": "From the bottom"
   },
@@ -306,6 +318,10 @@
   {
     "c": "table",
     "v": "Empty"
+  },
+  {
+    "c": "tabs",
+    "v": "An explained badge"
   },
   {
     "c": "tabs",

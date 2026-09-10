@@ -2,7 +2,6 @@ import {
   Menu as AriaMenu,
   Popover as AriaPopover,
   Header,
-  Keyboard,
   MenuItem,
   MenuSection,
   MenuTrigger,
@@ -11,6 +10,8 @@ import {
   SubmenuTrigger,
   Text,
 } from 'react-aria-components'
+
+import Kbd from './Kbd'
 
 import Icon from './Icon'
 import type { IconName } from './iconNames'
@@ -109,7 +110,7 @@ function renderItem(item: Item): React.ReactNode {
           </Text>
         )}
       </span>
-      {item.shortcut && <Keyboard className="menu-key">{item.shortcut}</Keyboard>}
+      {item.shortcut && <Kbd className="menu-key">{item.shortcut}</Kbd>}
       {/* Inline rather than an `Icon`, following `Select`'s caret: one path,
           used here and nowhere else, and the icon set has no chevron. */}
       {item.items && (

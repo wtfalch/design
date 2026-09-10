@@ -5,7 +5,6 @@ import {
   Dialog,
   Header,
   Input,
-  Keyboard,
   ListBox,
   ListBoxItem,
   ListBoxSection,
@@ -14,6 +13,8 @@ import {
   Text,
   useFilter,
 } from 'react-aria-components'
+
+import Kbd from './Kbd'
 
 import Icon from './Icon'
 import type { IconName } from './iconNames'
@@ -162,9 +163,7 @@ export default function Command({
                               </Text>
                             )}
                           </span>
-                          {command.shortcut && (
-                            <Keyboard className="cmd-key">{command.shortcut}</Keyboard>
-                          )}
+                          {command.shortcut && <Kbd className="cmd-key">{command.shortcut}</Kbd>}
                         </ListBoxItem>
                       ))}
                     </ListBoxSection>

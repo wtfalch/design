@@ -36,6 +36,7 @@ import {
   Identity,
   Illustration,
   Input,
+  Kbd,
   Markdown,
   Menu,
   Modal,
@@ -114,6 +115,30 @@ function TabsDemo() {
         { id: 'perm', label: 'Permissions', badge: '3' },
         { id: 'mem', label: 'Memories' },
         { id: 'gone', label: 'Discarded', disabled: true },
+      ]}
+    />
+  )
+}
+
+/** A badge that says what it means. Two of valet's admin tabs carried a mark
+ *  nobody could resolve and it went into a visible line instead, which is a
+ *  page working around a component. */
+function TabsBadgeDemo() {
+  const [at, setAt] = useState('keys')
+  return (
+    <Tabs
+      label="Organisation section"
+      value={at}
+      onChange={setAt}
+      tabs={[
+        { id: 'keys', label: 'Keys', badge: '3' },
+        {
+          id: 'limits',
+          label: 'Limits',
+          badge: '!',
+          badgeTitle: 'Over its monthly ceiling',
+        },
+        { id: 'people', label: 'People' },
       ]}
     />
   )
@@ -1177,6 +1202,11 @@ export const COMPONENTS: Component[] = [
       'The strip is one tab stop and the arrows move along it.',
     variants: [
       { name: 'Default', render: () => <TabsDemo /> },
+      {
+        name: 'An explained badge',
+        note: 'A badge is one or two characters, and a mark that terse either explains itself or does not. `badgeTitle` gives it a hover and an accessible name. Untitled badges are unchanged: the text stays part of the tab’s name, which is what makes “Keys 3” useful to hear.',
+        render: () => <TabsBadgeDemo />,
+      },
       { name: 'Vertical, grouped', render: () => <GroupedTabsDemo /> },
     ],
   },
@@ -1561,6 +1591,29 @@ export const COMPONENTS: Component[] = [
           <Select aria-label="Theme" disabled defaultValue="a">
             <option value="a">Anthropic’s to set</option>
           </Select>
+        ),
+      },
+      {
+        name: 'In a form',
+        note: 'With `name` the control posts, so a plain `<form action={…}>` reads it at submit — no mirrored hidden input keeping a second copy of the value in step. React Aria renders the hidden select, so validation and reset reach it too. `Field` names it through `labelledBy`, which is what stops the label existing twice.',
+        render: () => (
+          <form
+            style={{ display: 'grid', gap: 10, maxWidth: 320 }}
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <Field label="Region" hint="Where the instance runs. Cannot be changed later.">
+              {(f) => (
+                <Select id={f.id} name="region" aria-labelledby={f.labelId} defaultValue="sg" block>
+                  <option value="sg">Singapore</option>
+                  <option value="fra">Frankfurt</option>
+                  <option value="iad">Virginia</option>
+                </Select>
+              )}
+            </Field>
+            <Button type="submit" kind="primary">
+              Create
+            </Button>
+          </form>
         ),
       },
     ],
@@ -2161,6 +2214,39 @@ export const COMPONENTS: Component[] = [
               },
             ]}
           />
+        ),
+      },
+    ],
+  },
+  {
+    id: 'kbd',
+    name: 'Kbd',
+    blurb:
+      'The rule already existed twice, privately — `Menu`’s `.menu-key` and ' +
+      '`Command`’s `.cmd-key`, identical down to the property order — and neither ' +
+      'was reachable, so a consumer saying “press ⌘K” beside its own search box ' +
+      'drew a third. It is a `<kbd>`: “something you press”, not a styled word. ' +
+      'It draws the reminder and binds nothing.',
+    variants: [
+      {
+        name: 'Default',
+        render: () => (
+          <Row>
+            <Kbd>⌘K</Kbd>
+            <Kbd>Esc</Kbd>
+            <Kbd>Ctrl+Shift+P</Kbd>
+            <Kbd>/</Kbd>
+          </Row>
+        ),
+      },
+      {
+        name: 'Beside a control',
+        note: 'The shape the mail client had drawn by hand as `.mail-search-key`: a field that says what opens it without a sentence under it.',
+        render: () => (
+          <Row>
+            <Input aria-label="Search mail" defaultValue="" placeholder="Search" size="sm" />
+            <Kbd>/</Kbd>
+          </Row>
         ),
       },
     ],
