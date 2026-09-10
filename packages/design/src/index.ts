@@ -91,7 +91,9 @@ export { default as Tabs } from './components/Tabs'
 export type { Tab, TabGroup } from './components/Tabs'
 export { default as Textarea } from './components/Textarea'
 export type { Props as TextareaProps } from './components/Textarea'
-export { Toast, ToastHost, useToast } from './components/Toast'
+/** `ToastHost` nests: one inside another renders through, so a package can
+ *  wrap itself and still leave an application with a single region. */
+export { Toast, ToastHost, useHasToastHost, useToast } from './components/Toast'
 export { default as Toggle } from './components/Toggle'
 export { default as Tooltip } from './components/Tooltip'
 export { default as Tour } from './components/Tour'

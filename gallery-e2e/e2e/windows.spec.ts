@@ -60,3 +60,20 @@ for (const w of WINDOWS) {
     })
   }
 }
+
+/**
+ * One region, however many hosts.
+ *
+ * `ToastHost` nesting is what lets a package -- `@wtfalch/email`'s mail
+ * client -- wrap itself without giving an application that already has a host
+ * two regions announcing into the same page. Two regions is not a thing a
+ * screenshot shows: the second is empty until something is pushed, and then
+ * the same message appears twice in two places. So it is counted.
+ */
+test('a nested ToastHost renders through to one region', async ({ page }) => {
+  await page.goto(specimenUrl({ c: 'toast', v: 'Nested hosts' }, 'system'))
+  await page.getByRole('button', { name: /^good$/i }).click()
+
+  await expect(page.locator('.toast')).toHaveCount(1)
+  await expect(page.locator('.toasts')).toHaveCount(1)
+})

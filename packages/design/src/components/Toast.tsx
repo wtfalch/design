@@ -48,10 +48,28 @@ const MARK: Record<Toast['tone'], IconName> = {
  *  because a message that expires while you are reading it was never shown. */
 const LINGER = 4000
 
-const Ctx = createContext<(text: string, tone?: Toast['tone']) => void>(() => {})
+type Push = (text: string, tone?: Toast['tone']) => void
 
-export function useToast() {
-  return useContext(Ctx)
+/* `null`, not a no-op, so `ToastHost` can tell "nobody above me" from "a host
+   above me whose push happens to do nothing". `useToast` still hands back a
+   no-op, which is the old behaviour. */
+const Ctx = createContext<Push | null>(null)
+
+const NOOP: Push = () => {}
+
+export function useToast(): Push {
+  return useContext(Ctx) ?? NOOP
+}
+
+/**
+ * Whether anything above will actually show a toast.
+ *
+ * For a component that has a second way of saying something and would rather
+ * use it than push into the void. `useToast` outside a host is a no-op that
+ * typechecks, which is the failure this exists to let you avoid.
+ */
+export function useHasToastHost(): boolean {
+  return useContext(Ctx) !== null
 }
 
 /**
@@ -69,8 +87,22 @@ export function useToast() {
  * reachable; React Aria makes each toast an `alertdialog` inside a live
  * `region` for that reason, so the announcement still happens and the button
  * can still be reached.
+ *
+ * **Nesting one inside another is a no-op, and that is what makes this usable
+ * by a package.** `@wtfalch/email`'s mail client wanted to say "Archived."
+ * and could not: `useToast` needs a host above it, so the component would
+ * have had to wrap itself in one -- and then an application that already had
+ * a host would carry two regions announcing into the same page. It wrote its
+ * own `role="status"` strip instead and said so in a docblock, which is a
+ * package working around a package.
+ *
+ * So a `ToastHost` that finds one above it renders its children and steps
+ * aside. A library wraps itself unconditionally and gets the right answer
+ * both ways: its own region in an app that has none, and the app's region --
+ * one queue, one landmark, one place messages pile up -- in an app that does.
  */
 export function ToastHost({ children }: { children: React.ReactNode }) {
+  const outer = useContext(Ctx)
   const queue = useMemo(() => new ToastQueue<Toast>({ maxVisibleToasts: 4 }), [])
 
   /* What gets read aloud, and it is not the toast.
@@ -100,6 +132,12 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
       },
     [queue],
   )
+
+  /* Somebody above owns the region. Render through: pushing into the outer
+     queue is what keeps one landmark and one pile of messages on the page.
+     After every hook, because a hook count that changes with context is a
+     React error. */
+  if (outer) return <>{children}</>
 
   return (
     <Ctx.Provider value={push}>

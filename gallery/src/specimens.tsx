@@ -1233,6 +1233,21 @@ export const COMPONENTS: Component[] = [
           </ToastHost>
         ),
       },
+      {
+        name: 'Nested hosts',
+        note:
+          'A host inside a host renders through, which is what lets a package wrap ' +
+          'itself. Pressing these pushes into the outer queue: one region, one pile ' +
+          'of messages. Without it `@wtfalch/email` had to write its own live region ' +
+          'rather than give an application two.',
+        render: () => (
+          <ToastHost>
+            <ToastHost>
+              <ToastDemo />
+            </ToastHost>
+          </ToastHost>
+        ),
+      },
     ],
   },
   {
