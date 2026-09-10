@@ -1325,6 +1325,26 @@ export const COMPONENTS: Component[] = [
           </Row>
         ),
       },
+      {
+        name: 'As a link',
+        note: 'A control that takes you somewhere is an anchor, and `asChild` puts the button’s styling on it. Middle-click, cmd-click and “copy link address” come from the element; the appearance is this component’s. The disabled one keeps its href and refuses the click, because an anchor has no disabled attribute.',
+        render: () => (
+          <Row>
+            <Button asChild>
+              <a href="#as-a-link">Default</a>
+            </Button>
+            <Button asChild kind="primary">
+              <a href="#as-a-link">Primary</a>
+            </Button>
+            <Button asChild kind="ghost" size="sm">
+              <a href="#as-a-link">Ghost, small</a>
+            </Button>
+            <Button asChild disabled>
+              <a href="#as-a-link">Disabled</a>
+            </Button>
+          </Row>
+        ),
+      },
     ],
   },
   {

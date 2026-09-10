@@ -12,7 +12,8 @@
 /* Full width, for the one action a card or a step is about. Not a size: a
    `block` button is the same height as any other, it just stops being a thing
    you have to aim at. */
-button.block { display: flex; width: 100%; }
+button.block,
+a.btn.block { display: flex; width: 100%; }
 
 /* The default is `size-md`, spelled once for every control.
    The paragraph above promised one scale for buttons, inputs and selects, and
@@ -21,6 +22,7 @@ button.block { display: flex; width: 100%; }
    could line up. The download modal's search box against its Search button was
    the version you could see from across the room. */
 button,
+a.btn,
 input,
 textarea,
 select,

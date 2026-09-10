@@ -23,7 +23,10 @@ export { default as Brand } from './components/Brand'
 export { BRAND_MARKS, BRAND_NAMES } from './components/brandMarks'
 export type { BrandName, FillMark, Mark, StrokeMark } from './components/brandMarks'
 export { default as Button } from './components/Button'
-export type { Props as ButtonProps } from './components/Button'
+/** The union: the button's props, or the DOM's when `asChild` hands the
+ *  element to the caller. `ButtonOwnProps` is the button-only half, for a
+ *  wrapper that never slots. */
+export type { ButtonProps, Props as ButtonOwnProps } from './components/Button'
 export { default as Callout } from './components/Callout'
 export { default as Card } from './components/Card'
 export { default as Checkbox } from './components/Checkbox'

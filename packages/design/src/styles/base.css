@@ -82,7 +82,28 @@ body::before {
    where the flat grey reads as recessed rather than as something to use. It is
    derived rather than declared -- a new token would have to be added to every
    theme in `themes.ts`, and a theme that missed it would lose its controls. */
+/* An anchor drawn as a button. Three things the element brings that a
+   `<button>` does not, and all three have to go: the underline, the link
+   colour, and the text alignment a block anchor inherits. `cursor: pointer`
+   it already has. Disabled is `aria-disabled` here -- an anchor ignores the
+   native attribute -- so every `:disabled` rule above has an
+   `[aria-disabled='true']` twin rather than a rewrite, which leaves each
+   `button` selector at the specificity it had and every committed baseline
+   untouched. */
+a.btn {
+  text-decoration: none;
+  color: var(--text);
+  text-align: center;
+}
+
+a.btn[aria-disabled='true'] {
+  /* A disabled anchor still takes the pointer, so say so. The click itself is
+     blocked in the capture phase by the component. */
+  cursor: not-allowed;
+}
+
 button,
+a.btn,
 input,
 textarea,
 select {
@@ -106,7 +127,8 @@ select {
    the icon; the button simply had no opinion about how to arrange two things.
    `inline-flex` and a gap gives it one, and the gap replaces the space
    character people were putting between an icon and its label. */
-button {
+button,
+a.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -132,7 +154,8 @@ button[aria-pressed='true']:hover:not(:disabled) { border-color: var(--accent); 
 
 /* The glyph never shrinks: in a narrow row flexbox would take it from the icon
    before the text, and half an icon is not a smaller icon. */
-button > svg { flex: none; }
+button > svg,
+a.btn > svg { flex: none; }
 
 .size-sm { font-size: var(--text-xs); padding: var(--space-1) var(--space-2); }
 
@@ -158,6 +181,7 @@ input, textarea, select { width: 100%; }
 textarea { resize: none; }
 
 button:hover:not(:disabled),
+a.btn:hover:not([aria-disabled='true']),
 input:hover:not(:disabled),
 textarea:hover:not(:disabled),
 select:hover:not(:disabled) { border-color: var(--accent); }
@@ -166,6 +190,7 @@ select:hover:not(:disabled) { border-color: var(--accent); }
    `:focus` on the fields because a focused field is a place you are typing and
    should say so however you got there. */
 button:focus-visible,
+a.btn:focus-visible,
 input:focus,
 textarea:focus,
 select:focus { outline: none; border-color: var(--accent); }
@@ -259,11 +284,13 @@ input[type='checkbox']:disabled,
 input[type='radio']:disabled { cursor: not-allowed; background: var(--panel-2); }
 
 button:disabled,
+a.btn[aria-disabled='true'],
 input:disabled,
 textarea:disabled,
 select:disabled { opacity: 0.45; cursor: not-allowed; }
 
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+button.primary,
+a.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 /* A disabled primary is not a faded primary.
    `opacity: .45` was the whole of it, and a coloured fill at 45% is still a
@@ -271,7 +298,8 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
    thing on the panel. That got worse when onboarding started holding people at
    a disabled Next. So it gives up the fill entirely and becomes the shape of a
    disabled control -- the opacity then has nothing left to do. */
-button.primary:disabled {
+button.primary:disabled,
+a.btn.primary[aria-disabled='true'] {
   background: var(--panel-2);
   border-color: var(--border);
   color: var(--muted);
@@ -341,13 +369,15 @@ button[aria-busy='true']::after {
 
 /* Quiet: no border, no fill. For the action beside the action -- Cancel next to
    Save -- where a bordered box competes with the thing it is next to. */
-button.ghost {
+button.ghost,
+a.btn.ghost {
   background: transparent;
   border-color: transparent;
   color: var(--muted);
 }
 
-button.ghost:hover:not(:disabled) {
+button.ghost:hover:not(:disabled),
+a.btn.ghost:hover:not([aria-disabled='true']) {
   background: var(--panel-2);
   border-color: transparent;
   color: var(--text);
@@ -554,19 +584,22 @@ button.ghost:hover:not(:disabled) {
 /* `:where(button)` so this carries no specificity of its own: a component's
    press rule below -- a card, a tab, a rail item, all of them buttons --
    wins by coming later, instead of every one having to restate `button`. */
-:where(button):active:not(:disabled) {
+:where(button):active:not(:disabled),
+:where(a.btn):active:not([aria-disabled='true']) {
   background: color-mix(in srgb, var(--text) var(--press-ink), var(--control));
   border-color: var(--accent);
   transform: scale(var(--press-scale));
   transition: none;
 }
 
-button.primary:active:not(:disabled) {
+button.primary:active:not(:disabled),
+a.btn.primary:active:not([aria-disabled='true']) {
   background: color-mix(in srgb, var(--text) var(--press-ink), var(--accent));
   border-color: color-mix(in srgb, var(--text) var(--press-ink), var(--accent));
 }
 
-button.ghost:active:not(:disabled) {
+button.ghost:active:not(:disabled),
+a.btn.ghost:active:not([aria-disabled='true']) {
   background: color-mix(in srgb, var(--text) var(--press-ink), var(--panel-2));
   border-color: transparent;
 }
