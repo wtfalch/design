@@ -22,13 +22,13 @@
  * **Inlined rather than installed.** The npm package ships the whole set, and a
  * font or a bundle has to load before anything draws -- in an app that opens
  * offline, on a machine that has just downloaded it, that is a flash of missing
- * chrome on the one screen that has to inspire confidence. Nineteen glyphs cost
- * nothing and cannot fail to arrive.
+ * chrome on the one screen that has to inspire confidence. Forty-two glyphs
+ * cost nothing and cannot fail to arrive.
  *
  * `currentColor` throughout, so an icon takes the colour of the thing it sits
  * in and never needs a variant.
  *
- * Source names, if you need to add a twentieth from https://pepicons.com:
+ * Source names, if you need to add another from https://pepicons.com:
  *   chat      text-bubble
  *   settings  gear
  *   refresh   arrows-spin
@@ -49,7 +49,20 @@
  *   mic       microphone
  *   back      arrow-left
  *   spinner   arrow-spin
-  file      file
+ *   file      file
+ *   mail      letter
+ *   mail-open letter-open
+ *   pen       pen
+ *   send      paper-plane
+ *   trash     trash
+ *   paperclip paperclip
+ *   star      star
+ *   star-filled star-filled
+ *   search    loop          (Pepicons' name for a magnifier)
+ *   more      dots-x
+ *   menu      menu
+ *   reply     arrow-up-left
+ *   forward   arrow-up-right
  */
 
 import type { IconName } from './iconNames'
