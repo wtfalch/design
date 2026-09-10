@@ -312,6 +312,14 @@
     "v": "Stacked"
   },
   {
+    "c": "stat",
+    "v": "A row of tiles"
+  },
+  {
+    "c": "stat",
+    "v": "Bare, in a bordered row"
+  },
+  {
     "c": "table",
     "v": "Default"
   },

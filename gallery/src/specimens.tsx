@@ -51,6 +51,7 @@ import {
   Skeleton,
   Slider,
   SplitPane,
+  Stat,
   Table,
   Tabs,
   Textarea,
@@ -2214,6 +2215,61 @@ export const COMPONENTS: Component[] = [
               },
             ]}
           />
+        ),
+      },
+    ],
+  },
+  {
+    id: 'stat',
+    name: 'Stat',
+    blurb:
+      'valet drew this twice, on the portal overview and the organisation page ' +
+      'under /admin, and the same account’s numbers read as two products rather ' +
+      'than two views of one thing. Tabular figures are the reason it is not a ' +
+      'Card: a column of numbers is compared by where its digits sit.',
+    variants: [
+      {
+        name: 'A row of tiles',
+        note: 'The label leads, because a figure read before you know what it counts is a figure you read twice.',
+        render: () => (
+          <div
+            style={{
+              display: 'grid',
+              gap: 16,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(11rem, 1fr))',
+            }}
+          >
+            <Stat label="Active keys" value="1,284" note="Excludes revoked" />
+            <Stat label="Calls this month" value="98,203" note="Resets 1 October" />
+            <Stat label="Over ceiling" value="3" tone="warn" note="Of 47 organisations" />
+            <Stat label="Failed sends" value="0" tone="good" note="Last 24 hours" />
+          </div>
+        ),
+      },
+      {
+        name: 'Bare, in a bordered row',
+        note: 'A bordered tile inside a bordered row is two boxes saying one thing. This is valet’s `.v-figure`, the compact form its admin table already used.',
+        render: () => (
+          <Rows label="Organisations">
+            <DataRow
+              name="Northwind"
+              trail={<Stat look="bare" label="Calls" value="12,904" />}
+              pills={
+                <Pill tone="good" quiet inRow>
+                  active
+                </Pill>
+              }
+            />
+            <DataRow
+              name="Contoso"
+              trail={<Stat look="bare" label="Calls" value="431" />}
+              pills={
+                <Pill tone="warn" quiet inRow>
+                  suspended
+                </Pill>
+              }
+            />
+          </Rows>
         ),
       },
     ],

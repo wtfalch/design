@@ -34,6 +34,7 @@
    rule of equal specificity that came earlier would lose to whatever the
    sheets they cover happen to set. */
 @import './kbd.css';
+@import './stat.css';
 @import './scrollarea.css';
 @import './splitpane.css';
 @import './popover.css';

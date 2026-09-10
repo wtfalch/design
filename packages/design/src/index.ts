@@ -77,6 +77,9 @@ export type { Props as ScrollAreaProps } from './components/ScrollArea'
 export { default as Select } from './components/Select'
 export { default as SizeGrid } from './components/SizeGrid'
 export { default as Skeleton } from './components/Skeleton'
+/** One figure, with what it counts over it. Three apps drew this before it
+ *  was here. */
+export { default as Stat } from './components/Stat'
 export { default as Slider } from './components/Slider'
 /** Two panes and a handle between them, the handle being a real `separator`
  *  widget rather than a div with a mousedown listener. */
