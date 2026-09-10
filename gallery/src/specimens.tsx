@@ -47,6 +47,7 @@ import {
   Rows,
   ScrollArea,
   Select,
+  Shell,
   SizeGrid,
   Skeleton,
   Slider,
@@ -55,6 +56,7 @@ import {
   Table,
   Tabs,
   Textarea,
+  ThemeSwitch,
   ToastHost,
   Toggle,
   Tooltip,
@@ -2231,6 +2233,87 @@ export const COMPONENTS: Component[] = [
             ]}
           />
         ),
+      },
+    ],
+  },
+  {
+    id: 'shell',
+    name: 'Shell',
+    blurb:
+      'Three apps have one, all called shell.tsx, all the same six elements. It ' +
+      'gates nothing, which is worth saying because a frame looks like the place ' +
+      'to: a layout cannot reliably stop the page beneath it rendering, so every ' +
+      'page decides for itself who may see it.',
+    variants: [
+      {
+        name: 'Default',
+        note: 'A `<header>` and a `<main>`, so the landmarks exist. `brand` and `who` are slots, so a user menu or a theme control stays the app’s own client boundary.',
+        render: () => (
+          <div style={{ height: 300, overflow: 'hidden', resize: 'none' }}>
+            <Shell
+              brand={<strong>Management</strong>}
+              who={
+                <>
+                  <span className="quiet">will@wtfalch.dev</span>
+                  <Button kind="ghost" size="sm">
+                    Sign out
+                  </Button>
+                </>
+              }
+            >
+              <h1 style={{ margin: 0 }}>Organisations</h1>
+              <p className="quiet">Every organisation on this estate.</p>
+            </Shell>
+          </div>
+        ),
+      },
+      {
+        name: 'With a nav, wide',
+        note: 'manage kept `head-inner-wide` and `main-wide` as separate classes and had to remember all three; the measure is one custom property now.',
+        render: () => (
+          <div style={{ height: 300, overflow: 'hidden' }}>
+            <Shell
+              wide
+              brand={<strong>Northwind</strong>}
+              who={<ThemeSwitch product="tf" labelHidden />}
+              nav={
+                <Row>
+                  <Pill quiet inRow>
+                    Roles
+                  </Pill>
+                  <Pill quiet inRow>
+                    Members
+                  </Pill>
+                  <Pill quiet inRow>
+                    Security
+                  </Pill>
+                </Row>
+              }
+            >
+              <h1 style={{ margin: 0 }}>Members</h1>
+            </Shell>
+          </div>
+        ),
+      },
+    ],
+  },
+  {
+    id: 'themeswitch',
+    name: 'ThemeSwitch',
+    blurb:
+      'All three apps had one and the first forty lines were identical: the ' +
+      'guarded read, the guarded write, the assignment to data-theme. Two of the ' +
+      'three first-paint scripts beside them are byte-for-byte the same file.',
+    variants: [
+      {
+        name: 'Labelled',
+        note: 'The apps passed `aria-label="Appearance"` beside a visible “Appearance” span — the same string twice, which is the drift `Field` exists to stop. The label is rendered and pointed at, or hidden and used as the name, never both.',
+        render: () => <ThemeSwitch product="tf" />,
+      },
+      {
+        name: 'In a header',
+        note: 'A subset, in the order to show them. An id the product does not offer is dropped rather than thrown on.',
+        render: () => <ThemeSwitch product="tf" only={['night', 'paper']} labelHidden />,
       },
     ],
   },

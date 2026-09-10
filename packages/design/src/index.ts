@@ -76,6 +76,8 @@ export { default as ScrollArea } from './components/ScrollArea'
 export type { Props as ScrollAreaProps } from './components/ScrollArea'
 export { default as Select } from './components/Select'
 export { default as SizeGrid } from './components/SizeGrid'
+/** The frame a signed-in surface stands in. Gates nothing, on purpose. */
+export { default as Shell } from './components/Shell'
 export { default as Skeleton } from './components/Skeleton'
 /** One figure, with what it counts over it. Three apps drew this before it
  *  was here. */
@@ -90,6 +92,10 @@ export type { Column } from './components/Table'
 export { default as Tabs } from './components/Tabs'
 export type { Tab, TabGroup } from './components/Tabs'
 export { default as Textarea } from './components/Textarea'
+/** The theme control, and the blocking script that beats it to the paint. */
+export { default as ThemeSwitch } from './components/ThemeSwitch'
+export { THEME_STORAGE_KEY, themeChoiceScript, themeChoices, storedTheme } from './themes/choice'
+export type { ThemeChoice } from './themes/choice'
 export type { Props as TextareaProps } from './components/Textarea'
 /** `ToastHost` nests: one inside another renders through, so a package can
  *  wrap itself and still leave an application with a single region. */
