@@ -40,7 +40,10 @@ export { DangerAction, default as DangerZone } from './components/DangerZone'
 export { default as Dialog } from './components/Dialog'
 export { default as Empty } from './components/Empty'
 export { default as Field } from './components/Field'
-export type { FieldWiring } from './components/Field'
+/** The wiring a `Field` hands its control, and the hook that reads it —
+ *  its own module, so `Field.tsx` keeps its Fast Refresh boundary. */
+export { useFieldWiring } from './components/fieldWiring'
+export type { FieldWiring } from './components/fieldWiring'
 export { default as Icon } from './components/Icon'
 /** A person in one line -- initials, name, address -- and the two pure
  *  functions behind the disc, exported so a caller colouring something else

@@ -1654,6 +1654,34 @@ export const COMPONENTS: Component[] = [
         render: () => <FieldDemo />,
       },
       {
+        name: 'Plain children',
+        note:
+          'A function cannot cross the server boundary, so the render prop made ' +
+          'every page with a form a client component whether it needed to be or ' +
+          'not — which all three apps’ `design.ts` say, in the same sentence. ' +
+          'Plain children read the wiring from context instead. Explicit props ' +
+          'still win, so a caller that names an id means that id.',
+        render: () => (
+          <form
+            style={{ display: 'grid', gap: 12, maxWidth: 340 }}
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <Field label="Instance name" hint="Lowercase, no spaces.">
+              <Input name="instance" defaultValue="northwind" block />
+            </Field>
+            <Field label="Region" hint="Cannot be changed later.">
+              <Select name="region" defaultValue="sg" block>
+                <option value="sg">Singapore</option>
+                <option value="fra">Frankfurt</option>
+              </Select>
+            </Field>
+            <Field label="Notes" error="Say what this instance is for.">
+              <Textarea name="notes" rows={2} />
+            </Field>
+          </form>
+        ),
+      },
+      {
         name: 'The parts',
         note:
           'Both messages are wired to the input with `aria-describedby`, and an ' +

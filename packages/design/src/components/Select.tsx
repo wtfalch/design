@@ -80,6 +80,8 @@ function readOptions(children: ReactNode): Choice[] {
    `<button>` -- `onCopy` alone is typed against a different element. Call sites
    pass five things between them, so five is what this takes. */
 
+import { useFieldWiring } from './fieldWiring'
+
 import {
   Select as AriaSelect,
   Button,
@@ -102,6 +104,8 @@ interface Props {
   'aria-label'?: string
   'aria-labelledby'?: string
   disabled?: boolean
+  'aria-describedby'?: string
+  'aria-invalid'?: boolean
   /** What the form submits this under. Without it there is nothing to post,
    *  which is what sent callers back to a mirrored hidden input. */
   name?: string
@@ -132,19 +136,40 @@ export default function Select({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
   aside,
+  'aria-describedby': ariaDescribedBy,
+  'aria-invalid': ariaInvalid,
 }: Props) {
   const options = readOptions(children)
 
-  /* `title`, set on the element: React Aria's `Button` takes `id` and the
-     `aria-*` labelling props and filters the rest, the same `filterDOMProps`
-     that dropped `aria-busy` on `Button` and `aria-modal` on `Modal`. */
+  /* A `Select` is a `<button>`, and a button takes its accessible name from
+     its contents -- so `Field`'s `htmlFor` does not name it and the caller
+     used to repeat the label in an `aria-label`. Reading the wiring here is
+     what removes the second literal. Explicit props win throughout. */
+  const field = useFieldWiring()
+  const wiredId = id ?? field?.id
+  const wiredLabelledBy = ariaLabelledBy ?? (ariaLabel ? undefined : field?.labelId)
+
+  /* `title` and `aria-invalid`, set on the element: React Aria's `Button`
+     takes `id` and the *labelling* aria props -- label, labelledby,
+     describedby, details -- and filters the rest, the same `filterDOMProps`
+     that dropped `aria-busy` on `Button` and `aria-modal` on `Modal`.
+     `aria-invalid` is not on that list, so passing it as a prop typechecks,
+     reads correctly and does nothing at all. That is the third time this
+     has caught someone, which is why it is written down here too. */
   const control = useRef<HTMLButtonElement>(null)
+  const invalid = ariaInvalid ?? field?.['aria-invalid']
   useEffect(() => {
     const el = control.current
     if (!el) return
     if (title) el.title = title
     else el.removeAttribute('title')
   }, [title])
+  useEffect(() => {
+    const el = control.current
+    if (!el) return
+    if (invalid) el.setAttribute('aria-invalid', 'true')
+    else el.removeAttribute('aria-invalid')
+  }, [invalid])
 
   /* React Aria owns what was 13 KB of hand-rolled behaviour: the popover is
      positioned against the button and flips when the edge is near, which the
@@ -171,9 +196,14 @@ export default function Select({
       name={name}
       form={form}
       aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
+      aria-labelledby={wiredLabelledBy}
     >
-      <Button ref={control} id={id} className={`sel-control${size ? ` size-${size}` : ''}`}>
+      <Button
+        ref={control}
+        id={wiredId}
+        aria-describedby={ariaDescribedBy ?? field?.['aria-describedby']}
+        className={`sel-control${size ? ` size-${size}` : ''}`}
+      >
         <SelectValue className="sel-value">
           {({ selectedText, defaultChildren }) => selectedText ?? defaultChildren}
         </SelectValue>

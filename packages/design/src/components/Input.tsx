@@ -50,6 +50,7 @@ import { forwardRef, useState } from 'react'
 import { ToggleButton } from 'react-aria-components'
 
 import Icon from './Icon'
+import { useFieldWiring } from './fieldWiring'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'className'> {
@@ -69,6 +70,16 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
   { size = 'md', mono, block, className, type = 'text', ...rest },
   ref,
 ) {
+  /* What the `Field` above wired, when the caller did not thread it by hand.
+     Explicit props win: a caller that named an `id` meant that id, and a
+     render-prop `Field` spreading its wiring is passing the same values in
+     anyway. This is the fallback, not an override. */
+  const field = useFieldWiring()
+  const wired = {
+    id: rest.id ?? field?.id,
+    'aria-describedby': rest['aria-describedby'] ?? field?.['aria-describedby'],
+    'aria-invalid': rest['aria-invalid'] ?? field?.['aria-invalid'],
+  }
   const classes = [
     size === 'md' ? '' : `size-${size}`,
     mono ? 'mono' : '',
@@ -84,7 +95,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
   const [shown, setShown] = useState(false)
 
   if (type !== 'password') {
-    return <input ref={ref} type={type} className={classes || undefined} {...rest} />
+    return <input ref={ref} type={type} className={classes || undefined} {...rest} {...wired} />
   }
 
   return (
@@ -99,6 +110,11 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         autoCorrect={shown ? 'off' : undefined}
         spellCheck={shown ? false : undefined}
         {...rest}
+        /* After `rest`, always. `wired` already prefers what the caller
+           passed, and spreading `rest` last would put its `undefined` id
+           back over the one the field wired -- a key present with an
+           undefined value still overwrites. */
+        {...wired}
       />
       <ToggleButton
         className={`icon-btn ghost secret-eye${size === 'md' ? '' : ` size-${size}`}`}

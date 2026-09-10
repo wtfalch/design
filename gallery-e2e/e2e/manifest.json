@@ -141,6 +141,10 @@
   },
   {
     "c": "input",
+    "v": "Plain children"
+  },
+  {
+    "c": "input",
     "v": "The bare control"
   },
   {

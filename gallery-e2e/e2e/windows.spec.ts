@@ -77,3 +77,64 @@ test('a nested ToastHost renders through to one region', async ({ page }) => {
   await expect(page.locator('.toast')).toHaveCount(1)
   await expect(page.locator('.toasts')).toHaveCount(1)
 })
+
+/**
+ * The wiring reaches the control without a render prop.
+ *
+ * `Field`'s children used to have to be a function, which made every page
+ * with a form a client component. Plain children read the wiring from
+ * context instead -- and "read it" is the part a screenshot cannot show, so
+ * the attributes are measured.
+ *
+ * `aria-invalid` on `Select` is measured for a second reason: React Aria's
+ * `Button` filters every aria prop that is not a labelling one, so passing
+ * it typechecks and does nothing. It is set through a ref, like `title` and
+ * like `Button`'s `aria-busy` before it.
+ */
+test('Field wires plain children through context', async ({ page }) => {
+  await page.goto(specimenUrl({ c: 'input', v: 'Plain children' }, 'system'))
+
+  const wiring = await page.evaluate(() => {
+    const read = (el: Element | null) => ({
+      id: el?.getAttribute('id') ?? null,
+      describedby: el?.getAttribute('aria-describedby') ?? null,
+      invalid: el?.getAttribute('aria-invalid') ?? null,
+      labelledby: el?.getAttribute('aria-labelledby') ?? null,
+    })
+    const labelFor = (id: string | null) =>
+      id ? (document.querySelector(`label[for="${id}"]`)?.textContent ?? null) : null
+    const input = read(document.querySelector('input[name="instance"]'))
+    const select = read(document.querySelector('.sel-control'))
+    const textarea = read(document.querySelector('textarea[name="notes"]'))
+    return {
+      input,
+      select,
+      textarea,
+      inputLabel: labelFor(input.id),
+      /* A token list, not one id: React Aria puts the value span first and
+         appends what we passed, so the label is one of several. */
+      selectLabelText: (select.labelledby ?? '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .map((ref) => document.getElementById(ref)?.textContent ?? '')
+        .join(' '),
+      hintText: input.describedby
+        ? (document.getElementById(input.describedby)?.textContent ?? null)
+        : null,
+    }
+  })
+
+  // Every control got an id, and the label points at it.
+  expect(wiring.input.id).toBeTruthy()
+  expect(wiring.inputLabel).toContain('Instance name')
+  expect(wiring.hintText).toContain('Lowercase')
+
+  // A Select is a <button>, so `htmlFor` cannot name it: it takes the label's
+  // id instead, which is what removes the repeated aria-label.
+  expect(wiring.select.id).toBeTruthy()
+  expect(wiring.selectLabelText).toContain('Region')
+
+  // The error field is marked invalid and describes itself.
+  expect(wiring.textarea.invalid).toBe('true')
+  expect(wiring.textarea.describedby).toBeTruthy()
+})
