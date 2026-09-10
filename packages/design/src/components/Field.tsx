@@ -43,6 +43,13 @@ import { useId } from 'react'
 
 import { type FieldWiring, FieldWiringContext } from './fieldWiring'
 
+/* Re-exported here as well as from `fieldWiring.ts`, because this is where a
+   caller looks for it and #12's test imports it from this module. A `export
+   type` re-export is not a value export, so `Field.tsx` keeps the Fast
+   Refresh boundary `fastRefresh.test.ts` holds it to -- which is what forced
+   the hook and the context out of this file in the first place. */
+export type { FieldWiring } from './fieldWiring'
+
 export default function Field({
   label,
   hint,
