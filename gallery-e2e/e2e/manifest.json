@@ -9,6 +9,10 @@
   },
   {
     "c": "button",
+    "v": "As a link"
+  },
+  {
+    "c": "button",
     "v": "Busy"
   },
   {
@@ -144,6 +148,14 @@
     "v": "The parts"
   },
   {
+    "c": "kbd",
+    "v": "Beside a control"
+  },
+  {
+    "c": "kbd",
+    "v": "Default"
+  },
+  {
     "c": "menu",
     "v": "Grouped, with a description"
   },
@@ -252,6 +264,10 @@
     "v": "Disabled"
   },
   {
+    "c": "select",
+    "v": "In a form"
+  },
+  {
     "c": "sheet",
     "v": "From the bottom"
   },
@@ -296,12 +312,24 @@
     "v": "Stacked"
   },
   {
+    "c": "stat",
+    "v": "A row of tiles"
+  },
+  {
+    "c": "stat",
+    "v": "Bare, in a bordered row"
+  },
+  {
     "c": "table",
     "v": "Default"
   },
   {
     "c": "table",
     "v": "Empty"
+  },
+  {
+    "c": "tabs",
+    "v": "An explained badge"
   },
   {
     "c": "tabs",
@@ -330,6 +358,10 @@
   {
     "c": "textarea",
     "v": "The bare control"
+  },
+  {
+    "c": "toast",
+    "v": "Nested hosts"
   },
   {
     "c": "toast",

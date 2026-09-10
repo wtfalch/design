@@ -1,16 +1,19 @@
 /* Destructive, and legible as such standing still. */
-button.danger {
+button.danger,
+a.btn.danger {
   color: var(--bad);
   border-color: color-mix(in srgb, var(--bad) 45%, var(--border-strong));
 }
 
-button.danger:hover:not(:disabled) {
+button.danger:hover:not(:disabled),
+a.btn.danger:hover:not([aria-disabled='true']) {
   background: color-mix(in srgb, var(--bad) 12%, var(--panel));
   border-color: var(--bad);
   color: var(--bad);
 }
 
-button.danger:active:not(:disabled) {
+button.danger:active:not(:disabled),
+a.btn.danger:active:not([aria-disabled='true']) {
   background: color-mix(in srgb, var(--bad) 20%, var(--panel));
   border-color: var(--bad);
 }

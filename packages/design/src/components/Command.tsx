@@ -1,3 +1,12 @@
+'use client'
+
+/* Client, because this module's own JSX attaches handlers or calls hooks. A
+   server component may still import it -- that is the point -- it simply
+   renders on the client. The ones without this line (Brand, Empty, Icon,
+   Illustration, Pill, Progress, Skeleton, Stat, Textarea, Table) render on
+   the server, which is why the directive is per component rather than one
+   line at the package's front door. */
+
 import { useState } from 'react'
 import {
   Modal as AriaModal,
@@ -5,7 +14,6 @@ import {
   Dialog,
   Header,
   Input,
-  Keyboard,
   ListBox,
   ListBoxItem,
   ListBoxSection,
@@ -14,6 +22,8 @@ import {
   Text,
   useFilter,
 } from 'react-aria-components'
+
+import Kbd from './Kbd'
 
 import Icon from './Icon'
 import type { IconName } from './iconNames'
@@ -162,9 +172,7 @@ export default function Command({
                               </Text>
                             )}
                           </span>
-                          {command.shortcut && (
-                            <Keyboard className="cmd-key">{command.shortcut}</Keyboard>
-                          )}
+                          {command.shortcut && <Kbd className="cmd-key">{command.shortcut}</Kbd>}
                         </ListBoxItem>
                       ))}
                     </ListBoxSection>

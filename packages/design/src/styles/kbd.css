@@ -1,0 +1,12 @@
+/* One rule where there were two identical ones, in `menu.css` and
+   `command.css`. Both keep their class as well, so `Menu` and `Command` are
+   `.kbd .menu-key` and `.kbd .cmd-key` now: the declarations are the same, so
+   nothing moves, and the context classes stay available for a rule that ever
+   needs to tell the two apart. */
+.kbd {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--muted);
+  letter-spacing: var(--tracking);
+}

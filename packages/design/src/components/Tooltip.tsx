@@ -1,3 +1,12 @@
+'use client'
+
+/* Client, because this module's own JSX attaches handlers or calls hooks. A
+   server component may still import it -- that is the point -- it simply
+   renders on the client. The ones without this line (Brand, Empty, Icon,
+   Illustration, Pill, Progress, Skeleton, Stat, Textarea, Table) render on
+   the server, which is why the directive is per component rather than one
+   line at the package's front door. */
+
 /**
  * A tooltip. It was called `Explain`, which named the intention rather than the
  * thing -- so it sat in a catalogue beside Button and Callout as though it were

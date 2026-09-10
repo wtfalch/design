@@ -1,8 +1,16 @@
+'use client'
+
+/* Client, because this module's own JSX attaches handlers or calls hooks. A
+   server component may still import it -- that is the point -- it simply
+   renders on the client. The ones without this line (Brand, Empty, Icon,
+   Illustration, Pill, Progress, Skeleton, Stat, Textarea, Table) render on
+   the server, which is why the directive is per component rather than one
+   line at the package's front door. */
+
 import {
   Menu as AriaMenu,
   Popover as AriaPopover,
   Header,
-  Keyboard,
   MenuItem,
   MenuSection,
   MenuTrigger,
@@ -11,6 +19,8 @@ import {
   SubmenuTrigger,
   Text,
 } from 'react-aria-components'
+
+import Kbd from './Kbd'
 
 import Icon from './Icon'
 import type { IconName } from './iconNames'
@@ -109,7 +119,7 @@ function renderItem(item: Item): React.ReactNode {
           </Text>
         )}
       </span>
-      {item.shortcut && <Keyboard className="menu-key">{item.shortcut}</Keyboard>}
+      {item.shortcut && <Kbd className="menu-key">{item.shortcut}</Kbd>}
       {/* Inline rather than an `Icon`, following `Select`'s caret: one path,
           used here and nowhere else, and the icon set has no chevron. */}
       {item.items && (

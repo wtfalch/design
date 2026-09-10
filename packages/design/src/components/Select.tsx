@@ -1,3 +1,12 @@
+'use client'
+
+/* Client, because this module's own JSX attaches handlers or calls hooks. A
+   server component may still import it -- that is the point -- it simply
+   renders on the client. The ones without this line (Brand, Empty, Icon,
+   Illustration, Pill, Progress, Skeleton, Stat, Textarea, Table) render on
+   the server, which is why the directive is per component rather than one
+   line at the package's front door. */
+
 import { Children, type ReactNode, isValidElement, useEffect, useRef } from 'react'
 
 /**
@@ -20,6 +29,20 @@ import { Children, type ReactNode, isValidElement, useEffect, useRef } from 'rea
  * an announced role for free; a custom one owes every one of them. The ARIA
  * pattern is combobox-with-listbox, which is what a screen reader expects to
  * find when it lands on something that behaves like this.
+ *
+ * **`name` is what makes it a form control again, and the omission had a
+ * cost.** Keeping the old API kept `value` and `onChange` but not the one
+ * attribute a plain `<form action={…}>` needs: with nothing to submit under,
+ * a caller wanting one choice in a Server Action had to mirror the value into
+ * a hidden input beside the control and keep the two in step by hand. valet
+ * did exactly that for every `Select` on the page. This is the other half of
+ * 0.6.0, which gave `Checkbox` the same thing and stopped here.
+ *
+ * React Aria renders the hidden select itself, so the value posts, validation
+ * reaches it and a reset restores it -- none of which a mirrored input got
+ * right. Uncontrolled is now a real option: `name` with `defaultValue` and no
+ * `onChange` is a control the form reads at submit, which is what preserves a
+ * half-filled form through a failed action.
  */
 
 interface Choice {
@@ -79,6 +102,11 @@ interface Props {
   'aria-label'?: string
   'aria-labelledby'?: string
   disabled?: boolean
+  /** What the form submits this under. Without it there is nothing to post,
+   *  which is what sent callers back to a mirrored hidden input. */
+  name?: string
+  /** The form to submit with, when the control sits outside it. */
+  form?: string
   value?: string | number
   defaultValue?: string | number
   /** Native-select-shaped on purpose -- `e.target.value` -- because that is
@@ -97,6 +125,8 @@ export default function Select({
   defaultValue,
   onChange,
   disabled,
+  name,
+  form,
   id,
   title,
   'aria-label': ariaLabel,
@@ -138,6 +168,8 @@ export default function Select({
         if (key !== null) onChange?.({ target: { value: String(key) } })
       }}
       isDisabled={disabled}
+      name={name}
+      form={form}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
     >

@@ -1,0 +1,50 @@
+/* A figure with furniture. `--space-1` between the three lines because they
+   are one object read top to bottom, not three paragraphs. */
+.stat {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+/* Inside something already bordered. A bordered tile in a bordered row is two
+   boxes saying one thing. */
+.stat-bare {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  gap: 0;
+  line-height: 1.25;
+}
+
+.stat > p { margin: 0; }
+
+.stat-label {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* Tabular figures are the point: a column of numbers is compared by its
+   digits' positions, and proportional ones move them per row. */
+.stat-value {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-bare .stat-value { font-size: var(--text-sm); }
+
+.stat-note {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+/* Only the figure takes the colour. Colouring the label too makes the tile a
+   status box, and a tone here is a remark about the number. */
+.stat[data-tone='info'] .stat-value { color: var(--info); }
+.stat[data-tone='good'] .stat-value { color: var(--good); }
+.stat[data-tone='warn'] .stat-value { color: var(--warn); }
+.stat[data-tone='bad'] .stat-value { color: var(--bad); }

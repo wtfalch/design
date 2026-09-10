@@ -1,3 +1,12 @@
+'use client'
+
+/* Client, because this module's own JSX attaches handlers or calls hooks. A
+   server component may still import it -- that is the point -- it simply
+   renders on the client. The ones without this line (Brand, Empty, Icon,
+   Illustration, Pill, Progress, Skeleton, Stat, Textarea, Table) render on
+   the server, which is why the directive is per component rather than one
+   line at the package's front door. */
+
 /**
  * A button. The most-copied markup in the app, finally a component.
  *
@@ -21,12 +30,44 @@
  * off it, and not firing twice on a touch screen. `data-pressed`,
  * `data-hovered` and `data-focus-visible` land on the element, so the
  * stylesheet keeps describing states rather than tracking them.
+ *
+ * **`asChild` puts the styling on somebody else's element, and that is how a
+ * link becomes a button.** A control that takes you somewhere has to be an
+ * anchor: middle-click, cmd-click, "copy link address" and a screen reader's
+ * list of links all come from the element, not from what it looks like. Every
+ * consumer had drawn its own instead — valet's `.v-link-button`, manage's and
+ * app-template's `.app-link` — three hand-styled anchors chasing one button's
+ * appearance, which is the drift this package exists to stop.
+ *
+ * The alternative was an `href` prop rendering React Aria's `Link`, and
+ * `asChild` beats it on the case that actually occurs: in a Next app the
+ * anchor has to be `next/link`, or the whole page reloads. `href` would have
+ * meant every app wrapping its tree in a `RouterProvider` and remembering to;
+ * `asChild` lets the caller hand over the element they already wanted:
+ *
+ *     <Button asChild kind="primary"><Link href="/manage">Manage</Link></Button>
+ *
+ * It is the same shape chef-monorepo's `Button` uses, for the same reason.
+ *
+ * Two things do not survive the swap, both because the slotted element is not
+ * a `<button>`. `busy` is ignored: its countdown bar is drawn on the element
+ * this component would have rendered, and the child owns its own contents.
+ * And `disabled` cannot use the native attribute, which an anchor ignores, so
+ * it becomes `aria-disabled` plus a capture-phase block — `Slot` runs the
+ * child's own `onClick` before ours, so the capture phase is the only place
+ * left to stop it, and stopping propagation there is what a native disabled
+ * button does anyway: it emits no click at all.
  */
 
+import { Slot } from '@radix-ui/react-slot'
 import { useEffect, useRef } from 'react'
-import { Button as AriaButton, type ButtonProps } from 'react-aria-components'
+import { Button as AriaButton, type ButtonProps as AriaButtonProps } from 'react-aria-components'
 
-export interface Props extends Omit<ButtonProps, 'className' | 'style' | 'children'> {
+/** What this component adds, on either element. Kept separate from React
+ *  Aria's set so the `asChild` half of `ButtonProps` can have these without
+ *  the button-only ones -- `className` lives here, and React Aria's own
+ *  `className` is a function-or-string this package does not want. */
+export interface OwnProps {
   children?: React.ReactNode
   /** The same word every other control in the package uses. React Aria spells
    *  it `isDisabled`, and that still works; this one exists so a consumer does
@@ -64,17 +105,32 @@ export interface Props extends Omit<ButtonProps, 'className' | 'style' | 'childr
   className?: string
 }
 
-export default function Button({
-  kind = 'default',
-  disabled,
-  size = 'md',
-  busy,
-  block,
-  iconOnly,
-  className,
-  children,
-  ...rest
-}: Props) {
+export interface Props
+  extends OwnProps,
+    Omit<AriaButtonProps, 'className' | 'style' | 'children'> {}
+
+/** The button's own props, plus the slot switch. When `asChild` is set the
+ *  element is the caller's, so what may be passed alongside is the DOM's
+ *  attribute set rather than React Aria's — `onPress` and `type` have nothing
+ *  to attach to on an `<a>`. */
+export type ButtonProps =
+  | (Props & { asChild?: false })
+  | (OwnProps &
+      Omit<React.HTMLAttributes<HTMLElement>, 'className' | 'style' | 'children'> & {
+        asChild: true
+        children: React.ReactNode
+      })
+
+/* An anchor ignores `disabled`, and `Slot` runs the child's `onClick` before
+   ours, so the capture phase is the only place left to block it. */
+const blockActivation = (event: React.MouseEvent<HTMLElement>) => {
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+export default function Button(props: ButtonProps) {
+  const { kind = 'default', disabled, size = 'md', busy, block, iconOnly, className } = props
+
   const classes = [
     iconOnly ? 'icon-btn' : '',
     kind === 'default' ? '' : kind,
@@ -100,6 +156,10 @@ export default function Button({
    * *not* disabled -- "Working, not disabled", and the label stays because it
    * is the only thing saying what is taking so long. Swapping the semantics to
    * get a tidier call site would be changing behaviour nobody asked to change.
+   *
+   * Declared before the `asChild` branch below, because a hook cannot sit
+   * after a conditional return. It does nothing on that path: the ref is
+   * never attached, so there is no element to stamp.
    */
   const ref = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -108,6 +168,55 @@ export default function Button({
     if (busy) el.setAttribute('aria-busy', 'true')
     else el.removeAttribute('aria-busy')
   }, [busy])
+
+  if (props.asChild) {
+    /* The one class the button form does not carry. Every rule in the
+       stylesheet is written against the `button` element, which an anchor is
+       not, so the slotted element needs a hook of its own. Adding it here
+       rather than to `classes` above keeps the button's own class list, and
+       therefore every committed baseline, exactly as it was. */
+    const slotClasses = ['btn', classes].filter(Boolean).join(' ')
+
+    /* Narrowed by `props.asChild`, so what is left after the component's own
+       props is the DOM attribute set -- which is why an unknown `data-*`
+       reaches the child untouched. */
+    const {
+      asChild: _asChild,
+      kind: _kind,
+      disabled: _disabled,
+      size: _size,
+      busy: _busy,
+      block: _block,
+      iconOnly: _iconOnly,
+      className: _className,
+      children,
+      ...slotted
+    } = props
+
+    return (
+      <Slot
+        {...slotted}
+        aria-disabled={disabled || slotted['aria-disabled']}
+        onClickCapture={disabled ? blockActivation : slotted.onClickCapture}
+        className={slotClasses}
+      >
+        {children}
+      </Slot>
+    )
+  }
+
+  const {
+    asChild: _asChild,
+    kind: _kind,
+    disabled: _disabled,
+    size: _size,
+    busy: _busy,
+    block: _block,
+    iconOnly: _iconOnly,
+    className: _className,
+    children,
+    ...rest
+  } = props
 
   return (
     <AriaButton

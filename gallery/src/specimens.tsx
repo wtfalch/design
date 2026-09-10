@@ -36,6 +36,7 @@ import {
   Identity,
   Illustration,
   Input,
+  Kbd,
   Markdown,
   Menu,
   Modal,
@@ -50,6 +51,7 @@ import {
   Skeleton,
   Slider,
   SplitPane,
+  Stat,
   Table,
   Tabs,
   Textarea,
@@ -114,6 +116,30 @@ function TabsDemo() {
         { id: 'perm', label: 'Permissions', badge: '3' },
         { id: 'mem', label: 'Memories' },
         { id: 'gone', label: 'Discarded', disabled: true },
+      ]}
+    />
+  )
+}
+
+/** A badge that says what it means. Two of valet's admin tabs carried a mark
+ *  nobody could resolve and it went into a visible line instead, which is a
+ *  page working around a component. */
+function TabsBadgeDemo() {
+  const [at, setAt] = useState('keys')
+  return (
+    <Tabs
+      label="Organisation section"
+      value={at}
+      onChange={setAt}
+      tabs={[
+        { id: 'keys', label: 'Keys', badge: '3' },
+        {
+          id: 'limits',
+          label: 'Limits',
+          badge: '!',
+          badgeTitle: 'Over its monthly ceiling',
+        },
+        { id: 'people', label: 'People' },
       ]}
     />
   )
@@ -1177,6 +1203,11 @@ export const COMPONENTS: Component[] = [
       'The strip is one tab stop and the arrows move along it.',
     variants: [
       { name: 'Default', render: () => <TabsDemo /> },
+      {
+        name: 'An explained badge',
+        note: 'A badge is one or two characters, and a mark that terse either explains itself or does not. `badgeTitle` gives it a hover and an accessible name. Untitled badges are unchanged: the text stays part of the tab’s name, which is what makes “Keys 3” useful to hear.',
+        render: () => <TabsBadgeDemo />,
+      },
       { name: 'Vertical, grouped', render: () => <GroupedTabsDemo /> },
     ],
   },
@@ -1199,6 +1230,21 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <ToastHost>
             <ToastDemo />
+          </ToastHost>
+        ),
+      },
+      {
+        name: 'Nested hosts',
+        note:
+          'A host inside a host renders through, which is what lets a package wrap ' +
+          'itself. Pressing these pushes into the outer queue: one region, one pile ' +
+          'of messages. Without it `@wtfalch/email` had to write its own live region ' +
+          'rather than give an application two.',
+        render: () => (
+          <ToastHost>
+            <ToastHost>
+              <ToastDemo />
+            </ToastHost>
           </ToastHost>
         ),
       },
@@ -1321,6 +1367,26 @@ export const COMPONENTS: Component[] = [
             </Button>
             <Button iconOnly aria-label="Studio">
               <Icon name="code" />
+            </Button>
+          </Row>
+        ),
+      },
+      {
+        name: 'As a link',
+        note: 'A control that takes you somewhere is an anchor, and `asChild` puts the button’s styling on it. Middle-click, cmd-click and “copy link address” come from the element; the appearance is this component’s. The disabled one keeps its href and refuses the click, because an anchor has no disabled attribute.',
+        render: () => (
+          <Row>
+            <Button asChild>
+              <a href="#as-a-link">Default</a>
+            </Button>
+            <Button asChild kind="primary">
+              <a href="#as-a-link">Primary</a>
+            </Button>
+            <Button asChild kind="ghost" size="sm">
+              <a href="#as-a-link">Ghost, small</a>
+            </Button>
+            <Button asChild disabled>
+              <a href="#as-a-link">Disabled</a>
             </Button>
           </Row>
         ),
@@ -1541,6 +1607,29 @@ export const COMPONENTS: Component[] = [
           <Select aria-label="Theme" disabled defaultValue="a">
             <option value="a">Anthropic’s to set</option>
           </Select>
+        ),
+      },
+      {
+        name: 'In a form',
+        note: 'With `name` the control posts, so a plain `<form action={…}>` reads it at submit — no mirrored hidden input keeping a second copy of the value in step. React Aria renders the hidden select, so validation and reset reach it too. `Field` names it through `labelledBy`, which is what stops the label existing twice.',
+        render: () => (
+          <form
+            style={{ display: 'grid', gap: 10, maxWidth: 320 }}
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <Field label="Region" hint="Where the instance runs. Cannot be changed later.">
+              {(f) => (
+                <Select id={f.id} name="region" aria-labelledby={f.labelId} defaultValue="sg" block>
+                  <option value="sg">Singapore</option>
+                  <option value="fra">Frankfurt</option>
+                  <option value="iad">Virginia</option>
+                </Select>
+              )}
+            </Field>
+            <Button type="submit" kind="primary">
+              Create
+            </Button>
+          </form>
         ),
       },
     ],
@@ -2141,6 +2230,94 @@ export const COMPONENTS: Component[] = [
               },
             ]}
           />
+        ),
+      },
+    ],
+  },
+  {
+    id: 'stat',
+    name: 'Stat',
+    blurb:
+      'valet drew this twice, on the portal overview and the organisation page ' +
+      'under /admin, and the same account’s numbers read as two products rather ' +
+      'than two views of one thing. Tabular figures are the reason it is not a ' +
+      'Card: a column of numbers is compared by where its digits sit.',
+    variants: [
+      {
+        name: 'A row of tiles',
+        note: 'The label leads, because a figure read before you know what it counts is a figure you read twice.',
+        render: () => (
+          <div
+            style={{
+              display: 'grid',
+              gap: 16,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(11rem, 1fr))',
+            }}
+          >
+            <Stat label="Active keys" value="1,284" note="Excludes revoked" />
+            <Stat label="Calls this month" value="98,203" note="Resets 1 October" />
+            <Stat label="Over ceiling" value="3" tone="warn" note="Of 47 organisations" />
+            <Stat label="Failed sends" value="0" tone="good" note="Last 24 hours" />
+          </div>
+        ),
+      },
+      {
+        name: 'Bare, in a bordered row',
+        note: 'A bordered tile inside a bordered row is two boxes saying one thing. This is valet’s `.v-figure`, the compact form its admin table already used.',
+        render: () => (
+          <Rows label="Organisations">
+            <DataRow
+              name="Northwind"
+              trail={<Stat look="bare" label="Calls" value="12,904" />}
+              pills={
+                <Pill tone="good" quiet inRow>
+                  active
+                </Pill>
+              }
+            />
+            <DataRow
+              name="Contoso"
+              trail={<Stat look="bare" label="Calls" value="431" />}
+              pills={
+                <Pill tone="warn" quiet inRow>
+                  suspended
+                </Pill>
+              }
+            />
+          </Rows>
+        ),
+      },
+    ],
+  },
+  {
+    id: 'kbd',
+    name: 'Kbd',
+    blurb:
+      'The rule already existed twice, privately — `Menu`’s `.menu-key` and ' +
+      '`Command`’s `.cmd-key`, identical down to the property order — and neither ' +
+      'was reachable, so a consumer saying “press ⌘K” beside its own search box ' +
+      'drew a third. It is a `<kbd>`: “something you press”, not a styled word. ' +
+      'It draws the reminder and binds nothing.',
+    variants: [
+      {
+        name: 'Default',
+        render: () => (
+          <Row>
+            <Kbd>⌘K</Kbd>
+            <Kbd>Esc</Kbd>
+            <Kbd>Ctrl+Shift+P</Kbd>
+            <Kbd>/</Kbd>
+          </Row>
+        ),
+      },
+      {
+        name: 'Beside a control',
+        note: 'The shape the mail client had drawn by hand as `.mail-search-key`: a field that says what opens it without a sentence under it.',
+        render: () => (
+          <Row>
+            <Input aria-label="Search mail" defaultValue="" placeholder="Search" size="sm" />
+            <Kbd>/</Kbd>
+          </Row>
         ),
       },
     ],
