@@ -49,7 +49,7 @@
 import { forwardRef, useState } from 'react'
 import { ToggleButton } from 'react-aria-components'
 
-import Icon from './Icon'
+import Icon, { type IconName } from './Icon'
 import { useFieldWiring } from './fieldWiring'
 
 export interface Props
@@ -63,11 +63,20 @@ export interface Props
   /** Full width of whatever holds it. Inputs already are, by default; this is
    *  for the `size`d ones, which are not. */
   block?: boolean
+  /** A glyph inside the left edge. Decorative: it is `aria-hidden`, because
+   *  a magnifier beside a field called "Search" is the label said twice. */
+  icon?: IconName
+  /** Empty it. Given, a clear button appears inside the right edge whenever
+   *  the field has a value; the caller owns the value and does the clearing. */
+  onClear?: () => void
+  /** Inside the right edge, before the clear button. A `Kbd` saying what
+   *  opens this, which is what the mail client's `.mail-search-key` was. */
+  trailing?: React.ReactNode
   className?: string
 }
 
 const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { size = 'md', mono, block, className, type = 'text', ...rest },
+  { size = 'md', mono, block, className, type = 'text', icon, onClear, trailing, ...rest },
   ref,
 ) {
   /* What the `Field` above wired, when the caller did not thread it by hand.
@@ -94,8 +103,46 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
      React error, and a remount would drop the caret. */
   const [shown, setShown] = useState(false)
 
+  const glyph = { sm: 14, md: 16, lg: 18 }[size]
+
   if (type !== 'password') {
-    return <input ref={ref} type={type} className={classes || undefined} {...rest} {...wired} />
+    const box = (
+      <input ref={ref} type={type} className={classes || undefined} {...rest} {...wired} />
+    )
+    if (!icon && !onClear && !trailing) return box
+
+    /* Something to clear, rather than something that could be cleared: a
+       clear button over an empty field is a control that does nothing. Both
+       shapes of value are checked because either may be the caller's. */
+    const filled =
+      rest.value !== undefined
+        ? String(rest.value).length > 0
+        : String(rest.defaultValue ?? '').length > 0
+
+    return (
+      <span
+        className={`adorned adorned-${size}${block ? ' block' : ''}${icon ? ' adorned-icon' : ''}`}
+      >
+        {icon && <Icon name={icon} size={glyph} className="adorned-mark" aria-hidden />}
+        {box}
+        {(trailing || (onClear && filled)) && (
+          <span className="adorned-end">
+            {trailing}
+            {onClear && filled && (
+              <button
+                type="button"
+                className="icon-btn ghost adorned-clear"
+                aria-label="Clear"
+                onClick={onClear}
+                disabled={rest.disabled}
+              >
+                <Icon name="close" size={glyph} />
+              </button>
+            )}
+          </span>
+        )}
+      </span>
+    )
   }
 
   return (
@@ -123,7 +170,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         onChange={setShown}
         isDisabled={rest.disabled}
       >
-        <Icon name={shown ? 'eye-off' : 'eye'} size={{ sm: 14, md: 16, lg: 18 }[size]} />
+        <Icon name={shown ? 'eye-off' : 'eye'} size={glyph} />
       </ToggleButton>
     </span>
   )

@@ -133,6 +133,10 @@
   },
   {
     "c": "input",
+    "v": "A search box"
+  },
+  {
+    "c": "input",
     "v": "Labelled"
   },
   {

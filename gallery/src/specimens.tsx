@@ -126,6 +126,24 @@ function TabsDemo() {
 /** A badge that says what it means. Two of valet's admin tabs carried a mark
  *  nobody could resolve and it went into a visible line instead, which is a
  *  page working around a component. */
+/** The search box every consumer drew by hand: a glyph inside the left edge,
+ *  a key hint and a clear button inside the right. */
+function SearchInputDemo() {
+  const [q, setQ] = useState('northwind')
+  return (
+    <Input
+      aria-label="Search organisations"
+      icon="search"
+      placeholder="Search"
+      value={q}
+      onChange={(e) => setQ(e.target.value)}
+      onClear={() => setQ('')}
+      trailing={<Kbd>/</Kbd>}
+      block
+    />
+  )
+}
+
 function TabsBadgeDemo() {
   const [at, setAt] = useState('keys')
   return (
@@ -1652,6 +1670,20 @@ export const COMPONENTS: Component[] = [
           'Description above the input, error below — the order they are wanted ' +
           'in. Type a valid https:// URL and the second one recovers.',
         render: () => <FieldDemo />,
+      },
+      {
+        name: 'A search box',
+        note:
+          'A glyph inside the left edge, a key hint and a clear button inside the ' +
+          'right — four hand-written classes and an absolutely-positioned button in ' +
+          '`@wtfalch/email`. `onClear` is a callback, not a `clearable` flag: the ' +
+          'value is the caller’s, and a control that emptied itself would work ' +
+          'uncontrolled and silently do nothing controlled.',
+        render: () => (
+          <div style={{ maxWidth: 320 }}>
+            <SearchInputDemo />
+          </div>
+        ),
       },
       {
         name: 'Plain children',
