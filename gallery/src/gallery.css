@@ -341,3 +341,87 @@
 
 .demo-stack { display: grid; gap: var(--space-2); justify-items: start; }
 .demo-pager { width: min(30rem, 100%); }
+
+/* ---------------------------------------------------------------- the gallery's own
+
+   The gallery used to reach into the package's classes -- `set-hint`, `mono`,
+   `grow`, `truncate` and a dozen more -- which made "a component's classes are
+   private" a claim rather than a fact: the package's own harness was the
+   biggest consumer of the thing nobody was supposed to use.
+
+   These are the gallery's, `g-` prefixed, written in the token vocabulary
+   exactly as an app's own stylesheet is. They are deliberately not clever: the
+   point is that the package hands out components and tokens, and everything
+   else a page needs it writes itself. */
+
+/* `.g-mono` before `.g-hint`, which is the order the package has them in:
+   both set a font-size, so whichever comes last wins on an element carrying
+   both. Writing them the other way round made `g-mono g-hint` render at
+   `--text-sm` instead of `--text-xs`, which is a different size on every
+   specimen that pairs them. */
+.g-mono { font-family: var(--font-mono); font-size: var(--text-sm); }
+.g-hint { font-size: var(--text-xs); color: var(--muted); line-height: 1.45; }
+.g-muted { color: var(--muted); }
+.g-grow { flex: 1; min-width: 0; }
+.g-named { display: flex; align-items: center; min-width: 0; }
+
+/* A name beside its pills, and the two rules that make it work. The name
+   shrinks and ellipsises; the pills never do -- which is the whole failure
+   `Rows` exists to stop, and it lives in the descendants rather than in the
+   class itself. Copying `.named` without them made the pill wrap onto a
+   second line instead of the name truncating. */
+.g-named > .g-truncate { min-width: 0; flex: 0 1 auto; }
+.g-named > .pill { flex: none; }
+.g-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.g-row { display: flex; align-items: center; gap: var(--space-3); }
+.g-row-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  /* The divider, and the room around it. 7px top and bottom put the text
+     almost on the rule beneath it -- a divider separates two rows, and at that
+     spacing it reads as underlining the one above. */
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+/* The last row in a run has no rule under it: a divider separates two rows,
+   and one under the final row is underlining rather than separating.
+   `.set-row` carries the same `:has` rule in the package; copying the class
+   without it is how the pill specimens grew a line along the bottom. */
+.g-row-wrap:not(:has(~ .g-row-wrap)) { border-bottom: none; }
+
+/* A control in one of these rows takes its type from the row.
+   `slider.css` scopes `:where(.set-row) button` for the same reason: a button
+   at 25px beside a 35px select is a row that does not line up. The gallery
+   copied the class and not this, so every Select inside one came out a size
+   too large. */
+:where(.g-row-wrap) button { font-size: var(--text-xs); }
+
+.g-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  border-top: var(--border-width) solid var(--border);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+}
+.g-flat-card { background: transparent; border-color: var(--border); }
+.g-brand {
+  display: block;
+  height: calc(var(--text-md) * 1.5);
+  width: auto;
+  color: var(--good);
+  transform-origin: center;
+}
+
+/* The spinner, which was `.spin`. The keyframe is the gallery's too now --
+   borrowing `ds-spin` would be the same borrowing in a different costume. */
+@keyframes g-spin { to { transform: rotate(360deg); } }
+.g-spin { display: inline-block; animation: g-spin 900ms linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-spin { animation: none; }
+}

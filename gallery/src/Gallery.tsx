@@ -168,7 +168,7 @@ function Demo({ name, value }: { name: string; value: string }) {
   }
   // Whatever is left is a number or a keyword, and its value is the whole of
   // what it has to say.
-  return <span className="spec-demo-plain mono">{value || '—'}</span>
+  return <span className="spec-demo-plain g-mono">{value || '—'}</span>
 }
 
 function Swatch({ name, value }: { name: string; value: string }) {
@@ -178,8 +178,8 @@ function Swatch({ name, value }: { name: string; value: string }) {
         <Demo name={name} value={value} />
       </span>
       <span className="spec-token-body">
-        <span className="spec-token-name mono">{name}</span>
-        <span className="spec-token-value mono">{value}</span>
+        <span className="spec-token-name g-mono">{name}</span>
+        <span className="spec-token-value g-mono">{value}</span>
       </span>
     </div>
   )
@@ -220,12 +220,12 @@ export default function Gallery() {
     <div className={`spec-app${wide ? ' spec-wide' : ''}`}>
       <aside className="spec-rail">
         <div className="spec-brand">
-          <Brand className="brand" />
-          <span className="set-hint">components</span>
+          <Brand className="g-brand" />
+          <span className="g-hint">components</span>
         </div>
 
         <div className="spec-controls">
-          <label className="set-hint" htmlFor="spec-theme">
+          <label className="g-hint" htmlFor="spec-theme">
             Theme
           </label>
           {/* The app's own control, not a bare `<select>`. A gallery that
@@ -246,7 +246,7 @@ export default function Gallery() {
           </Select>
           <label className="spec-check">
             <input type="checkbox" checked={wide} onChange={(e) => setWide(e.target.checked)} />
-            <span className="set-hint">Wide</span>
+            <span className="g-hint">Wide</span>
           </label>
         </div>
 
@@ -259,7 +259,7 @@ export default function Gallery() {
               onClick={() => go(c.id)}
             >
               {c.name}
-              <span className="set-hint">{c.variants.length}</span>
+              <span className="g-hint">{c.variants.length}</span>
             </button>
           ))}
           <button
@@ -267,7 +267,7 @@ export default function Gallery() {
             className={`spec-link${current === TOKENS_PAGE ? ' on' : ''}`}
             onClick={() => go(TOKENS_PAGE)}
           >
-            Tokens<span className="set-hint">{tokens.length}</span>
+            Tokens<span className="g-hint">{tokens.length}</span>
           </button>
         </nav>
       </aside>
@@ -281,7 +281,7 @@ export default function Gallery() {
               <div key={v.name} className="spec-item">
                 <div className="spec-label">
                   <strong>{v.name}</strong>
-                  {v.note && <div className="set-hint">{v.note}</div>}
+                  {v.note && <div className="g-hint">{v.note}</div>}
                 </div>
                 {/* On the app's own surface, not the page's: most of these are
                     drawn to sit on a panel, and judging them against the wrong

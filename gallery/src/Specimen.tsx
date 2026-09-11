@@ -52,7 +52,7 @@ export default function Specimen({ target }: { target: Target }) {
       {target.chrome && (
         <div className="spec-label">
           <strong>{component.name}</strong>
-          <div className="set-hint">{variant.name}</div>
+          <div className="g-hint">{variant.name}</div>
         </div>
       )}
       {/* The same surface the gallery uses. Most of these are drawn to sit on a

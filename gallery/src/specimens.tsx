@@ -227,10 +227,10 @@ function DialogDemo() {
             </>
           }
         >
-          <div className="set-hint">
-            <code className="mono">qwen3:4b</code> wants to write to
-            <code className="mono"> ~/Documents/dev/tf</code>. Allowing this covers the whole folder
-            until you revoke it in Settings.
+          <div className="g-hint">
+            <code className="g-mono">qwen3:4b</code> wants to write to
+            <code className="g-mono"> ~/Documents/dev/tf</code>. Allowing this covers the whole
+            folder until you revoke it in Settings.
           </div>
         </Dialog>
       )}
@@ -245,7 +245,7 @@ function Peeps({ tone }: { tone?: string }) {
       {ILLUSTRATIONS.map((name) => (
         <figure key={name}>
           <Illustration name={name} size={120} />
-          <figcaption className="mono">{name}</figcaption>
+          <figcaption className="g-mono">{name}</figcaption>
         </figure>
       ))}
     </div>
@@ -260,7 +260,7 @@ function ModalDemo() {
       {open && (
         <Modal
           title="Model settings"
-          subtitle={<span className="grow truncate muted mono">qwen3:8b</span>}
+          subtitle={<span className="g-grow g-truncate g-muted g-mono">qwen3:8b</span>}
           onClose={() => setOpen(false)}
           width="min(520px, 100%)"
           footer={
@@ -274,13 +274,13 @@ function ModalDemo() {
             </>
           }
         >
-          <div className="set-row">
-            <span className="grow">What to call it</span>
+          <div className="g-row-wrap">
+            <span className="g-grow">What to call it</span>
             <Input defaultValue="qwen3:8b" aria-label="What to call this model" />
           </div>
-          <div className="set-row">
-            <span className="grow">Keep loaded for</span>
-            <span className="set-hint mono">5 minutes</span>
+          <div className="g-row-wrap">
+            <span className="g-grow">Keep loaded for</span>
+            <span className="g-hint g-mono">5 minutes</span>
           </div>
         </Modal>
       )}
@@ -301,11 +301,11 @@ function FieldDemo() {
         label="Server name"
         hint="How it appears in the tool list. Letters, digits and dashes."
       >
-        {(f) => <Input {...f} defaultValue="linear" className="mono" />}
+        {(f) => <Input {...f} defaultValue="linear" className="g-mono" />}
       </Field>
       <Field label="Server URL" required hint="An SSE or streamable-HTTP endpoint." error={bad}>
         {(f) => (
-          <Input {...f} className="mono" value={url} onChange={(e) => setUrl(e.target.value)} />
+          <Input {...f} className="g-mono" value={url} onChange={(e) => setUrl(e.target.value)} />
         )}
       </Field>
     </div>
@@ -485,10 +485,10 @@ function PickCard() {
     <div>
       {['bartowski/Qwen3-4B-GGUF', 'qwen3:4b'].map((id) => (
         <Card key={id} onClick={() => setAt(id)} selected={at === id}>
-          <div className="row">
-            <div className="grow">
-              <div className="truncate">{id}</div>
-              <div className="muted mono" style={{ marginTop: 'var(--space-1)' }}>
+          <div className="g-row">
+            <div className="g-grow">
+              <div className="g-truncate">{id}</div>
+              <div className="g-muted g-mono" style={{ marginTop: 'var(--space-1)' }}>
                 2.50 GB · installed
               </div>
             </div>
@@ -553,7 +553,7 @@ function CheckboxDemo() {
       ].map(([k, why]) => (
         <Checkbox
           key={k}
-          label={<span className="mono">{k}</span>}
+          label={<span className="g-mono">{k}</span>}
           hint={why}
           checked={on.includes(k)}
           onChange={() => flip(k)}
@@ -603,13 +603,13 @@ function SplitDemo({ direction = 'row' as 'row' | 'column' }) {
       >
         <div className="demo-pane">
           <strong>Mailboxes</strong>
-          <p className="set-hint">
+          <p className="g-hint">
             {Math.round(size)}% — drag the handle, or focus it and use the arrows.
           </p>
         </div>
         <div className="demo-pane demo-pane-2">
           <strong>Message</strong>
-          <p className="set-hint">Shift-arrow moves in tens. Enter collapses and restores.</p>
+          <p className="g-hint">Shift-arrow moves in tens. Enter collapses and restores.</p>
         </div>
       </SplitPane>
     </div>
@@ -659,7 +659,7 @@ function CommandDemo() {
   return (
     <div className="demo-stack">
       <Button onClick={() => setOpen(true)}>Open palette</Button>
-      {ran && <span className="set-hint">Ran: {ran}</span>}
+      {ran && <span className="g-hint">Ran: {ran}</span>}
       <Command
         open={open}
         onOpenChange={setOpen}
@@ -768,7 +768,7 @@ function ChipsDemo() {
           onRemove={() => setPeople((rest) => rest.filter((p) => p.address !== person.address))}
         />
       ))}
-      {people.length === 0 && <span className="set-hint">All removed. Reload to reset.</span>}
+      {people.length === 0 && <span className="g-hint">All removed. Reload to reset.</span>}
     </Row>
   )
 }
@@ -1003,12 +1003,12 @@ export const COMPONENTS: Component[] = [
             caption="Installed packages"
             keyOf={(p) => p.name}
             columns={[
-              { header: 'Package', cell: (p) => <span className="mono">{p.name}</span> },
-              { header: 'Version', cell: (p) => <span className="mono">{p.version}</span> },
+              { header: 'Package', cell: (p) => <span className="g-mono">{p.name}</span> },
+              { header: 'Version', cell: (p) => <span className="g-mono">{p.version}</span> },
               { header: 'Size', align: 'end', cell: (p) => p.size },
               {
                 header: 'Pulled in by',
-                cell: (p) => p.by ?? <span className="set-hint">asked for</span>,
+                cell: (p) => p.by ?? <span className="g-hint">asked for</span>,
               },
               {
                 header: 'Actions',
@@ -1147,9 +1147,9 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <div>
             {[0, 1, 2].map((i) => (
-              <div className="card" key={i}>
-                <div className="row">
-                  <div className="grow">
+              <Card key={i}>
+                <div className="g-row">
+                  <div className="g-grow">
                     <Skeleton width={`${52 - i * 9}%`} height={4} variant="rounded" />
                     <div style={{ marginTop: 'var(--space-2)' }}>
                       <Skeleton width="34%" height={3} variant="rounded" />
@@ -1157,7 +1157,7 @@ export const COMPONENTS: Component[] = [
                   </div>
                   <Skeleton width={28} height={9} variant="rounded" />
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         ),
@@ -1529,17 +1529,17 @@ export const COMPONENTS: Component[] = [
           'The three weights together, which is how they are actually met: one ' +
           'state, two capabilities, and the size left as text.',
         render: () => (
-          <div className="set-row">
-            <span className="grow">
-              <span className="named">
-                <span className="truncate">qwen3-8-27b-uncensored</span>
+          <div className="g-row-wrap">
+            <span className="g-grow">
+              <span className="g-named">
+                <span className="g-truncate">qwen3-8-27b-uncensored</span>
                 <Pill tone="info" inRow>
                   in use
                 </Pill>
                 <Pill inRow>thinks</Pill>
                 <Pill inRow>tools</Pill>
               </span>
-              <div className="set-hint">10.62 GB · 27.3B · quantisation not recorded</div>
+              <div className="g-hint">10.62 GB · 27.3B · quantisation not recorded</div>
             </span>
           </div>
         ),
@@ -1548,15 +1548,15 @@ export const COMPONENTS: Component[] = [
         name: 'When the name is too long',
         note: 'The name truncates and the pills keep their width. They used to be what got ellipsised away.',
         render: () => (
-          <div className="set-row" style={{ maxWidth: 420 }}>
-            <span className="grow" style={{ minWidth: 0 }}>
-              <span className="named">
-                <span className="truncate">
+          <div className="g-row-wrap" style={{ maxWidth: 420 }}>
+            <span className="g-grow" style={{ minWidth: 0 }}>
+              <span className="g-named">
+                <span className="g-truncate">
                   qwen3-6-27b-fable-fusion-711-uncensored-heretic-nm-dau-neo-max-mtp
                 </span>
                 <Pill inRow>reads images</Pill>
               </span>
-              <div className="set-hint">12.60 GB · 26.9B · IQ2_M</div>
+              <div className="g-hint">12.60 GB · 26.9B · IQ2_M</div>
             </span>
           </div>
         ),
@@ -1868,18 +1868,18 @@ export const COMPONENTS: Component[] = [
           'be a second `.card-head` for this — same class name, different rule — ' +
           'used by nothing but the page documenting it.',
         render: () => (
-          <Card icon="settings" title="Engines" className="card-flat">
-            <div className="set-row">
-              <span className="grow">
-                ollama<div className="set-hint">v0.33.2 · running</div>
+          <Card icon="settings" title="Engines" className="g-flat-card">
+            <div className="g-row-wrap">
+              <span className="g-grow">
+                ollama<div className="g-hint">v0.33.2 · running</div>
               </span>
               <Button kind="ghost" size="sm">
                 Remove
               </Button>
             </div>
-            <div className="set-row">
-              <span className="grow">
-                stable-diffusion.cpp<div className="set-hint">not installed</div>
+            <div className="g-row-wrap">
+              <span className="g-grow">
+                stable-diffusion.cpp<div className="g-hint">not installed</div>
               </span>
               <Button kind="primary" size="sm">
                 Install
@@ -1902,10 +1902,10 @@ export const COMPONENTS: Component[] = [
           'the whole page.',
         render: () => (
           <Card tone="bad">
-            <div className="row">
-              <div className="grow">
-                <div className="truncate">stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf</div>
-                <div className="muted mono" style={{ marginTop: 'var(--space-1)' }}>
+            <div className="g-row">
+              <div className="g-grow">
+                <div className="g-truncate">stable-diffusion-v1-5-pruned-emaonly-Q4_0.gguf</div>
+                <div className="g-muted g-mono" style={{ marginTop: 'var(--space-1)' }}>
                   Hugging Face answered 404
                 </div>
               </div>
@@ -1928,10 +1928,10 @@ export const COMPONENTS: Component[] = [
             title="Advanced"
             description="These change how the model engine runs. Saving one restarts it."
           >
-            <div className="set-row">
-              <span className="grow">
+            <div className="g-row-wrap">
+              <span className="g-grow">
                 <strong>Runs requests</strong>
-                <div className="set-hint">One at a time, or several per step.</div>
+                <div className="g-hint">One at a time, or several per step.</div>
               </span>
               <Select aria-label="How the engine runs requests" defaultValue="serialise">
                 <option value="serialise">One at a time</option>
@@ -1948,10 +1948,10 @@ export const COMPONENTS: Component[] = [
           'this, and they stay this.',
         render: () => (
           <Card>
-            <div className="row">
-              <div className="grow">
-                <div className="truncate">unsloth/Qwen2.5-VL-7B-Instruct-GGUF</div>
-                <div className="muted mono" style={{ marginTop: 'var(--space-1)' }}>
+            <div className="g-row">
+              <div className="g-grow">
+                <div className="g-truncate">unsloth/Qwen2.5-VL-7B-Instruct-GGUF</div>
+                <div className="g-muted g-mono" style={{ marginTop: 'var(--space-1)' }}>
                   1,204,993 downloads · 412 likes · apache-2.0
                 </div>
               </div>
@@ -1979,32 +1979,6 @@ export const COMPONENTS: Component[] = [
           'is what the app already did and losing a workspace costs one click.',
         render: () => <ModalDemo />,
       },
-      {
-        name: 'Shown inline',
-        note:
-          'The same parts, unportalled, so the shape is visible without covering ' + 'the page.',
-        render: () => (
-          <div className="modal" style={{ position: 'static', maxWidth: 460 }}>
-            <header className="modal-head">
-              <strong>Welcome</strong>
-              <span className="grow" />
-              <span className="set-hint mono">1 of 4</span>
-            </header>
-            <div className="modal-body">
-              <section className="set">
-                <h4>The engine</h4>
-                <div className="set-hint">TF does not run models itself — Ollama does.</div>
-              </section>
-            </div>
-            <footer className="set-actions first-run-actions">
-              <span className="grow" />
-              <Button kind="primary" isDisabled>
-                Next
-              </Button>
-            </footer>
-          </div>
-        ),
-      },
     ],
   },
   {
@@ -2019,9 +1993,9 @@ export const COMPONENTS: Component[] = [
         render: () => (
           <div>
             <div>Ordinary body text, at the base size.</div>
-            <div className="muted">Muted — secondary, still readable.</div>
-            <div className="set-hint">Hint — the small print under a control.</div>
-            <div className="mono">mono — paths, ids, anything you might copy</div>
+            <div className="g-muted">Muted — secondary, still readable.</div>
+            <div className="g-hint">Hint — the small print under a control.</div>
+            <div className="g-mono">mono — paths, ids, anything you might copy</div>
           </div>
         ),
       },
@@ -2031,7 +2005,7 @@ export const COMPONENTS: Component[] = [
           <div style={{ display: 'grid', gap: 6 }}>
             {(['2xs', 'xs', 'sm', 'base', 'md', 'lg', 'xl'] as const).map((s) => (
               <div key={s} style={{ fontSize: `var(--text-${s})` }}>
-                <span className="mono set-hint">--text-{s}</span> The quick brown fox
+                <span className="g-mono g-hint">--text-{s}</span> The quick brown fox
               </div>
             ))}
           </div>
@@ -2092,7 +2066,7 @@ export const COMPONENTS: Component[] = [
             {ICON_NAMES.map((n) => (
               <div key={n} className="spec-icon">
                 <Icon name={n} size={22} />
-                <span className="set-hint mono">{n}</span>
+                <span className="g-hint g-mono">{n}</span>
               </div>
             ))}
           </div>
@@ -2134,10 +2108,10 @@ export const COMPONENTS: Component[] = [
         note: 'A rotation, not a bounce: the dashboard re-renders every five seconds and a replaced node restarts its animation — a spin has no perceptible start, so the restart is invisible.',
         render: () => (
           <Row>
-            <Icon name="spinner" className="spin" />
-            <Icon name="spinner" className="spin" size={22} />
+            <Icon name="spinner" className="g-spin" />
+            <Icon name="spinner" className="g-spin" size={22} />
             <Button kind="primary" busy>
-              <Icon name="spinner" className="spin" size={15} /> Installing…
+              <Icon name="spinner" className="g-spin" size={15} /> Installing…
             </Button>
           </Row>
         ),
