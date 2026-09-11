@@ -12,8 +12,7 @@
 /* Full width, for the one action a card or a step is about. Not a size: a
    `block` button is the same height as any other, it just stops being a thing
    you have to aim at. */
-button.block,
-a.btn.block { display: flex; width: 100%; }
+.btn.block { display: flex; width: 100%; }
 
 /* The default is `size-md`, spelled once for every control.
    The paragraph above promised one scale for buttons, inputs and selects, and
@@ -21,12 +20,32 @@ a.btn.block { display: flex; width: 100%; }
    input was eight pixels taller than the button beside it and no row of the two
    could line up. The download modal's search box against its Search button was
    the version you could see from across the room. */
-button,
-a.btn,
+.btn,
 input,
 textarea,
 select,
 .sel-control { padding: var(--space-2) var(--space-3); }
+
+/* A control, so it wears the control styling -- and says so.
+ *
+ * `Select` renders React Aria's `Button`, which is a bare `<button>`: it took
+ * `font`, colour, the surface and the border from the
+ * `button, input, textarea, select` reset without ever asking for them. When
+ * that reset moved to `.btn` -- so a tab, a row and a card would stop
+ * inheriting control styling they only wanted to undo -- this control lost
+ * all of it at once, which is what the baselines showed.
+ *
+ * A rule of its own, and after `.size-sm` in the cascade. Stating
+ * `font: inherit` in the shared rule above instead put the shorthand ahead of
+ * `.size-sm`'s `font-size` and quietly made every small control full size. */
+.sel-control {
+  font: inherit;
+  color: var(--text);
+  background: var(--control);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
 
 /* Centred on the whole block -- the caption and the sentence together -- rather
    than aligned to either end of it. `.field-row` pins to the bottom, which is

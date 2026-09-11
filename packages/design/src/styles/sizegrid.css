@@ -4,6 +4,10 @@
 .size-grid { display: grid; gap: var(--space-1); }
 
 .size-cell {
+  /* The element rule made every bare button `inline-flex`; this one is a painted cell with no contents, so it says what it is. */
+  display: block;
+  /* Stated rather than inherited. These came from the `button, input, textarea, select` reset, which applied control styling to everything that happened to be a `<button>` -- so this rule spent its opening lines undoing it, and would break silently if that rule ever moved. It did move, to `.btn`. */
+  font: inherit;
   width: 18px; height: 14px; padding: 0;
   border: 1px solid var(--border); border-radius: var(--radius-sm);
   background: var(--panel-2); cursor: pointer;

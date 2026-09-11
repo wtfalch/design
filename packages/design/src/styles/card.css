@@ -1,4 +1,10 @@
 .card {
+  /* A card is a block, and was one only because it is usually a `<div>`. Pressable, it is a `<button>`, which the element rule made `inline-flex` and centred -- so the same card read as two different things depending on whether it had an onClick. Stated, it reads as one. */
+  display: block;
+  /* Stated rather than inherited. These came from the `button, input, textarea, select` reset, which applied control styling to everything that happened to be a `<button>` -- so this rule spent its opening lines undoing it, and would break silently if that rule ever moved. It did move, to `.btn`. */
+  font: inherit;
+  color: var(--text);
+  text-align: left;
   background: var(--panel);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-md);
@@ -73,7 +79,7 @@
 
 /* A card that is itself the choice. Reset first, because it is a `<button>`
    now and inherits a control's padding and centring. */
-button.card {
+.btn.card {
   display: block;
   width: 100%;
   text-align: left;

@@ -132,6 +132,12 @@ export default function Button(props: ButtonProps) {
   const { kind = 'default', disabled, size = 'md', busy, block, iconOnly, className } = props
 
   const classes = [
+    /* Always, on both elements. Every rule that used to hang off the `button`
+       element now hangs off this class, so the styling belongs to this
+       component rather than to whatever happens to be a `<button>` -- which
+       is what let a tab, a row and a card inherit control styling and then
+       spend five declarations undoing it. */
+    'btn',
     iconOnly ? 'icon-btn' : '',
     kind === 'default' ? '' : kind,
     size === 'md' ? '' : `size-${size}`,
@@ -170,12 +176,7 @@ export default function Button(props: ButtonProps) {
   }, [busy])
 
   if (props.asChild) {
-    /* The one class the button form does not carry. Every rule in the
-       stylesheet is written against the `button` element, which an anchor is
-       not, so the slotted element needs a hook of its own. Adding it here
-       rather than to `classes` above keeps the button's own class list, and
-       therefore every committed baseline, exactly as it was. */
-    const slotClasses = ['btn', classes].filter(Boolean).join(' ')
+    const slotClasses = classes
 
     /* Narrowed by `props.asChild`, so what is left after the component's own
        props is the DOM attribute set -- which is why an unknown `data-*`

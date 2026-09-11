@@ -77,6 +77,8 @@
 }
 
 .ident-remove {
+  /* Stated rather than inherited. These came from the `button, input, textarea, select` reset, which applied control styling to everything that happened to be a `<button>` -- so this rule spent its opening lines undoing it, and would break silently if that rule ever moved. It did move, to `.btn`. */
+  font: inherit;
   flex: none;
   display: inline-flex;
   align-items: center;
