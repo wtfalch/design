@@ -50,14 +50,20 @@
    * changed the leading of whatever it was put on -- which is invisible in a
    * single element and shows up as a sub-pixel shift of every line in a
    * screenshot. It is why eight `stat` baselines and twelve `progress` ones
-   * moved when nothing about their layout had. */
-  --text-2xs--line-height: inherit;
-  --text-xs--line-height: inherit;
-  --text-sm--line-height: inherit;
-  --text-base--line-height: inherit;
-  --text-md--line-height: inherit;
-  --text-lg--line-height: inherit;
-  --text-xl--line-height: inherit;
+   * moved when nothing about their layout had.
+   *
+   * `initial`, not `inherit`: `inherit` is still a declaration, and once the
+   * component sheets moved into a layer the utility started winning -- so
+   * `text-xs` began overriding `.set-hint`'s `line-height: 1.45` with
+   * `inherit`. `initial` removes the key, so `text-*` emits a font-size and
+   * nothing else. */
+  --text-2xs--line-height: initial;
+  --text-xs--line-height: initial;
+  --text-sm--line-height: initial;
+  --text-base--line-height: initial;
+  --text-md--line-height: initial;
+  --text-lg--line-height: initial;
+  --text-xl--line-height: initial;
 
   --text-2xs: var(--text-2xs);
   --text-xs: var(--text-xs);

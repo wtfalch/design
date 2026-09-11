@@ -2,8 +2,12 @@
    `?`, which is an offer to read more, and from a banner, which is a problem.
    The mark is a round `i` rather than an emoji so it takes the theme's colours
    and stays the same size as the text beside it. */
-/* An info-toned `.callout`, spelled the old way. Identical to it now rather than
-   nearly identical to it, which is the whole point of the consolidation: the
+/* An info-toned `.callout`, spelled the old way. Identical to it now rather
+   than nearly identical to it, which is the whole point of the consolidation.
+   (This comment has been unterminated since before the Tailwind branch -- it
+   stops mid-sentence and never closes, so the CSS parser merged it with the
+   one below and recovered. Nothing was lost from the stylesheet; the rest of
+   the sentence was. Closed here rather than guessed at.) */
 
 /* What is left once `Tooltip` draws its own mark: the hover and focus that
    reach the mark from its parent, and the tip -- whose closed and open
