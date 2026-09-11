@@ -57,14 +57,6 @@
 /* The binding, set in the mono face at the size of the small print. Right of
    the row and never the reason the row is wide: `flex: none` with the label
    taking the slack. */
-.menu-key {
-  flex: none;
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--muted);
-  letter-spacing: var(--tracking);
-}
-
 .menu-more { flex: none; color: var(--muted); }
 
 .menu-rule {

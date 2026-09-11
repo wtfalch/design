@@ -172,7 +172,7 @@ export default function Command({
                               </Text>
                             )}
                           </span>
-                          {command.shortcut && <Kbd className="cmd-key">{command.shortcut}</Kbd>}
+                          {command.shortcut && <Kbd>{command.shortcut}</Kbd>}
                         </ListBoxItem>
                       ))}
                     </ListBoxSection>

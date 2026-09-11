@@ -24,6 +24,11 @@
  * carries the slot wiring that lets `Menu` and `Command` place it, so this is
  * that component with the package's class on it rather than a new one.
  *
+ * **Drawn with utilities.** Its five declarations were a `.kbd` rule that
+ * `Menu` and `Command` reached for by class name; they are on the element
+ * now, so the component carries its own appearance and nothing else has to
+ * know the class exists.
+ *
  * **It draws the reminder; it does not bind anything.** Same contract as
  * `Menu`'s `shortcut` and `Command`'s: what actually listens for the chord is
  * the app's business, and a component that both drew a key and bound it would
@@ -42,5 +47,16 @@ export default function Kbd({
   children: React.ReactNode
   className?: string
 }) {
-  return <Keyboard className={['kbd', className].filter(Boolean).join(' ')}>{children}</Keyboard>
+  /* Utilities rather than a `.kbd` rule. Five declarations, each of which
+     reads as what it is at the call site: it never shrinks in a flex row, it
+     is the theme's mono face at the smallest step, and it is quiet. */
+  return (
+    <Keyboard
+      className={['flex-none font-mono text-2xs text-muted tracking-normal', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      {children}
+    </Keyboard>
+  )
 }

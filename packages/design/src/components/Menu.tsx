@@ -119,7 +119,7 @@ function renderItem(item: Item): React.ReactNode {
           </Text>
         )}
       </span>
-      {item.shortcut && <Kbd className="menu-key">{item.shortcut}</Kbd>}
+      {item.shortcut && <Kbd>{item.shortcut}</Kbd>}
       {/* Inline rather than an `Icon`, following `Select`'s caret: one path,
           used here and nowhere else, and the icon set has no chevron. */}
       {item.items && (

@@ -51,6 +51,13 @@
   --text-lg: var(--text-lg);
   --text-xl: var(--text-xl);
 
+  /* The faces. Tailwind ships defaults for both namespaces, so these are
+     overrides rather than additions: without them `font-mono` would emit
+     Tailwind's stack instead of the theme's, and a theme that changed its
+     mono face would stop reaching the components. */
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
   --font-weight-normal: var(--weight);
   --font-weight-strong: var(--weight-strong);
   --tracking-normal: var(--tracking);
@@ -74,6 +81,9 @@
   --color-warn: var(--warn);
   --color-bad: var(--bad);
   --color-info: var(--info);
+
+  /* One width, named, so `border` means the theme's hairline rather than 1px. */
+  --default-border-width: var(--border-width);
 
   --duration-fast: var(--dur-fast);
   --duration-md: var(--dur-md);
