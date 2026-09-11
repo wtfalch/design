@@ -41,16 +41,32 @@ export default function Shell({
   children: React.ReactNode
   className?: string
 }) {
+  /* Utilities: this component is layout and nothing else, which is where they
+     earn their place. The measure is the one thing that is not a utility --
+     it is a number two elements have to agree on, so it is a custom property
+     on the frame rather than a literal repeated in three class lists, which
+     is how manage ended up with `head-inner-wide` and `main-wide` as separate
+     classes and had to remember both. */
+  const measure = wide ? 'max-w-[var(--shell-measure-wide)]' : 'max-w-[var(--shell-measure)]'
+  const band = `w-full mx-auto px-4 ${measure}`
+
   return (
-    <div className={['shell', className].filter(Boolean).join(' ')}>
-      <header className="shell-head">
-        <div className={`shell-head-inner${wide ? ' shell-wide' : ''}`}>
+    <div
+      className={['shell flex flex-col min-h-screen surface-bg text-text', className]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      {/* `flex-none`, so a long page does not squeeze the header. */}
+      <header className="flex-none border-b border-border surface-panel">
+        <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
           {brand}
-          {who && <div className="shell-who">{who}</div>}
+          {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
         </div>
-        {nav && <div className={`shell-nav${wide ? ' shell-wide' : ''}`}>{nav}</div>}
+        {nav && <div className={`${band} pb-2`}>{nav}</div>}
       </header>
-      <main className={`shell-main${wide ? ' shell-wide' : ''}`}>{children}</main>
+      {/* `min-w-0` because a flex child will not shrink below its content, and
+          one wide table inside then pushes the whole page sideways. */}
+      <main className={`${band} flex-1 py-6 min-w-0`}>{children}</main>
     </div>
   )
 }

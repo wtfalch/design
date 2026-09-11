@@ -1,64 +1,14 @@
-/* The frame. Layout only: every colour and every step is a token, and the
-   page inside it owns its own spacing. */
-.shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-}
-
-.shell-head {
-  border-bottom: var(--border-width) solid var(--border);
-  background: var(--panel);
-  /* `flex: none` so a long page does not squeeze the header. */
-  flex: none;
-}
-
-/* The measure, said once. `--shell-measure` rather than a literal so an app
-   with a different one sets a variable instead of overriding three rules and
-   missing the fourth -- which is how manage ended up with `head-inner-wide`
-   and `main-wide` as separate classes. */
+/* The measure, and only the measure.
+ *
+ * `Shell` draws itself with utilities -- it is layout and nothing else. What
+ * stays here is the one value the header band, the nav band and the main band
+ * all have to agree on: a custom property, so an app changes it in one place
+ * rather than overriding three rules and missing the fourth. That is how
+ * manage ended up carrying `head-inner-wide` and `main-wide` as separate
+ * classes it had to remember together. */
 .shell {
   --shell-measure: 64rem;
   --shell-measure-wide: 90rem;
-}
-
-.shell-head-inner,
-.shell-nav,
-.shell-main {
-  width: 100%;
-  max-width: var(--shell-measure);
-  margin-inline: auto;
-  padding-inline: var(--space-4);
-}
-
-.shell-wide { max-width: var(--shell-measure-wide); }
-
-.shell-head-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding-block: var(--space-3);
-  min-width: 0;
-}
-
-.shell-who {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-width: 0;
-}
-
-.shell-nav { padding-bottom: var(--space-2); }
-
-.shell-main {
-  flex: 1;
-  padding-block: var(--space-6);
-  /* `min-width: 0` because a flex child will not shrink below its content,
-     and one wide table inside then pushes the whole page sideways. */
-  min-width: 0;
 }
 
 /* The label beside the theme control, when it is drawn. */
