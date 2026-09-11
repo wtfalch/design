@@ -90,22 +90,31 @@ body::before {
    `[aria-disabled='true']` twin rather than a rewrite, which leaves each
    `button` selector at the specificity it had and every committed baseline
    untouched. */
- {
+.btn {
+  /* The three an anchor brings that a `<button>` does not. Harmless on the
+     button form -- it has no underline and centres already -- and the reason
+     `Button` puts one class on both elements rather than keeping a twin
+     selector for each. */
   text-decoration: none;
   color: var(--text);
   text-align: center;
 }
 
- {
+.btn[aria-disabled='true'] {
   /* A disabled anchor still takes the pointer, so say so. The click itself is
      blocked in the capture phase by the component. */
   cursor: not-allowed;
 }
 
-.btn,
-input,
-textarea,
-select {
+/* `:where`, so this base carries no specificity of its own.
+ *
+ * It was `button, input, textarea, select` -- an element selector, which
+ * `.size-sm` and every other class outranked without anyone thinking about
+ * it. Moving it to `.btn` to stop a tab inheriting a control's look raised it
+ * to a class, so it tied with `.size-sm` and won on source order: every
+ * button came out `8px 12px` whatever size it asked for. `:where` puts it
+ * back to zero, which is what the element selector was silently providing. */
+:where(.btn, input, textarea, select) {
   font: inherit;
   color: var(--text);
   background: var(--control);
@@ -153,6 +162,30 @@ select {
 /* The glyph never shrinks: in a narrow row flexbox would take it from the icon
    before the text, and half an icon is not a smaller icon. */
 .btn > svg { flex: none; }
+
+/* `Select`'s control wears the control styling, and says so.
+ *
+ * It renders React Aria's `Button` -- a bare `<button>` -- and used to take
+ * `font`, colour, the surface and the border from the
+ * `button, input, textarea, select` reset without asking. When that reset
+ * moved to `.btn`, so a tab and a row would stop inheriting a control's look
+ * only to undo it, this lost all of it at once.
+ *
+ * Here rather than in `select.css`, and that placement is the rule, not
+ * tidiness: `font` is a shorthand and it resets `font-size`, so declared
+ * after `.size-sm` below it silently makes every small control full size.
+ * `index.css` says the import order is behaviour; this is what that means.
+ *
+ * `:where` for the same reason the reset above uses it: this is a base a
+ * `size` class has to be able to beat, and a bare class ties with one. */
+:where(.sel-control) {
+  font: inherit;
+  color: var(--text);
+  background: var(--control);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
 
 .size-sm { font-size: var(--text-xs); padding: var(--space-1) var(--space-2); }
 
@@ -279,6 +312,7 @@ input[type='checkbox']:disabled,
 input[type='radio']:disabled { cursor: not-allowed; background: var(--panel-2); }
 
 .btn:disabled,
+.btn[aria-disabled='true'],
 input:disabled,
 textarea:disabled,
 select:disabled { opacity: 0.45; cursor: not-allowed; }
@@ -831,4 +865,19 @@ input:active, textarea:active, select:active { transform: none; }
 .sel-control:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* The anchor form's disabled states, alongside the button's.
+ *
+ * `.btn` is one class on two elements, and an `<a>` has no `:disabled` -- it
+ * carries `aria-disabled` and a capture-phase click block instead. Every
+ * rule above that reads `:disabled` needs the attribute twin, or a disabled
+ * link is a link that looks pressable and refuses silently. Folding the old
+ * `a.btn` twins into `.btn` dropped these, and the baselines showed a
+ * disabled link at full strength. */
+.btn.primary[aria-disabled='true'] {
+  background: var(--panel-2);
+  border-color: var(--border);
+  color: var(--muted);
+  opacity: 1;
 }

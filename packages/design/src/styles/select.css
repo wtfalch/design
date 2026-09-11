@@ -20,32 +20,23 @@
    input was eight pixels taller than the button beside it and no row of the two
    could line up. The download modal's search box against its Search button was
    the version you could see from across the room. */
-.btn,
-input,
-textarea,
-select,
+/* `:where`, so this base carries no specificity of its own.
+ *
+ * It was `button, input, textarea, select` -- an element selector, which
+ * `.size-sm` and every other class outranked without anyone thinking about
+ * it. Moving it to `.btn` to stop a tab inheriting a control's look raised it
+ * to a class, so it tied with `.size-sm` and won on source order: every
+ * button came out `8px 12px` whatever size it asked for. `:where` puts it
+ * back to zero, which is what the element selector was silently providing. */
+:where(.btn, input, textarea, select) { padding: var(--space-2) var(--space-3); }
+
+/* The select's control keeps its padding at full class weight, and after
+   `.size-sm` in the cascade, because that is where it has always been: this
+   file is imported after `base.css`, so a `size`d select took the size's type
+   and this padding. Folding it into the `:where` above handed the padding
+   back to `.size-sm` and shrank every small select by seven pixels. */
 .sel-control { padding: var(--space-2) var(--space-3); }
 
-/* A control, so it wears the control styling -- and says so.
- *
- * `Select` renders React Aria's `Button`, which is a bare `<button>`: it took
- * `font`, colour, the surface and the border from the
- * `button, input, textarea, select` reset without ever asking for them. When
- * that reset moved to `.btn` -- so a tab, a row and a card would stop
- * inheriting control styling they only wanted to undo -- this control lost
- * all of it at once, which is what the baselines showed.
- *
- * A rule of its own, and after `.size-sm` in the cascade. Stating
- * `font: inherit` in the shared rule above instead put the shorthand ahead of
- * `.size-sm`'s `font-size` and quietly made every small control full size. */
-.sel-control {
-  font: inherit;
-  color: var(--text);
-  background: var(--control);
-  border: var(--border-width) solid var(--border-strong);
-  border-radius: var(--radius);
-  cursor: pointer;
-}
 
 /* Centred on the whole block -- the caption and the sentence together -- rather
    than aligned to either end of it. `.field-row` pins to the bottom, which is
