@@ -21,12 +21,36 @@ cd gallery-e2e && bash ../tools/e2e-docker.sh npx playwright test   # the visual
 
 Behaviour comes from React Aria Components 1.21 — roles, keyboard, focus
 management, touch, dismissal. Every pixel is ours, styled off the token
-vocabulary through `data-*` attributes. No Tailwind, no utility layer. The
+vocabulary through `data-*` attributes. Tailwind is wired to that vocabulary
+as of 0.9.0 -- every scale points at its token, and there is no preflight,
+because this package styles `button`, `input`, `select` and `textarea` by
+element and the reset would unstyle all of them. A component may draw itself
+with utilities where its own class is private, which is now all of them. The
 package README has the vocabulary and how to write a theme. This file has the
 rules, each with the bug that produced it, because a rule without its reason
 gets argued away by the next person who finds it inconvenient. Most of them
 were learned in tf and moved here with the code on 2026-09-05; tf's
 `dashboard/CLAUDE.md` keeps the ones about *using* the system.
+
+## The package hands out components and tokens, not classes
+
+A class here is an implementation detail, and `test/privateClasses.test.ts`
+fails if anything outside the package names one. The rule exists because
+moving `Card`'s box into its own class list deleted `.card` from the
+stylesheet and nothing in this package failed -- no type error, no red test.
+It broke in the gallery, which had been rendering `<div className="card">`
+around three skeleton rows.
+
+It is not a tidiness rule. A class looks like one declaration block and is
+actually that block plus its descendants (`.named > .pill { flex: none }`),
+its structural exceptions (`.set-row:not(:has(~ .set-row))`), its context
+rules (`:where(.set-row) button`) and its position in the cascade (`.mono`
+before `.set-hint`, because both set a font-size). Copying one means copying
+all five, and the gallery's own migration got each of them wrong once before
+the baselines caught it.
+
+What a consumer gets instead: the components, and `tokens.css`. An app writes
+its own layout in the token vocabulary, prefixed, the way `app-template` does.
 
 ## The docblocks are the documentation
 

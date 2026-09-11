@@ -7,6 +7,24 @@ product can look like itself without forking the stylesheet.
 pnpm add @wtfalch/design
 ```
 
+## What is public
+
+The components, and the tokens. Not the classes.
+
+A class in this package is an implementation detail: `.card`, `.set-row`,
+`.pill` and the rest may be renamed or deleted whenever the component that
+draws them changes, and 0.9.0 did exactly that to several of them. If you
+need a card, render `<Card>`; if you need a row of your own, write it in the
+token vocabulary:
+
+```css
+.app-row { display: flex; gap: var(--space-3); align-items: center; }
+```
+
+`tokens.css` ships separately for that, and every value a theme can change is
+in it. An app that wants utilities should run Tailwind over its own source --
+this package's stylesheet is compiled and does not need it.
+
 ```ts
 import '@wtfalch/design/tokens.css'   // the vocabulary and its base values
 import '@wtfalch/design/styles.css'   // the components
