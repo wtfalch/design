@@ -119,6 +119,19 @@
 
 /* The tick marks the chosen row. Colour alone would not: a list where the only
    difference is a hue is a list you cannot read past. */
+/* The tick's resting state lives here, beside the state that overrides it.
+ *
+ * It was `opacity-0` on the element and `opacity: 1` here, which worked only
+ * while this sheet was unlayered. A utility is in `@layer utilities` and
+ * beats `@layer components` whatever the selector, so the moment the sheets
+ * moved into a layer the tick stopped appearing on the selected row -- the
+ * resting state won permanently.
+ *
+ * The rule generalises: a utility for a resting state whose active state is a
+ * relationship between elements will always beat that active state. The pair
+ * has to sit in the same layer. */
+.sel-tick { opacity: 0; }
+
 .sel-item[data-selected] .sel-tick { opacity: 1; }
 
 /* The icon on a speaker's row in the open list -- `Select`'s `aside`. Last in

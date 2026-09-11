@@ -65,10 +65,14 @@ export default function SizeGrid({
              cell with no contents, so it says it is a block rather than
              taking a control's arrangement -- is here. */
           className={[
-            'size-cell block w-[18px] h-[14px] p-0 rounded-sm border border-border surface-panel-2 cursor-pointer',
+            /* Geometry here; colour in `sizegrid.css`. The cell's resting border and
+             surface are the thing `on` and `chosen` override, and a utility
+             beats a component rule once the sheets are layered -- so stated
+             here they would win permanently and no cell would ever light up. */
+            'size-cell block w-[18px] h-[14px] p-0 rounded-sm cursor-pointer',
             'disabled:cursor-default disabled:opacity-50',
             on ? 'on' : '',
-            chosen && !hover ? 'border-accent' : '',
+            chosen && !hover ? 'chosen' : '',
           ]
             .filter(Boolean)
             .join(' ')}
