@@ -73,7 +73,7 @@ export default function Card({
           <Icon name={icon} size={20} />
         </span>
       )}
-      <div className="card-headings min-w-0 flex-1">
+      <div className="min-w-0 flex-1">
         {title && <strong className="card-title">{title}</strong>}
         {description && <div className="card-desc">{description}</div>}
       </div>
@@ -91,8 +91,7 @@ export default function Card({
      a pressable card is a `<button>`, which shrink-wraps: a row of cards
      became a row of labels the moment one gained an `onClick`. */
   const cls = [
-    'card block w-full box-border text-left [font:inherit] text-text',
-    'surface-panel border border-border rounded-md p-3 mb-3',
+    'card',
     onClick ? 'card-pick' : '',
     selected ? 'card-on' : '',
     tone ? `card-${tone}` : '',

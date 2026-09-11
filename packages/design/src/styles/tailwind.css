@@ -43,6 +43,22 @@
 
   /* Type. `--text-base` is the theme's own `--font-size`, so a density or a
      type-scale change moves every utility with it. */
+  /* Each step also clears the line-height Tailwind pairs with it.
+   *
+   * `text-sm` in v4 is two declarations, `font-size` *and* `line-height`, and
+   * the vocabulary's `--text-sm` is one. So every `text-*` utility silently
+   * changed the leading of whatever it was put on -- which is invisible in a
+   * single element and shows up as a sub-pixel shift of every line in a
+   * screenshot. It is why eight `stat` baselines and twelve `progress` ones
+   * moved when nothing about their layout had. */
+  --text-2xs--line-height: inherit;
+  --text-xs--line-height: inherit;
+  --text-sm--line-height: inherit;
+  --text-base--line-height: inherit;
+  --text-md--line-height: inherit;
+  --text-lg--line-height: inherit;
+  --text-xl--line-height: inherit;
+
   --text-2xs: var(--text-2xs);
   --text-xs: var(--text-xs);
   --text-sm: var(--text-sm);

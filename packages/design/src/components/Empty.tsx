@@ -54,7 +54,7 @@ export default function Empty({
   return (
     <div
       className={[
-        'grid justify-items-center text-center rounded-md',
+        'nothing-surface-or-slot grid justify-items-center text-center rounded-md',
         /* Dashed rather than solid: a solid border reads as a thing, and the
            point of this box is that there is no thing -- it marks out where
            the list will be. */
@@ -76,7 +76,7 @@ export default function Empty({
            follows it -- the same grey as the sentence under it, in every
            theme. `.illo` sets `color: inherit`, so this has to out-rank a
            single class: `text-muted` on the element itself does. */
-        <Illustration name={illustration} size={160} className="text-muted" />
+        <Illustration name={illustration} size={160} className="nothing-figure" />
       ) : (
         icon && (
           <span className="text-muted leading-[0]" aria-hidden="true">

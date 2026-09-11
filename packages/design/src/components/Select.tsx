@@ -237,7 +237,7 @@ export default function Select({
         offset={4}
         maxHeight={280}
       >
-        <ListBox className="sel-listbox">
+        <ListBox>
           {options.map((o) => (
             <ListBoxItem
               key={o.value}

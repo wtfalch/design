@@ -1,3 +1,29 @@
+/* `.card` is public API, not this component's private styling.
+ *
+ * Consumers apply it to their own markup -- the gallery's skeleton specimen
+ * renders `<div className="card">` around three rows, and app-template uses
+ * `card-pick`. Moving the box into `Card`'s own class list took that away
+ * with no type error and no failing test in this package: it broke only
+ * where somebody else had used the class, which is the worst way for an API
+ * to go.
+ *
+ * So the rule stays and `Card` wears it. The lesson generalises to every
+ * class in this package that a consumer can reach: a component may draw
+ * itself with utilities only where its class is genuinely private. */
+.card {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
 /* What is left once `Card` draws its own box: the tones, the pick and
    selected states, and the rules that reach from the card into what it
    holds. `:has(.card-icon) .card-inline` is a relationship, and a tone is a

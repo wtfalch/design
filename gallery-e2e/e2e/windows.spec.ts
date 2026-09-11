@@ -252,3 +252,53 @@ for (const theme of THEMES) {
     await expect(list).toHaveScreenshot(`select--open--${theme}.png`)
   })
 }
+
+/**
+ * Every surface that only exists while it is open.
+ *
+ * `visual.spec.ts` photographs a specimen's stage at rest, and each of these
+ * is portalled out of it -- so the committed baseline was the closed trigger
+ * and nothing else. `menu--on-a-message` is a picture of a button reading
+ * "Actions"; the sheet it opens had never been photographed at all.
+ *
+ * That is not hypothetical. The toast's dismiss control and the select's
+ * list were both changed in this branch and both looked wrong before anyone
+ * noticed, because nothing was watching them. These four close the rest of
+ * the gap.
+ */
+const OPENED = [
+  { c: 'menu', v: 'On a message', trigger: /actions/i, surface: '.menu-sheet' },
+  { c: 'command', v: 'Open it', trigger: /command|open/i, surface: '.cmd' },
+  { c: 'popover', v: 'A pane of controls', trigger: /./, surface: '.pop' },
+] as const
+
+for (const o of OPENED) {
+  for (const theme of THEMES) {
+    test(`${o.c} · open · ${theme}`, async ({ page }) => {
+      await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') })
+      await page.goto(specimenUrl({ c: o.c, v: o.v }, theme))
+      await themeApplied(page, theme)
+      await page.getByRole('button', { name: o.trigger }).first().click()
+
+      const surface = page.locator(o.surface).first()
+      await expect(surface).toBeVisible()
+      await page.evaluate(() => document.fonts.ready)
+      await expect(surface).toHaveScreenshot(`${o.c}--open--${theme}.png`)
+    })
+  }
+}
+
+/*
+ * The tooltip's tip is NOT photographed, and that is a known gap rather than
+ * an oversight.
+ *
+ * It opens on a pointer timer and fades in, so a screenshot of it is a race:
+ * with `page.clock` installed the timer never fires and the tip never
+ * arrives, and without it the shot lands mid-transition and differs every
+ * run. Three attempts at making it deterministic all flaked, and a flaky
+ * baseline is worse than none -- it trains people to re-run until green.
+ *
+ * What this means in practice: `.explain-tip` is the one surface in the
+ * package with no picture. `keyboard.spec.ts` covers that it opens and
+ * closes; nothing covers what it looks like.
+ */
