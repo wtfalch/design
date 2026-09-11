@@ -131,7 +131,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
             {onClear && filled && (
               <button
                 type="button"
-                className="icon-btn ghost adorned-clear"
+                className="icon-btn adorned-clear"
                 aria-label="Clear"
                 onClick={onClear}
                 disabled={rest.disabled}
@@ -164,7 +164,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         {...wired}
       />
       <ToggleButton
-        className={`icon-btn ghost secret-eye${size === 'md' ? '' : ` size-${size}`}`}
+        className={`icon-btn secret-eye${size === 'md' ? '' : ` size-${size}`}`}
         aria-label="Show password"
         isSelected={shown}
         onChange={setShown}

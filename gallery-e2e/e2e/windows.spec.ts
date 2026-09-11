@@ -203,3 +203,29 @@ test('the vocabulary survives Tailwind’s theme namespace', async ({ page }) =>
   expect(broken.declared).toBe('')
   expect(broken.used).toBe('0px')
 })
+
+/**
+ * A toast, open.
+ *
+ * `visual.spec.ts` photographs the buttons that push one, never the toast --
+ * it is transient, and the region is empty when the stage is shot. So its
+ * dismiss control had no baseline at all, which is how it went from
+ * `className="ghost size-sm"` (borrowed from `Button`, and matching only
+ * while `.ghost` was written against the `button` element) to a filled tile
+ * without anything noticing. Same reason `modal` and `dialog` are opened
+ * here: a thing nobody photographs is a thing that regresses in silence.
+ */
+for (const theme of THEMES) {
+  test(`toast · open · ${theme}`, async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') })
+    await page.goto(specimenUrl({ c: 'toast', v: 'Tones' }, theme))
+    await themeApplied(page, theme)
+    await page.getByRole('button', { name: /^good$/i }).click()
+
+    const toast = page.locator('.toast').first()
+    await expect(toast).toBeVisible()
+    await expect(toast.getByRole('button', { name: 'Dismiss' })).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    await expect(page.locator('.toasts')).toHaveScreenshot(`toast--open--${theme}.png`)
+  })
+}
