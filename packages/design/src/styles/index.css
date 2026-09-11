@@ -9,6 +9,7 @@
  * `scripts/copy-css.mjs` flattens these into one file at build time.
  */
 @import './_tailwind.built.css';
+@import './_system-light.css';
 @import './base.css';
 @import './select.css';
 @import './dangerzone.css';
