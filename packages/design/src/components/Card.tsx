@@ -11,7 +11,7 @@
  * A box with a reason to exist.
  *
  * `.card` was CSS and nothing else, so every caller assembled its own header:
- * a `<div className="row">`, a `<div className="grow">`, a title in a
+ * a `<div className="row">`, a `<div className="ctl-grow">`, a title in a
  * `truncate` span and a description in a `muted mono` div, with the spacing
  * retyped each time. Four variants of that shape existed and no two agreed on
  * the gap between the title and the line under it.

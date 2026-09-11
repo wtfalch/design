@@ -161,7 +161,7 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
         {({ toast }) => (
           <AriaToast toast={toast} className={`toast toast-${toast.content.tone}`}>
             <Icon name={MARK[toast.content.tone]} size={16} className="toast-mark" />
-            <ToastContent className="grow">
+            <ToastContent className="ctl-grow">
               <Text slot="title">{toast.content.text}</Text>
             </ToastContent>
             {/* React Aria's own `Button`, because `slot="close"` is how the

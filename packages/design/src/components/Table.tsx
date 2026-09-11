@@ -60,7 +60,7 @@ export default function Table<T>({
        tool for them: expressing the same thing with utilities means this
        component doing index arithmetic to work out what CSS already knows. */
     <div className={['overflow-x-auto', className].filter(Boolean).join(' ')}>
-      <table className="table">
+      <table className="data-table">
         {/* Visually hidden rather than absent: the table still needs a name,
             and a heading above it in the markup is not attached to it. */}
         <caption className="sr-only">{caption}</caption>

@@ -112,7 +112,7 @@ export default function Callout({
           <Icon name={mark} size={16} />
         </span>
       )}
-      <div className="grow">{children}</div>
+      <div className="ctl-grow">{children}</div>
       {running && (
         /* Decoration: the time remaining is not information anybody can act on,
            and a screen reader counting down a bar is noise on top of a message

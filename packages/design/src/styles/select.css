@@ -12,7 +12,7 @@
 /* Full width, for the one action a card or a step is about. Not a size: a
    `block` button is the same height as any other, it just stops being a thing
    you have to aim at. */
-.btn.block { display: flex; width: 100%; }
+.btn.ctl-block { display: flex; width: 100%; }
 
 /* The default is `size-md`, spelled once for every control.
    The paragraph above promised one scale for buttons, inputs and selects, and
@@ -61,16 +61,16 @@
 .sel { position: relative; display: inline-block; }
 
 /* The subject of its pane rather than a field in it: full width and a size up.
-   That was `.select-field.block` on the native element, and it carried the
+   That was `.select-field.ctl-block` on the native element, and it carried the
    reason with it -- model ids are long (`qwen2.5-coder:32b-instruct-q4_K_M`) and
    at the narrow size they truncated mid-name. */
-.sel.block { display: block; width: 100%; }
+.sel.ctl-block { display: block; width: 100%; }
 
-.sel.block .sel-control { padding: var(--space-2) var(--space-3); font-weight: 500; }
+.sel.ctl-block .sel-control { padding: var(--space-2) var(--space-3); font-weight: 500; }
 
 /* Not full width otherwise: a select as wide as its row, holding one short
    word, reads as an input somebody forgot to fill in. */
-.sel:not(.block) .sel-control { width: auto; max-width: 320px; }
+.sel:not(.ctl-block) .sel-control { width: auto; max-width: 320px; }
 
 .sel-control {
   display: flex;

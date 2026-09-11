@@ -141,7 +141,7 @@ export default function Button(props: ButtonProps) {
     iconOnly ? 'icon-btn' : '',
     kind === 'default' ? '' : kind,
     size === 'md' ? '' : `size-${size}`,
-    block ? 'block' : '',
+    block ? 'ctl-block' : '',
     className ?? '',
   ]
     .filter(Boolean)

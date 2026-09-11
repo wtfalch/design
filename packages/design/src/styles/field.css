@@ -95,7 +95,7 @@
 .adorned > .adorned-mark,
 .adorned > .adorned-end { grid-area: 1 / 1; }
 
-.adorned.block { width: 100%; }
+.adorned.ctl-block { width: 100%; }
 
 .adorned > .adorned-mark {
   justify-self: start;

@@ -483,7 +483,7 @@ select:disabled { opacity: 0.45; cursor: not-allowed; }
    header.) */
 .row { display: flex; align-items: center; gap: var(--space-3); }
 
-.grow { flex: 1; min-width: 0; }
+.ctl-grow { flex: 1; min-width: 0; }
 
 .mono { font-family: var(--font-mono); font-size: var(--text-sm); }
 
@@ -804,7 +804,7 @@ input:active, textarea:active, select:active { transform: none; }
 
 /* The top bar carries the title, the views and the way into settings. Nothing
    that belongs to a conversation lives here any more, so it can breathe. */
-.topbar .grow { flex: 1; min-width: 0; }
+.topbar .ctl-grow { flex: 1; min-width: 0; }
 
 /* Back on the left, Next on the right, with the gap between them doing the
    separating -- so the button that goes forward is in the same place on both

@@ -54,7 +54,7 @@ export default function Progress({
            with two weights, and centring them puts the smaller one adrift. */
         <div className="flex items-baseline gap-2 text-sm">
           <span>{label}</span>
-          <span className="grow" />
+          <span className="ctl-grow" />
           {detail && <span className="text-muted text-xs font-mono">{detail}</span>}
         </div>
       )}

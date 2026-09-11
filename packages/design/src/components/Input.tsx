@@ -92,7 +92,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
   const classes = [
     size === 'md' ? '' : `size-${size}`,
     mono ? 'mono' : '',
-    block ? 'block' : '',
+    block ? 'ctl-block' : '',
     className ?? '',
   ]
     .filter(Boolean)
@@ -121,7 +121,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
 
     return (
       <span
-        className={`adorned adorned-${size}${block ? ' block' : ''}${icon ? ' adorned-icon' : ''}`}
+        className={`adorned adorned-${size}${block ? ' ctl-block' : ''}${icon ? ' adorned-icon' : ''}`}
       >
         {icon && <Icon name={icon} size={glyph} className="adorned-mark" aria-hidden />}
         {box}
@@ -146,7 +146,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
   }
 
   return (
-    <span className={`secret secret-${size}${block ? ' block' : ''}`}>
+    <span className={`secret secret-${size}${block ? ' ctl-block' : ''}`}>
       <input
         ref={ref}
         type={shown ? 'text' : 'password'}

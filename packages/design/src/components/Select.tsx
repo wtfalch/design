@@ -184,7 +184,7 @@ export default function Select({
      state attributes where the classes were. */
   return (
     <AriaSelect
-      className={`sel${block ? ' block' : ''}${className ? ` ${className}` : ''}`}
+      className={`sel${block ? ' ctl-block' : ''}${className ? ` ${className}` : ''}`}
       selectedKey={value !== undefined ? String(value) : undefined}
       defaultSelectedKey={
         defaultValue !== undefined ? String(defaultValue) : (options[0]?.value ?? undefined)
