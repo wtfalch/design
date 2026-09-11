@@ -1,0 +1,101 @@
+/**
+ * Tailwind, bound to the token vocabulary.
+ *
+ * **No preflight, and that is not an optimisation.** Tailwind's reset styles
+ * `button`, `input`, `select` and `textarea` down to nothing, and this
+ * package styles those by element on purpose -- `base.css` says so, and
+ * every hover, focus, disabled and invalid rule in it hangs off the element
+ * rather than a class. Importing the reset would unstyle every control in
+ * the package and every consumer at once. Only the theme and utility layers
+ * are imported.
+ *
+ * **Every scale is the vocabulary's, not Tailwind's.** `p-3` has to mean
+ * `var(--space-3)` and not `0.75rem`, or a theme's `--density` stops
+ * reaching half the stylesheet. So each `@theme` entry points at the token
+ * it stands for, which keeps the indirection: `applyTheme` writes the custom
+ * property at run time and the utility follows it.
+ *
+ * **Surfaces are `@utility`, not `bg-*`.** `tokens.css` is explicit that a
+ * surface is consumed as `background:` and never `background-color:`, so a
+ * theme may hand it a gradient or an image. Tailwind's `bg-*` emits
+ * `background-color`, which would take that away silently -- 116 rules in
+ * this package rely on it. `surface-panel` and its siblings emit the
+ * shorthand.
+ */
+
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme {
+  /* Spacing. The scale has no 7, 9 or anything past 15, which is the point:
+     a step that is not here is a step the design does not have. */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-5: var(--space-5);
+  --spacing-6: var(--space-6);
+  --spacing-8: var(--space-8);
+  --spacing-10: var(--space-10);
+  --spacing-15: var(--space-15);
+
+  /* Type. `--text-base` is the theme's own `--font-size`, so a density or a
+     type-scale change moves every utility with it. */
+  --text-2xs: var(--text-2xs);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+
+  --font-weight-normal: var(--weight);
+  --font-weight-strong: var(--weight-strong);
+  --tracking-normal: var(--tracking);
+
+  --radius-sm: var(--radius-sm);
+  --radius-DEFAULT: var(--radius);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-pill: var(--radius-pill);
+
+  /* Colour, for the properties where a colour is what is wanted -- `color`,
+     `border-color`, `fill`. Surfaces are below, as utilities. */
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-on-accent: var(--on-accent);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --color-info: var(--info);
+
+  --duration-fast: var(--dur-fast);
+  --duration-md: var(--dur-md);
+  --duration-slow: var(--dur-slow);
+}
+
+/* The surfaces, as the shorthand the vocabulary requires. */
+@utility surface-bg {
+  background: var(--bg);
+}
+@utility surface-panel {
+  background: var(--panel);
+}
+@utility surface-panel-2 {
+  background: var(--panel-2);
+}
+@utility surface-control {
+  background: var(--control);
+}
+@utility surface-accent {
+  background: var(--accent);
+}
+@utility surface-none {
+  background: none;
+}

@@ -138,3 +138,68 @@ test('Field wires plain children through context', async ({ page }) => {
   expect(wiring.textarea.invalid).toBe('true')
   expect(wiring.textarea.describedby).toBeTruthy()
 })
+
+/**
+ * Tailwind's theme namespace collides with the vocabulary, and unlayered wins.
+ *
+ * Tailwind v4 names its font-size scale `--text-*` and its radius scale
+ * `--radius-*`, which are the names this package's tokens already have. So
+ * `@theme { --text-sm: var(--text-sm) }` compiles to a self-referential
+ * custom property on `:root` -- invalid, and if it won it would take every
+ * font size and every corner in the package with it.
+ *
+ * It does not win: `tokens.css` is unlayered and Tailwind's block is in
+ * `@layer theme`, and an unlayered declaration beats a layered one whatever
+ * the order. That is the whole reason the collision is survivable, it is not
+ * obvious from either file, and it would break silently -- text would fall
+ * back to the browser default everywhere at once -- if anyone ever moved
+ * `tokens.css` into a layer. So it is measured.
+ */
+test('the vocabulary survives Tailwind’s theme namespace', async ({ page }) => {
+  await page.goto(specimenUrl({ c: 'button', v: 'Kinds' }, 'system'))
+
+  const resolved = await page.evaluate(() => {
+    const cs = getComputedStyle(document.documentElement)
+    const probe = document.createElement('div')
+    document.body.append(probe)
+    probe.style.fontSize = 'var(--text-sm)'
+    probe.style.borderRadius = 'var(--radius-md)'
+    const p = getComputedStyle(probe)
+    const out = {
+      textSm: cs.getPropertyValue('--text-sm').trim(),
+      radiusMd: cs.getPropertyValue('--radius-md').trim(),
+      usedFontSize: p.fontSize,
+      usedRadius: p.borderRadius,
+    }
+    probe.remove()
+    return out
+  })
+
+  // The token still holds a real value, not an empty self-reference.
+  expect(resolved.textSm).not.toBe('')
+  expect(resolved.radiusMd).not.toBe('')
+
+  // And a real length, not the fallback a guaranteed-invalid property leaves.
+  expect(resolved.usedRadius).toBe('8px')
+
+  /* The negative control, so the assertions above are known to detect the
+     thing they are written for: a self-referential custom property -- which
+     is exactly what `@theme { --text-sm: var(--text-sm) }` compiles to --
+     resolves to nothing, and `border-radius` falls back to 0. Without this
+     the test would pass just as happily against a page where the collision
+     had won. */
+  const broken = await page.evaluate(() => {
+    const el = document.createElement('div')
+    el.style.setProperty('--radius-md', 'var(--radius-md)')
+    el.style.borderRadius = 'var(--radius-md)'
+    document.body.append(el)
+    const out = {
+      declared: getComputedStyle(el).getPropertyValue('--radius-md').trim(),
+      used: getComputedStyle(el).borderRadius,
+    }
+    el.remove()
+    return out
+  })
+  expect(broken.declared).toBe('')
+  expect(broken.used).toBe('0px')
+})
