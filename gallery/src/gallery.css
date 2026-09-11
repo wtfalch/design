@@ -316,12 +316,17 @@
    and the bar floats in from the edge. `Rows` has no horizontal padding at all
    and expects its container to supply it, which is what `Card` does at
    `--space-3`. */
+/* No `overflow` here. This box *is* a `ScrollArea`, which manages its own --
+   `.scroller.axis-y` is `overflow-y: auto` -- and the gallery setting
+   `overflow: hidden` on top of it was the gallery fighting the component. It
+   lost while the package's sheets were unlayered and more specific; once they
+   moved into `@layer components` the unlayered rule won and the demo stopped
+   scrolling. Deleting it is the fix in either arrangement. */
 .demo-scroll {
   height: 180px;
   background: var(--panel);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
 }
 
 .demo-scroll .rows { padding: 0 var(--space-3); }

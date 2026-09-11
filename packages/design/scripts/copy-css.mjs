@@ -67,7 +67,9 @@ if (!existsSync(indexPath)) {
     if (m) {
       const file = join(src, 'styles', m[1])
       order.push(m[1])
-      out.push(`/* ---- ${m[1]} ---- */`, readFileSync(file, 'utf8').trimEnd(), '')
+      const body = readFileSync(file, 'utf8').trimEnd()
+      const layered = m[1].startsWith('./_') ? body : `@layer components {\n${body}\n}`
+      out.push(`/* ---- ${m[1]} ---- */`, layered, '')
       continue
     }
     // Anything that is not an import is a comment explaining the order. Keep it.

@@ -14,7 +14,7 @@
  * fail these numbers, and a consumer can run the same function on their own.
  *
  * `system` is two palettes: the base values in `tokens.css` when the OS is
- * dark, and the block in `base.css` scoped to `[data-theme='system']` when it
+ * dark, and the block in `_system-light.css` scoped to `[data-theme='system']` when it
  * is light. Both are measured; the light one is the one that had the 1.67:1
  * running pill.
  */
@@ -40,7 +40,11 @@ function hexes(block: string): Partial<ThemeTokens> {
 const tokens = read('tokens.css')
 const base = hexes(tokens.slice(tokens.indexOf(':root {'), tokens.indexOf('@media')))
 
-const baseCss = read('styles/base.css')
+/* The light `system` palette left `base.css` when the component sheets moved
+   into `@layer components`: it is a theme, and a layered theme loses to the
+   unlayered `:root` in `tokens.css`. It is unlayered in `_system-light.css`
+   now, and this is where it is measured from. */
+const baseCss = read('styles/_system-light.css')
 const lightBlock = baseCss.match(/:root\[data-theme='system'\]\s*\{([^}]*)\}/)?.[1] ?? ''
 const systemLight = hexes(lightBlock)
 
@@ -76,7 +80,10 @@ const BOUNDARY: [keyof ThemeTokens, keyof ThemeTokens, string][] = [
 describe('every theme is measured', () => {
   it('parsed the palettes it claims to', () => {
     expect(Object.keys(palettes).length).toBeGreaterThanOrEqual(4)
-    expect(systemLight['--bg'], 'the light system block was found in base.css').toBeTruthy()
+    expect(
+      systemLight['--bg'],
+      'the light system block was found in _system-light.css',
+    ).toBeTruthy()
   })
 
   for (const [name, p] of Object.entries(palettes)) {

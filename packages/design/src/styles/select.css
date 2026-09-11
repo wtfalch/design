@@ -92,16 +92,19 @@
 /* State is read off React Aria's attributes: `data-open` on the root,
    `data-focused` / `data-selected` / `data-disabled` on an item, where
    `.open`, `[data-active]`, `.on` and `.off` used to be. */
-.sel-list { scroll-padding-block: var(--space-1); box-shadow: var(--shadow-2); })` brings up ended flush against the
-     border and read as clipped rather than as one of a set -- and this list
-     opens scrolled to whatever is chosen, so that was the ordinary state.
-     `scroll-padding` insets what counts as "in view", so it stops short by
-     the same four the sides have. */
+/* The list keeps two things the utilities on `Select` cannot say.
+ *
+ * `scroll-padding-block`: the same room while the list is scrolled as it has
+ * at rest. Padding at the top of a scroll container scrolls away with the
+ * content, so the row `scrollIntoView({block: 'nearest'})` brings up ended
+ * flush against the border and read as clipped rather than as one of a set --
+ * and this list opens scrolled to whatever is chosen, so that was the
+ * ordinary state.
+ *
+ * `box-shadow`: `--shadow-2` is a token, and a utility would have to inline
+ * the value, which is the one thing the vocabulary exists to stop. */
+.sel-list {
   scroll-padding-block: var(--space-1);
-  list-style: none;
-  border: var(--border-width) solid var(--border-strong);
-  border-radius: var(--radius-md);
-  background: var(--panel);
   box-shadow: var(--shadow-2);
 }
 
@@ -116,6 +119,19 @@
 
 /* The tick marks the chosen row. Colour alone would not: a list where the only
    difference is a hue is a list you cannot read past. */
+/* The tick's resting state lives here, beside the state that overrides it.
+ *
+ * It was `opacity-0` on the element and `opacity: 1` here, which worked only
+ * while this sheet was unlayered. A utility is in `@layer utilities` and
+ * beats `@layer components` whatever the selector, so the moment the sheets
+ * moved into a layer the tick stopped appearing on the selected row -- the
+ * resting state won permanently.
+ *
+ * The rule generalises: a utility for a resting state whose active state is a
+ * relationship between elements will always beat that active state. The pair
+ * has to sit in the same layer. */
+.sel-tick { opacity: 0; }
+
 .sel-item[data-selected] .sel-tick { opacity: 1; }
 
 /* The icon on a speaker's row in the open list -- `Select`'s `aside`. Last in

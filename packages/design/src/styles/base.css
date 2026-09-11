@@ -1,31 +1,3 @@
-/* Light, only under the `system` theme. This used to override `:root`
-   unconditionally, so choosing a dark theme on a light-mode laptop got
-   silently repainted. Every other theme states its own palette. */
-@media (prefers-color-scheme: light) {
-  :root[data-theme='system'] {
-      --bg: #f3f5f7;
-      --panel: #ffffff;
-      --panel-2: #e9edf1;
-      --border: #e4e8ec;
-      --border-strong: #8792a1;
-      --text: #191d23;
-      --muted: #5d6773;
-      --accent: #0e7872;
-      --accent-dim: #7fbdb8;
-      --on-accent: #ffffff;
-      /* Overridden here, which the old light theme never did: the base set is
-         tuned for a dark panel, and `#4ade80` on white is 1.74:1. */
-      --good: #1c7a4a;
-      --warn: #8a6216;
-      --bad: #b3312c;
-      --info: #216bc9;
-      --shadow-1: 0 4px 14px rgba(16, 24, 40, 0.08);
-      --shadow-2: 0 8px 24px rgba(16, 24, 40, 0.10);
-      --shadow-3: 0 12px 32px rgba(16, 24, 40, 0.12);
-      --scrim: rgba(16, 24, 40, 0.32);
-    }
-}
-
 /* Derived from the two surfaces every theme already defines, so a theme gets a
    control colour without knowing this exists. */
 /* Pseudo-elements too. `*` does not match them, and `box-sizing` is not

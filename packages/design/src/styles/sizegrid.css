@@ -1,11 +1,24 @@
-/* What is left of the size grid once it draws itself.
+/* The cell's colour, all of it, in one place.
  *
- * `on` follows the pointer; `chosen` is what is actually saved, shown only
- * when nothing is hovered so the two can never contradict each other.
- * `chosen` is a border colour and says so at the call site; `on` is a fill
- * mixed from the accent, and `color-mix` in an arbitrary value is less
- * readable than the rule it replaces. */
+ * `SizeGrid` draws the cell's geometry with utilities and leaves every colour
+ * here, because `on` and `chosen` override the resting state -- and a utility
+ * is in `@layer utilities`, which beats `@layer components` whatever the
+ * selector. Stated as `surface-panel-2` and `border-border` on the element,
+ * the resting state won permanently and no cell ever lit up.
+ *
+ * That is the third time this pattern has bitten: `Select`'s tick and
+ * `Empty`'s figure were the other two. The rule: a resting state whose
+ * active state is a CSS rule has to be a CSS rule too. */
+.size-cell {
+  border: var(--border-width) solid var(--border);
+  background: var(--panel-2);
+}
+
+/* `on` follows the pointer; `chosen` is what is actually saved, shown only
+   when nothing is hovered so the two can never contradict each other. */
 .size-cell.on {
   border-color: var(--accent);
   background: color-mix(in srgb, var(--accent) 45%, transparent);
 }
+
+.size-cell.chosen { border-color: var(--accent); }

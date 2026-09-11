@@ -248,7 +248,7 @@ export default function Select({
             >
               <span className="flex-1 min-w-0 overflow-hidden text-ellipsis">{o.label}</span>
               <svg
-                className="sel-tick flex-none opacity-0"
+                className="sel-tick flex-none"
                 viewBox="0 0 24 24"
                 width="13"
                 height="13"
