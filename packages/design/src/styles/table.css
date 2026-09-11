@@ -4,8 +4,6 @@
    versions. */
 .table th .set-hint { font-weight: 400; }
 
-.table-scroll { overflow-x: auto; }
-
 .table {
   width: 100%;
   border-collapse: collapse;

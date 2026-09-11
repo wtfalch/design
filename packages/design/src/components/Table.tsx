@@ -54,7 +54,12 @@ export default function Table<T>({
     return empty ? <div className="set-hint rows-empty">{empty}</div> : null
   }
   return (
-    <div className={`table-scroll${className ? ` ${className}` : ''}`}>
+    /* The one thing about a table that is a property of one element. Its
+       cells, headings and last-row rule are structural -- `th:first-child`,
+       `tbody tr:last-child td` -- and a structural pseudo-class is the right
+       tool for them: expressing the same thing with utilities means this
+       component doing index arithmetic to work out what CSS already knows. */
+    <div className={['overflow-x-auto', className].filter(Boolean).join(' ')}>
       <table className="table">
         {/* Visually hidden rather than absent: the table still needs a name,
             and a heading above it in the markup is not attached to it. */}

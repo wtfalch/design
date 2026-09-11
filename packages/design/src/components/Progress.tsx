@@ -45,12 +45,17 @@ export default function Progress({
   const pct = indeterminate ? 0 : Math.max(0, Math.min(100, (value / max) * 100))
 
   return (
-    <div className={`progress${className ? ` ${className}` : ''}`}>
+    /* `progress` stays as a hook: `card.css` spaces a bar that follows a
+       card's contents, which is a relationship between two elements. The rest
+       is this component's own shape and reads better here. */
+    <div className={['progress grid gap-1', className].filter(Boolean).join(' ')}>
       {(label || detail) && (
-        <div className="progress-head">
-          <span className="progress-label">{label}</span>
+        /* Baseline, not centre: the label and the detail are one line of text
+           with two weights, and centring them puts the smaller one adrift. */
+        <div className="flex items-baseline gap-2 text-sm">
+          <span>{label}</span>
           <span className="grow" />
-          {detail && <span className="progress-detail mono">{detail}</span>}
+          {detail && <span className="text-muted text-xs font-mono">{detail}</span>}
         </div>
       )}
       {/* biome-ignore lint/a11y/useFocusableInteractive: a progressbar is not interactive; there is nothing to focus and nothing to press. */}
