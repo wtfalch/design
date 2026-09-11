@@ -229,3 +229,26 @@ for (const theme of THEMES) {
     await expect(page.locator('.toasts')).toHaveScreenshot(`toast--open--${theme}.png`)
   })
 }
+
+/**
+ * The select's list, open.
+ *
+ * Portalled to the body, so `visual.spec.ts` photographs the closed control
+ * and never the part the component exists for -- the list is the whole
+ * reason this is not a native `<select>`. That is the second surface found
+ * without a baseline, after the toast: both are things that only exist while
+ * open, and the stage is shot closed.
+ */
+for (const theme of THEMES) {
+  test(`select · open · ${theme}`, async ({ page }) => {
+    await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') })
+    await page.goto(specimenUrl({ c: 'select', v: 'Default' }, theme))
+    await themeApplied(page, theme)
+    await page.locator('.sel-control').first().click()
+
+    const list = page.locator('.sel-list')
+    await expect(list).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    await expect(list).toHaveScreenshot(`select--open--${theme}.png`)
+  })
+}

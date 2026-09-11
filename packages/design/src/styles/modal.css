@@ -37,13 +37,6 @@
    Not `display: contents`, which was the first attempt. An element with no box
    cannot take focus, so React Aria's initial focus fell through to the first
    input and Escape -- handled on the section -- stopped closing the window. */
-.modal-dialog {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  flex: 1;
-}
-
 .modal {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -94,18 +87,9 @@
    laid out for the bare `<strong>` it used to hold -- 86px tall with them,
    41px without, on a head whose padding is 12 over 8. `font: inherit` so the
    `<strong>` rule above is the one that sets the size. */
-.modal-title { margin: 0; font: inherit; }
-
 /* Under the title, on the header's padding rather than the body's, so it reads
    as part of the heading rather than as the first line of content. */
-.modal-desc {
-  margin: 0;
-  padding: 0 var(--space-4) var(--space-3);
-  color: var(--muted);
-  font-size: var(--text-sm);
-  line-height: 1.5;
-  max-width: 62ch;
-}
+.modal-desc { line-height: 1.5; }
 
 .modal-body { padding: var(--space-2) var(--space-4) var(--space-3); overflow-y: auto; }
 

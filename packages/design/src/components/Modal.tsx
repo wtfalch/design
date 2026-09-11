@@ -161,7 +161,7 @@ export default function Modal({
             Named, so those rules can find it. */}
         <Dialog
           ref={dialogRef}
-          className="modal-dialog"
+          className="modal-dialog flex flex-col min-h-0 flex-1"
           aria-labelledby={labelledBy ?? (title ? headingId : undefined)}
         >
           {(title || head || (onClose && closeButton)) && (
@@ -174,7 +174,12 @@ export default function Modal({
                    takes them back off so the `<strong>` inside draws exactly as
                    it did; without it every window opened with its title
                    floating in a band twice the height of the head. */
-                <Heading slot="title" id={headingId} level={2} className="modal-title">
+                <Heading
+                  slot="title"
+                  id={headingId}
+                  level={2}
+                  className="modal-title m-0 [font:inherit]"
+                >
                   <strong>{title}</strong>
                 </Heading>
               )}
@@ -193,7 +198,7 @@ export default function Modal({
               )}
             </header>
           )}
-          {description && <p className="modal-desc">{description}</p>}
+          {description && <p className="m-0 px-4 pb-3 text-muted text-sm">{description}</p>}
           <div className={`modal-body${bodyClass ? ` ${bodyClass}` : ''}`}>{children}</div>
           {footer && (
             <footer className={`set-actions${footerClass ? ` ${footerClass}` : ''}`}>
