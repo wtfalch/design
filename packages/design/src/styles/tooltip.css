@@ -5,36 +5,15 @@
 /* An info-toned `.callout`, spelled the old way. Identical to it now rather than
    nearly identical to it, which is the whole point of the consolidation: the
 
-/* The `?` beside a setting, and the box it shows on hover. Built like the
+/* What is left once `Tooltip` draws its own mark: the hover and focus that
+   reach the mark from its parent, and the tip -- whose closed and open
+   states are three rules the cascade resolves in order, with
+   `data-entering` and `data-exiting` around the transition. None of that is
+   a property on one element.
+
+   The `?` beside a setting, and the box it shows on hover. Built like the
    status dot's tooltip and for the same reasons: `title` waits a second and a
    half, renders newlines however it likes, and cannot be styled. */
-.explain {
-  position: relative;
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  /* The heading it follows is tracked out, which leaves the last letter's
-     spacing sitting between them and reads as none at all. */
-  margin-left: var(--space-2);
-  cursor: help;
-  /* Headings here are uppercase and tracked out, and one of these sits inside
-     a heading. */
-  text-transform: none;
-  letter-spacing: normal;
-  font-weight: 400;
-}
-
-.explain-mark {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  font-size: var(--text-xs);
-  line-height: 16px;
-  text-align: center;
-}
-
 .explain:hover .explain-mark,
 .explain:focus-visible .explain-mark { color: var(--text); border-color: var(--accent); }
 

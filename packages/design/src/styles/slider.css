@@ -217,4 +217,5 @@ input[type='range'].slider:disabled::-moz-range-thumb { opacity: 0; }
    buttons only, so a button in a row stood 25px beside a 35px select and no
    size class could ask for the select's height. Type from the row, box from
    the scale, and the two line up; an explicit `size-*` still wins. */
-:where(.set-row) button, :where(.set-row) .slider-box { font-size: var(--text-xs); }
+:where(.set-row) button,
+:where(.set-row) .slider-box { font-size: var(--text-xs); }

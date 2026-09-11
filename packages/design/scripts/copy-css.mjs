@@ -12,6 +12,7 @@
  * works in a bundler, behind a `<link>`, and inside a sandboxed applet frame
  * alike.
  */
+import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -24,6 +25,31 @@ const dist = resolve(here, '../dist')
  *  none of the components -- to theme an applet frame, say. */
 mkdirSync(dist, { recursive: true })
 writeFileSync(join(dist, 'tokens.css'), readFileSync(join(src, 'tokens.css')))
+
+/**
+ * Tailwind first, because `index.css` imports its output and this script
+ * flattens imports textually -- it cannot resolve `tailwindcss/theme.css`
+ * and would ship the literal `@import` line to every consumer.
+ *
+ * The CLI scans the components for the utilities they actually use and emits
+ * only those, which is why this runs against `src` rather than `dist`: the
+ * class names live in the TSX.
+ */
+const twIn = join(src, 'styles/tailwind.css')
+const twOut = join(src, 'styles/_tailwind.built.css')
+execFileSync(
+  process.execPath,
+  [
+    resolve(here, '../node_modules/@tailwindcss/cli/dist/index.mjs'),
+    '-i',
+    twIn,
+    '-o',
+    twOut,
+    '--content',
+    join(src, '**/*.tsx'),
+  ],
+  { stdio: 'inherit' },
+)
 
 const indexPath = join(src, 'styles/index.css')
 mkdirSync(join(dist, 'styles'), { recursive: true })

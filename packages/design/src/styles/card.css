@@ -1,30 +1,43 @@
+/* `.card` is public API, not this component's private styling.
+ *
+ * Consumers apply it to their own markup -- the gallery's skeleton specimen
+ * renders `<div className="card">` around three rows, and app-template uses
+ * `card-pick`. Moving the box into `Card`'s own class list took that away
+ * with no type error and no failing test in this package: it broke only
+ * where somebody else had used the class, which is the worst way for an API
+ * to go.
+ *
+ * So the rule stays and `Card` wears it. The lesson generalises to every
+ * class in this package that a consumer can reach: a component may draw
+ * itself with utilities only where its class is genuinely private. */
 .card {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--text);
+  text-align: left;
   background: var(--panel);
   border: var(--border-width) solid var(--border);
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-3);
+  padding: var(--space-3);
   margin-bottom: var(--space-3);
 }
 
+/* What is left once `Card` draws its own box: the tones, the pick and
+   selected states, and the rules that reach from the card into what it
+   holds. `:has(.card-icon) .card-inline` is a relationship, and a tone is a
+   `color-mix`; neither is a property on one element. */
+
 /* Header, when there is one. The title and the line under it were retyped at
    every call site and no two agreed on the gap between them. */
-.card-head { display: flex; align-items: flex-start; gap: var(--space-3); }
-
-.card-head:not(:last-child) { margin-bottom: var(--space-3); }
-
-.card-headings { min-width: 0; flex: 1; }
-
 /* The card owns the space between the things it holds. Without this a callout
    and the button under it sit edge to edge, and every caller has to remember a
    margin on whichever child happens to be second. */
-.card-body { display: grid; gap: var(--space-3); }
-
 /* The card's own control, on the card's padding rather than indented into its
    body. Centred against the whole heading block, not against the title -- a
    switch aligned to the first line drifts upward the moment the description
    runs to two. */
-.card-action { flex: none; align-self: center; display: flex; align-items: center; }
-
 /* A row inside a card that lines up with the header rather than indenting past
    it: same left edge as the title, same right edge as the action. Its label is
    a quiet caption, not a second heading -- the card already has one, and two
@@ -71,17 +84,6 @@
   color: var(--muted);
 }
 
-/* A card that is itself the choice. Reset first, because it is a `<button>`
-   now and inherits a control's padding and centring. */
-button.card {
-  display: block;
-  width: 100%;
-  text-align: left;
-  font: inherit;
-  color: inherit;
-  padding: var(--space-3);
-}
-
 /* Variants, because a card is doing four jobs and looked like one.
    A search result you can act on, a thing already installed, something that
    went wrong, and a heading with rows under it are not the same object, and
@@ -123,3 +125,17 @@ button.card {
 .card-flat { background: transparent; border-color: var(--border); }
 
 .modal-body .card { background: var(--panel-2); }
+
+/* Selected, which used to arrive from `button[aria-pressed='true']`.
+ *
+ * A card marks its choice with `aria-pressed`, and the tint came from the
+ * element rule every bare `<button>` in the package was picking up. That rule
+ * belongs to `Button` now, so the card says what being chosen looks like --
+ * which is the right place for it anyway: a chosen card is a card's idea, not
+ * a button's. */
+.card[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+}
+
+.card[aria-pressed='true']:hover { border-color: var(--accent); }

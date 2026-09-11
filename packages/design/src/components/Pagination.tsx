@@ -162,8 +162,16 @@ export default function Pagination({
   const canGoOn = pages === undefined ? shown >= limit : page < pages
 
   return (
-    <nav className={`pager${className ? ` ${className}` : ''}`} aria-label={label}>
-      <p className="pager-count">
+    <nav
+      className={[
+        'flex items-center justify-between gap-4 flex-wrap py-2 text-xs text-muted',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-label={label}
+    >
+      <p className="pager-count m-0">
         {shown === 0 ? (
           `No ${unit}`
         ) : (
@@ -176,7 +184,7 @@ export default function Pagination({
         )}
       </p>
 
-      <div className="pager-controls">
+      <div className="flex items-center gap-1">
         <button
           type="button"
           className="pager-step"

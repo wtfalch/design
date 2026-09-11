@@ -92,7 +92,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
   const classes = [
     size === 'md' ? '' : `size-${size}`,
     mono ? 'mono' : '',
-    block ? 'block' : '',
+    block ? 'ctl-block' : '',
     className ?? '',
   ]
     .filter(Boolean)
@@ -121,7 +121,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
 
     return (
       <span
-        className={`adorned adorned-${size}${block ? ' block' : ''}${icon ? ' adorned-icon' : ''}`}
+        className={`adorned adorned-${size}${block ? ' ctl-block' : ''}${icon ? ' adorned-icon' : ''}`}
       >
         {icon && <Icon name={icon} size={glyph} className="adorned-mark" aria-hidden />}
         {box}
@@ -131,7 +131,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
             {onClear && filled && (
               <button
                 type="button"
-                className="icon-btn ghost adorned-clear"
+                className="icon-btn adorned-clear"
                 aria-label="Clear"
                 onClick={onClear}
                 disabled={rest.disabled}
@@ -146,7 +146,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
   }
 
   return (
-    <span className={`secret secret-${size}${block ? ' block' : ''}`}>
+    <span className={`secret secret-${size}${block ? ' ctl-block' : ''}`}>
       <input
         ref={ref}
         type={shown ? 'text' : 'password'}
@@ -164,7 +164,7 @@ const Input = forwardRef<HTMLInputElement, Props>(function Input(
         {...wired}
       />
       <ToggleButton
-        className={`icon-btn ghost secret-eye${size === 'md' ? '' : ` size-${size}`}`}
+        className={`icon-btn secret-eye${size === 'md' ? '' : ` size-${size}`}`}
         aria-label="Show password"
         isSelected={shown}
         onChange={setShown}

@@ -119,7 +119,7 @@ function renderItem(item: Item): React.ReactNode {
           </Text>
         )}
       </span>
-      {item.shortcut && <Kbd className="menu-key">{item.shortcut}</Kbd>}
+      {item.shortcut && <Kbd>{item.shortcut}</Kbd>}
       {/* Inline rather than an `Icon`, following `Select`'s caret: one path,
           used here and nowhere else, and the icon set has no chevron. */}
       {item.items && (
@@ -140,8 +140,10 @@ function renderItem(item: Item): React.ReactNode {
   const body = item.items ? (
     <SubmenuTrigger key={item.id}>
       {row}
-      <AriaPopover className="menu-sheet">
-        <AriaMenu className="menu-list">{item.items.map(renderItem)}</AriaMenu>
+      <AriaPopover className="menu-sheet surface-panel border border-border rounded-md min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-[60]">
+        <AriaMenu className="p-1 outline-none grid gap-[var(--border-width)]">
+          {item.items.map(renderItem)}
+        </AriaMenu>
       </AriaPopover>
     </SubmenuTrigger>
   ) : (
@@ -167,10 +169,10 @@ export default function Menu({
         placement={placement}
         offset={6}
       >
-        <AriaMenu className="menu-list" aria-label={label}>
+        <AriaMenu className="p-1 outline-none grid gap-[var(--border-width)]" aria-label={label}>
           {items.map((entry) =>
             isSection(entry) ? (
-              <MenuSection key={entry.title} className="menu-section">
+              <MenuSection key={entry.title}>
                 <Header className="menu-section-title">{entry.title}</Header>
                 {entry.items.map(renderItem)}
               </MenuSection>

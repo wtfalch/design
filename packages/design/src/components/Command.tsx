@@ -144,7 +144,7 @@ export default function Command({
               ) : (
                 <ListBox className="cmd-list" aria-label={label} selectionMode="none">
                   {shown.map((group) => (
-                    <ListBoxSection key={group.title} className="cmd-group">
+                    <ListBoxSection key={group.title}>
                       <Header className="cmd-group-title">{group.title}</Header>
                       {group.commands.map((command) => (
                         <ListBoxItem
@@ -172,7 +172,7 @@ export default function Command({
                               </Text>
                             )}
                           </span>
-                          {command.shortcut && <Kbd className="cmd-key">{command.shortcut}</Kbd>}
+                          {command.shortcut && <Kbd>{command.shortcut}</Kbd>}
                         </ListBoxItem>
                       ))}
                     </ListBoxSection>

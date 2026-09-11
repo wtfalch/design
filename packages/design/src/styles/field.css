@@ -95,7 +95,7 @@
 .adorned > .adorned-mark,
 .adorned > .adorned-end { grid-area: 1 / 1; }
 
-.adorned.block { width: 100%; }
+.adorned.ctl-block { width: 100%; }
 
 .adorned > .adorned-mark {
   justify-self: start;
@@ -147,3 +147,28 @@
 }
 
 .adorned-lg .adorned-clear { padding: var(--space-2); }
+
+/* The eye and the clear button stop borrowing `ghost`.
+ *
+ * Both were `className="icon-btn ghost …"` -- reaching into `Button`'s class
+ * vocabulary from another component, which worked only because `.ghost` was
+ * written as `button.ghost` and they happen to be `<button>`s. It is `.btn.ghost`
+ * now, so the borrowing stopped matching and `.icon-btn`'s panel background
+ * came through: the baselines showed a filled tile where there had been a bare
+ * glyph.
+ *
+ * Stated here instead. What they actually wanted from `ghost` is two lines,
+ * and saying them is cheaper than either component knowing what a button's
+ * classes are called. */
+.secret-eye,
+.adorned-clear {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+}
+
+.secret-eye:hover:not(:disabled),
+.adorned-clear:hover:not(:disabled) {
+  background: var(--panel-2);
+  color: var(--text);
+}

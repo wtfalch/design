@@ -11,7 +11,7 @@
  * A box with a reason to exist.
  *
  * `.card` was CSS and nothing else, so every caller assembled its own header:
- * a `<div className="row">`, a `<div className="grow">`, a title in a
+ * a `<div className="row">`, a `<div className="ctl-grow">`, a title in a
  * `truncate` span and a description in a `muted mono` div, with the spacing
  * retyped each time. Four variants of that shape existed and no two agreed on
  * the gap between the title and the line under it.
@@ -61,24 +61,44 @@ export default function Card({
   selected?: boolean
   className?: string
 }) {
+  const body = children && <div className="grid gap-3">{children}</div>
+
+  /* `mb-3` when something follows, which is what `.card-head:not(:last-child)`
+     was saying. The component knows whether there is a body; a structural
+     pseudo-class was working that out from the DOM. */
   const head = (title || description || action) && (
-    <div className="card-head">
+    <div className={`card-head flex items-start gap-3${body ? ' mb-3' : ''}`}>
       {icon && (
         <span className="card-icon" aria-hidden="true">
           <Icon name={icon} size={20} />
         </span>
       )}
-      <div className="card-headings">
+      <div className="min-w-0 flex-1">
         {title && <strong className="card-title">{title}</strong>}
         {description && <div className="card-desc">{description}</div>}
       </div>
-      {action && <div className="card-action">{action}</div>}
+      {/* Centred against the whole heading block, not the title: a switch
+          aligned to the first line drifts upward the moment the description
+          runs to two. */}
+      {action && <div className="flex-none self-center flex items-center">{action}</div>}
     </div>
   )
 
-  const cls = `card${onClick ? ' card-pick' : ''}${selected ? ' card-on' : ''}${tone ? ` card-${tone}` : ''}${className ? ` ${className}` : ''}`
-
-  const body = children && <div className="card-body">{children}</div>
+  /* `card` stays as the hook: the tones, the pick and selected states, and
+     `:has(.card-icon)` indenting an inline row past the icon, are all either
+     a `color-mix` or a relationship between elements. What is here is the
+     card's own box -- and `display: block` with `width: 100%` matter, because
+     a pressable card is a `<button>`, which shrink-wraps: a row of cards
+     became a row of labels the moment one gained an `onClick`. */
+  const cls = [
+    'card',
+    onClick ? 'card-pick' : '',
+    selected ? 'card-on' : '',
+    tone ? `card-${tone}` : '',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   if (onClick) {
     return (

@@ -23,3 +23,15 @@
    caller says otherwise. Not `transparent`: these have overlapping shapes, and
    a shirt that lets the arm behind it show through reads as a hole. */
 .illo .paper { fill: var(--illo-paper); }
+
+/* The figure in a whole-surface `Empty`, drawn in the muted grey of the
+   sentence under it.
+ *
+ * A utility cannot do this, and the reason is worth keeping: `.illo` sets
+ * `color: inherit` and is unlayered, while every Tailwind utility lives in
+ * `@layer utilities` -- and an unlayered declaration beats a layered one
+ * whatever the specificity. So `text-muted` on the figure lost, silently,
+ * and the shirt came out full text black beside a muted sentence. The
+ * original rule already carried a note about needing two classes to beat
+ * `.illo`; layers make that impossible rather than merely fiddly. */
+.nothing-figure { color: var(--muted); }

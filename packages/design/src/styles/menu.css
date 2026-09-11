@@ -1,24 +1,10 @@
+/* What is left once `Menu` draws its sheet and its list: the rows, whose
+   `data-focused`, `data-pressed` and danger states React Aria stamps on
+   them, and the rules that reach from a row into what it holds. The
+   `box-shadow` stays on the sheet too -- `--shadow-2` is a token, and a
+   utility would have to inline it. */
+
 /* A list of verbs, on the same sheet as every other anchored surface. */
-.menu-sheet {
-  background: var(--panel);
-  border: var(--border-width) solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-2);
-  min-width: 12rem;
-  max-width: min(20rem, calc(100vw - var(--space-6)));
-  max-height: 24rem;
-  overflow: auto;
-  overscroll-behavior: contain;
-  z-index: 60;
-}
-
-.menu-list {
-  padding: var(--space-1);
-  outline: none;
-  display: grid;
-  gap: var(--border-width);
-}
-
 .menu-item {
   display: flex;
   align-items: center;
@@ -57,14 +43,6 @@
 /* The binding, set in the mono face at the size of the small print. Right of
    the row and never the reason the row is wide: `flex: none` with the label
    taking the slack. */
-.menu-key {
-  flex: none;
-  font-family: var(--font-mono);
-  font-size: var(--text-2xs);
-  color: var(--muted);
-  letter-spacing: var(--tracking);
-}
-
 .menu-more { flex: none; color: var(--muted); }
 
 .menu-rule {
@@ -99,3 +77,5 @@
   .menu-sheet[data-entering],
   .menu-sheet[data-exiting] { animation: none; }
 }
+
+.menu-sheet { box-shadow: var(--shadow-2); }

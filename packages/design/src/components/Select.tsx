@@ -184,7 +184,7 @@ export default function Select({
      state attributes where the classes were. */
   return (
     <AriaSelect
-      className={`sel${block ? ' block' : ''}${className ? ` ${className}` : ''}`}
+      className={`sel${block ? ' ctl-block' : ''}${className ? ` ${className}` : ''}`}
       selectedKey={value !== undefined ? String(value) : undefined}
       defaultSelectedKey={
         defaultValue !== undefined ? String(defaultValue) : (options[0]?.value ?? undefined)
@@ -204,12 +204,18 @@ export default function Select({
         aria-describedby={ariaDescribedBy ?? field?.['aria-describedby']}
         className={`sel-control${size ? ` size-${size}` : ''}`}
       >
-        <SelectValue className="sel-value">
+        <SelectValue className="sel-value flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">
           {({ selectedText, defaultChildren }) => selectedText ?? defaultChildren}
         </SelectValue>
         {/* Inline rather than a component: one path, used here and nowhere
             else. `Caret` was a module and an export for exactly this. */}
-        <svg className="sel-caret" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+        <svg
+          className="sel-caret flex-none opacity-60"
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          aria-hidden="true"
+        >
           <path
             fill="none"
             stroke="currentColor"
@@ -225,19 +231,24 @@ export default function Select({
           beats the sheet's `max-height: 280px` cap. The cap is the sheet's
           decision: a list taller than that is a list you scroll, not one that
           runs to the bottom of the screen. */}
-      <Popover className="sel-list" placement="bottom start" offset={4} maxHeight={280}>
-        <ListBox className="sel-listbox">
+      <Popover
+        className="sel-list z-[60] max-h-[280px] overflow-y-auto m-0 p-1 list-none border border-border-strong rounded-md surface-panel"
+        placement="bottom start"
+        offset={4}
+        maxHeight={280}
+      >
+        <ListBox>
           {options.map((o) => (
             <ListBoxItem
               key={o.value}
               id={o.value}
               textValue={o.text}
               isDisabled={o.disabled}
-              className="sel-item"
+              className="sel-item flex items-center gap-2 p-2 rounded-sm cursor-pointer whitespace-nowrap"
             >
-              <span className="sel-item-label">{o.label}</span>
+              <span className="flex-1 min-w-0 overflow-hidden text-ellipsis">{o.label}</span>
               <svg
-                className="sel-tick"
+                className="sel-tick flex-none opacity-0"
                 viewBox="0 0 24 24"
                 width="13"
                 height="13"

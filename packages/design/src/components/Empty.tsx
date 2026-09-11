@@ -53,21 +53,41 @@ export default function Empty({
 }) {
   return (
     <div
-      className={`nothing${illustration ? ' nothing-surface' : ''}${
-        className ? ` ${className}` : ''
-      }`}
+      className={[
+        'nothing-surface-or-slot grid justify-items-center text-center rounded-md',
+        /* Dashed rather than solid: a solid border reads as a thing, and the
+           point of this box is that there is no thing -- it marks out where
+           the list will be. */
+        illustration
+          ? /* A whole surface rather than a slot in a card. The outline goes,
+               because a window-sized dashed rectangle reads as a layout that
+               failed rather than a view with nothing on it, and the box
+               centres itself in whatever it was dropped into. */
+            'gap-3 py-10 px-4 m-auto'
+          : 'gap-2 py-5 px-4 border border-dashed border-border-strong',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
     >
       {illustration ? (
+        /* `currentColor` reaches the figure through the two rules the
+           illustrations ship with, so the colour is set here and the drawing
+           follows it -- the same grey as the sentence under it, in every
+           theme. `.illo` sets `color: inherit`, so this has to out-rank a
+           single class: `text-muted` on the element itself does. */
         <Illustration name={illustration} size={160} className="nothing-figure" />
       ) : (
         icon && (
-          <span className="nothing-mark" aria-hidden="true">
+          <span className="text-muted leading-[0]" aria-hidden="true">
             <Icon name={icon} size={20} />
           </span>
         )
       )}
-      <p className="nothing-said">{children}</p>
-      {action && <div className="nothing-act">{action}</div>}
+      {/* `--text-sm`, not the `--text-xs` this used to be: a sentence
+          somebody is meant to read, not a caption qualifying something. */}
+      <p className="m-0 text-muted text-sm leading-[1.5] max-w-[46ch]">{children}</p>
+      {action && <div className="mt-1">{action}</div>}
     </div>
   )
 }

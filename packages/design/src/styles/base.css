@@ -90,23 +90,31 @@ body::before {
    `[aria-disabled='true']` twin rather than a rewrite, which leaves each
    `button` selector at the specificity it had and every committed baseline
    untouched. */
-a.btn {
+.btn {
+  /* The three an anchor brings that a `<button>` does not. Harmless on the
+     button form -- it has no underline and centres already -- and the reason
+     `Button` puts one class on both elements rather than keeping a twin
+     selector for each. */
   text-decoration: none;
   color: var(--text);
   text-align: center;
 }
 
-a.btn[aria-disabled='true'] {
+.btn[aria-disabled='true'] {
   /* A disabled anchor still takes the pointer, so say so. The click itself is
      blocked in the capture phase by the component. */
   cursor: not-allowed;
 }
 
-button,
-a.btn,
-input,
-textarea,
-select {
+/* `:where`, so this base carries no specificity of its own.
+ *
+ * It was `button, input, textarea, select` -- an element selector, which
+ * `.size-sm` and every other class outranked without anyone thinking about
+ * it. Moving it to `.btn` to stop a tab inheriting a control's look raised it
+ * to a class, so it tied with `.size-sm` and won on source order: every
+ * button came out `8px 12px` whatever size it asked for. `:where` puts it
+ * back to zero, which is what the element selector was silently providing. */
+:where(.btn, input, textarea, select) {
   font: inherit;
   color: var(--text);
   background: var(--control);
@@ -127,8 +135,7 @@ select {
    the icon; the button simply had no opinion about how to arrange two things.
    `inline-flex` and a gap gives it one, and the gap replaces the space
    character people were putting between an icon and its label. */
-button,
-a.btn {
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -144,18 +151,41 @@ a.btn {
 
    Several places already drew this by hand as `.chat-bar-btn.on`. This is the
    same look, said once, on a plain button. */
-button[aria-pressed='true'] {
+.btn[aria-pressed='true'] {
   border-color: var(--accent);
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 10%, var(--panel));
 }
 
-button[aria-pressed='true']:hover:not(:disabled) { border-color: var(--accent); }
+.btn[aria-pressed='true']:hover:not(:disabled) { border-color: var(--accent); }
 
 /* The glyph never shrinks: in a narrow row flexbox would take it from the icon
    before the text, and half an icon is not a smaller icon. */
-button > svg,
-a.btn > svg { flex: none; }
+.btn > svg { flex: none; }
+
+/* `Select`'s control wears the control styling, and says so.
+ *
+ * It renders React Aria's `Button` -- a bare `<button>` -- and used to take
+ * `font`, colour, the surface and the border from the
+ * `button, input, textarea, select` reset without asking. When that reset
+ * moved to `.btn`, so a tab and a row would stop inheriting a control's look
+ * only to undo it, this lost all of it at once.
+ *
+ * Here rather than in `select.css`, and that placement is the rule, not
+ * tidiness: `font` is a shorthand and it resets `font-size`, so declared
+ * after `.size-sm` below it silently makes every small control full size.
+ * `index.css` says the import order is behaviour; this is what that means.
+ *
+ * `:where` for the same reason the reset above uses it: this is a base a
+ * `size` class has to be able to beat, and a bare class ties with one. */
+:where(.sel-control) {
+  font: inherit;
+  color: var(--text);
+  background: var(--control);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
 
 .size-sm { font-size: var(--text-xs); padding: var(--space-1) var(--space-2); }
 
@@ -180,8 +210,7 @@ input, textarea, select { width: 100%; }
    same disagreement written twice. */
 textarea { resize: none; }
 
-button:hover:not(:disabled),
-a.btn:hover:not([aria-disabled='true']),
+.btn:hover:not(:disabled),
 input:hover:not(:disabled),
 textarea:hover:not(:disabled),
 select:hover:not(:disabled) { border-color: var(--accent); }
@@ -189,8 +218,7 @@ select:hover:not(:disabled) { border-color: var(--accent); }
 /* `:focus-visible` on the button so a click does not leave a ring behind it,
    `:focus` on the fields because a focused field is a place you are typing and
    should say so however you got there. */
-button:focus-visible,
-a.btn:focus-visible,
+.btn:focus-visible,
 input:focus,
 textarea:focus,
 select:focus { outline: none; border-color: var(--accent); }
@@ -283,14 +311,13 @@ input[type='radio']:focus-visible { outline: none; box-shadow: var(--focus-ring)
 input[type='checkbox']:disabled,
 input[type='radio']:disabled { cursor: not-allowed; background: var(--panel-2); }
 
-button:disabled,
-a.btn[aria-disabled='true'],
+.btn:disabled,
+.btn[aria-disabled='true'],
 input:disabled,
 textarea:disabled,
 select:disabled { opacity: 0.45; cursor: not-allowed; }
 
-button.primary,
-a.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 /* A disabled primary is not a faded primary.
    `opacity: .45` was the whole of it, and a coloured fill at 45% is still a
@@ -298,8 +325,7 @@ a.btn.primary { background: var(--accent); border-color: var(--accent); color: v
    thing on the panel. That got worse when onboarding started holding people at
    a disabled Next. So it gives up the fill entirely and becomes the shape of a
    disabled control -- the opacity then has nothing left to do. */
-button.primary:disabled,
-a.btn.primary[aria-disabled='true'] {
+.btn.primary:disabled {
   background: var(--panel-2);
   border-color: var(--border);
   color: var(--muted);
@@ -313,7 +339,7 @@ a.btn.primary[aria-disabled='true'] {
    line under it that travels.
    `aria-busy` rather than a class: the attribute is what a screen reader reads,
    and styling the thing that carries the meaning is how they stay in step. */
-button[aria-busy='true'] {
+.btn[aria-busy='true'] {
   position: relative;
   overflow: hidden;
   cursor: progress;
@@ -326,18 +352,18 @@ button[aria-busy='true'] {
    something that is working, that reads as a control that failed and went
    grey. So a busy button keeps every colour it had and takes only the loss of
    the cursor and the press; the travelling line is what says why. */
-button[aria-busy='true']:disabled {
+.btn[aria-busy='true']:disabled {
   opacity: 1;
   cursor: progress;
 }
 
-button.primary[aria-busy='true']:disabled {
+.btn.primary[aria-busy='true']:disabled {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--on-accent);
 }
 
-button[aria-busy='true']::after {
+.btn[aria-busy='true']::after {
   content: '';
   position: absolute;
   left: 0;
@@ -369,15 +395,13 @@ button[aria-busy='true']::after {
 
 /* Quiet: no border, no fill. For the action beside the action -- Cancel next to
    Save -- where a bordered box competes with the thing it is next to. */
-button.ghost,
-a.btn.ghost {
+.btn.ghost {
   background: transparent;
   border-color: transparent;
   color: var(--muted);
 }
 
-button.ghost:hover:not(:disabled),
-a.btn.ghost:hover:not([aria-disabled='true']) {
+.btn.ghost:hover:not(:disabled) {
   background: var(--panel-2);
   border-color: transparent;
   color: var(--text);
@@ -459,7 +483,7 @@ a.btn.ghost:hover:not([aria-disabled='true']) {
    header.) */
 .row { display: flex; align-items: center; gap: var(--space-3); }
 
-.grow { flex: 1; min-width: 0; }
+.ctl-grow { flex: 1; min-width: 0; }
 
 .mono { font-family: var(--font-mono); font-size: var(--text-sm); }
 
@@ -523,10 +547,17 @@ a.btn.ghost:hover:not([aria-disabled='true']) {
 /* A pill following a name needs the gap outside its own border. Leading
    whitespace inside the span puts it under the pill's background instead,
    which reads as the badge touching the word it qualifies. */
-.row-pill { margin-left: var(--space-2); vertical-align: baseline; }
+/* A pill beside a name, and the one thing that keeps the pair working:
+   `flex: none`, so the pill never shrinks and the name ellipsises instead.
+   That was `rows.css`'s `.named > .pill`, which meant anybody laying out a
+   name and its pills had to know a package class by name to get it. The
+   variant already says "I am in a row"; it may as well say what that costs. */
+.row-pill { margin-left: var(--space-2); vertical-align: baseline; flex: none; }
 
 /* The tile's only control. Dim until hovered: it is chrome on someone's app. */
 .icon-btn {
+  /* Stated rather than inherited. These came from the `button, input, textarea, select` reset, which applied control styling to everything that happened to be a `<button>` -- so this rule spent its opening lines undoing it, and would break silently if that rule ever moved. It did move, to `.btn`. */
+  font: inherit;
   display: inline-flex; align-items: center; padding: var(--space-1);
   background: none; border: 0; color: var(--muted); opacity: 0.6; cursor: pointer;
 }
@@ -592,19 +623,17 @@ a.btn.ghost:hover:not([aria-disabled='true']) {
   transition: none;
 }
 
-button.primary:active:not(:disabled),
-a.btn.primary:active:not([aria-disabled='true']) {
+.btn.primary:active:not(:disabled) {
   background: color-mix(in srgb, var(--text) var(--press-ink), var(--accent));
   border-color: color-mix(in srgb, var(--text) var(--press-ink), var(--accent));
 }
 
-button.ghost:active:not(:disabled),
-a.btn.ghost:active:not([aria-disabled='true']) {
+.btn.ghost:active:not(:disabled) {
   background: color-mix(in srgb, var(--text) var(--press-ink), var(--panel-2));
   border-color: transparent;
 }
 
-button[aria-pressed='true']:active:not(:disabled) {
+.btn[aria-pressed='true']:active:not(:disabled) {
   background: color-mix(in srgb, var(--accent) 18%, var(--panel));
 }
 
@@ -775,7 +804,7 @@ input:active, textarea:active, select:active { transform: none; }
 
 /* The top bar carries the title, the views and the way into settings. Nothing
    that belongs to a conversation lives here any more, so it can breathe. */
-.topbar .grow { flex: 1; min-width: 0; }
+.topbar .ctl-grow { flex: 1; min-width: 0; }
 
 /* Back on the left, Next on the right, with the gap between them doing the
    separating -- so the button that goes forward is in the same place on both
@@ -805,4 +834,55 @@ input:active, textarea:active, select:active { transform: none; }
 @keyframes ds-skel {
   from { opacity: 0.55; }
   to { opacity: 1; }
+}
+
+/* The states the `button` element rule used to hand every bare `<button>` in
+   the package, now asked for by name.
+ *
+ * This is the half of the decoupling that a screenshot cannot show: `:focus-visible`
+ * is not photographed, so nine components would have lost their focus ring in
+ * silence. `keyboard.spec.ts` is what actually holds this.
+ *
+ * `.btn` has its own, in the rules above. These are the ones that are a button
+ * for their behaviour and not for their appearance -- a tab, a row, a card, a
+ * pager step, a grid cell, a remove cross. */
+.tab:focus-visible,
+.row-hit:focus-visible,
+.card:focus-visible,
+.ident-remove:focus-visible,
+.size-cell:focus-visible,
+.pager-step:focus-visible,
+.pager-page:focus-visible,
+.sel-control:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* `:disabled` came from the same rule. A control that cannot be pressed has to
+   say so whatever element it is. */
+.tab:disabled,
+.row-hit:disabled,
+.card:disabled,
+.ident-remove:disabled,
+.size-cell:disabled,
+.pager-step:disabled,
+.pager-page:disabled,
+.sel-control:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* The anchor form's disabled states, alongside the button's.
+ *
+ * `.btn` is one class on two elements, and an `<a>` has no `:disabled` -- it
+ * carries `aria-disabled` and a capture-phase click block instead. Every
+ * rule above that reads `:disabled` needs the attribute twin, or a disabled
+ * link is a link that looks pressable and refuses silently. Folding the old
+ * `a.btn` twins into `.btn` dropped these, and the baselines showed a
+ * disabled link at full strength. */
+.btn.primary[aria-disabled='true'] {
+  background: var(--panel-2);
+  border-color: var(--border);
+  color: var(--muted);
+  opacity: 1;
 }

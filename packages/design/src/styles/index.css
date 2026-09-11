@@ -8,6 +8,7 @@
  *
  * `scripts/copy-css.mjs` flattens these into one file at build time.
  */
+@import './_tailwind.built.css';
 @import './base.css';
 @import './select.css';
 @import './dangerzone.css';
@@ -16,7 +17,6 @@
 @import './toggle.css';
 @import './skeleton.css';
 @import './rows.css';
-@import './empty.css';
 @import './progress.css';
 @import './tabs.css';
 @import './toast.css';
@@ -33,7 +33,6 @@
    anchored surfaces (`.pop`, `.menu-sheet`, `.cmd`) sit over everything and a
    rule of equal specificity that came earlier would lose to whatever the
    sheets they cover happen to set. */
-@import './kbd.css';
 @import './stat.css';
 @import './shell.css';
 @import './scrollarea.css';

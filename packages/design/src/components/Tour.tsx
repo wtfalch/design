@@ -162,7 +162,7 @@ export default function Tour({
           <span className="tour-count mono">
             {at + 1} of {live.length}
           </span>
-          <span className="grow" />
+          <span className="ctl-grow" />
           <Button kind="ghost" size="sm" onPress={finish}>
             Skip
           </Button>

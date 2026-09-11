@@ -14,7 +14,7 @@
  * hand:
  *
  *     <div className="set-row">
- *       <span className="grow" style={{ minWidth: 0 }}>
+ *       <span className="ctl-grow" style={{ minWidth: 0 }}>
  *         <span className="named">
  *           <span className="truncate">{name}</span>
  *           …pills…

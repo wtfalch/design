@@ -161,14 +161,19 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
         {({ toast }) => (
           <AriaToast toast={toast} className={`toast toast-${toast.content.tone}`}>
             <Icon name={MARK[toast.content.tone]} size={16} className="toast-mark" />
-            <ToastContent className="grow">
+            <ToastContent className="ctl-grow">
               <Text slot="title">{toast.content.text}</Text>
             </ToastContent>
             {/* React Aria's own `Button`, because `slot="close"` is how the
                 region knows which control dismisses -- and how it knows to
-                put focus back afterwards. The classes are the ones our
-                `Button` would have chosen. */}
-            <Button slot="close" className="ghost size-sm" aria-label="Dismiss">
+                put focus back afterwards.
+                `toast-close`, not `ghost size-sm`: those are `Button`'s
+                classes, and reaching for them from here worked only while
+                `.ghost` was written against the `button` element. It is
+                `.btn.ghost` now. A component that wants another component's
+                look asks for the component, or says what it wants; this one
+                says what it wants, in `toast.css`. */}
+            <Button slot="close" className="toast-close" aria-label="Dismiss">
               <Icon name="close" size={14} />
             </Button>
           </AriaToast>

@@ -51,13 +51,28 @@ export default function Stat({
   look?: 'tile' | 'bare'
   className?: string
 }) {
-  const classes = ['stat', look === 'bare' ? 'stat-bare' : '', className].filter(Boolean).join(' ')
+  /* Utilities, so the tile's shape reads where it is drawn. `bare` states
+     the compact shape rather than adding a class that undoes the tile's --
+     which is the mistake the old element reset made across this package.
+     `stat` and `stat-value` stay as hooks: the tone is an attribute on the
+     tile colouring a child, which is a relationship, and a utility is a
+     property on one element. */
+  const tile =
+    look === 'bare'
+      ? 'grid gap-0 leading-[1.25]'
+      : 'grid gap-1 p-4 border border-border rounded-md surface-panel'
+
+  const classes = ['stat', tile, '[&>p]:m-0', className].filter(Boolean).join(' ')
 
   return (
     <div className={classes} data-tone={tone}>
-      <p className="stat-label">{label}</p>
-      <p className="stat-value">{value}</p>
-      {note && <p className="stat-note">{note}</p>}
+      <p className="text-xs text-muted">{label}</p>
+      <p
+        className={`stat-value font-strong tabular-nums ${look === 'bare' ? 'text-sm' : 'text-lg'}`}
+      >
+        {value}
+      </p>
+      {note && <p className="text-xs text-muted">{note}</p>}
     </div>
   )
 }

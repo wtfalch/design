@@ -2,6 +2,14 @@
 .tabs { position: relative; display: flex; gap: var(--space-1); }
 
 .tab {
+  /* Layout the `button` element rule used to supply. A tab is a button for its behaviour, not its look, so it now says what it wants instead of taking a control's arrangement and undoing the rest. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  /* Stated rather than inherited. These came from the `button, input, textarea, select` reset, which applied control styling to everything that happened to be a `<button>` -- so this rule spent its opening lines undoing it, and would break silently if that rule ever moved. It did move, to `.btn`. */
+  font: inherit;
+  cursor: pointer;
   position: relative;
   z-index: 1;
   background: transparent;

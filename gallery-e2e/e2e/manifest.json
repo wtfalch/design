@@ -176,10 +176,6 @@
     "v": "Default"
   },
   {
-    "c": "modal",
-    "v": "Shown inline"
-  },
-  {
     "c": "pagination",
     "v": "The server would not count"
   },
