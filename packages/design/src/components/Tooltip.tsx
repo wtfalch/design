@@ -91,7 +91,20 @@ export default function Tooltip({
     <TooltipTrigger delay={0} closeDelay={150}>
       <Focusable>
         <span
-          className={`explain explain-${align}${className ? ` ${className}` : ''}`}
+          /* `explain` stays as the hook: the mark brightens on hover and on
+             focus of this element, which is a parent state reaching a child.
+             The rest is this element's own. `text-transform` and
+             `letter-spacing` are reset because one of these sits inside a
+             heading, and headings here are uppercase and tracked out. */
+          className={[
+            'explain',
+            `explain-${align}`,
+            'relative flex-none inline-flex items-center ml-2 cursor-help',
+            'normal-case tracking-normal font-normal',
+            className,
+          ]
+            .filter(Boolean)
+            .join(' ')}
           /* A role, because a name on a role-less span is prohibited -- axe's
              `aria-prohibited-attr`, found the first time this was scanned. `img`
              rather than `button`: the mark is a glyph that reveals help, not a
@@ -102,7 +115,10 @@ export default function Tooltip({
           aria-label={mark ? label : `About ${label}`}
         >
           {mark ?? (
-            <span className="explain-mark" aria-hidden="true">
+            <span
+              className="explain-mark w-[18px] h-[18px] rounded-full border border-border text-muted text-xs leading-[16px] text-center"
+              aria-hidden="true"
+            >
               ?
             </span>
           )}

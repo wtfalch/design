@@ -60,7 +60,18 @@ export default function SizeGrid({
         <button
           key={`${col}x${row}`}
           type="button"
-          className={`size-cell${on ? ' on' : ''}${chosen && !hover ? ' chosen' : ''}`}
+          /* `size-cell` stays as the hook for the two states: `on` is a fill
+             from `color-mix`, which is not a utility. The rest -- a painted
+             cell with no contents, so it says it is a block rather than
+             taking a control's arrangement -- is here. */
+          className={[
+            'size-cell block w-[18px] h-[14px] p-0 rounded-sm border border-border surface-panel-2 cursor-pointer',
+            'disabled:cursor-default disabled:opacity-50',
+            on ? 'on' : '',
+            chosen && !hover ? 'border-accent' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
           disabled={disabled}
           aria-label={`${col} by ${row}`}
           onMouseEnter={() => !disabled && setHover({ cols: col, rows: row })}
@@ -72,9 +83,9 @@ export default function SizeGrid({
   }
 
   return (
-    <div className="size-grid-wrap">
+    <div className="flex items-center gap-2">
       <div
-        className="size-grid"
+        className="grid gap-1"
         style={{ gridTemplateColumns: `repeat(${extent.cols}, 1fr)` }}
         onMouseLeave={() => setHover(null)}
       >
@@ -83,7 +94,7 @@ export default function SizeGrid({
       <span className="set-hint mono">
         {shown.cols} × {shown.rows}
         {(extent.cols === max.cols || extent.rows === max.rows) && (
-          <span className="size-ceiling">
+          <span className="opacity-[0.55]">
             {' '}
             · max {max.cols}×{max.rows}
           </span>
