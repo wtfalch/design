@@ -367,11 +367,10 @@
 
 /* A name beside its pills, and the two rules that make it work. The name
    shrinks and ellipsises; the pills never do -- which is the whole failure
-   `Rows` exists to stop, and it lives in the descendants rather than in the
-   class itself. Copying `.named` without them made the pill wrap onto a
-   second line instead of the name truncating. */
+   `Rows` exists to stop. The pill half belongs to the component now --
+   `Pill`'s `inRow` carries `flex: none` -- so this is the only rule left here,
+   and the gallery names no package class at all. */
 .g-named > .g-truncate { min-width: 0; flex: 0 1 auto; }
-.g-named > .pill { flex: none; }
 .g-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .g-row { display: flex; align-items: center; gap: var(--space-3); }
 .g-row-wrap {

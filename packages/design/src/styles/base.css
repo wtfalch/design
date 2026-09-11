@@ -547,7 +547,12 @@ select:disabled { opacity: 0.45; cursor: not-allowed; }
 /* A pill following a name needs the gap outside its own border. Leading
    whitespace inside the span puts it under the pill's background instead,
    which reads as the badge touching the word it qualifies. */
-.row-pill { margin-left: var(--space-2); vertical-align: baseline; }
+/* A pill beside a name, and the one thing that keeps the pair working:
+   `flex: none`, so the pill never shrinks and the name ellipsises instead.
+   That was `rows.css`'s `.named > .pill`, which meant anybody laying out a
+   name and its pills had to know a package class by name to get it. The
+   variant already says "I am in a row"; it may as well say what that costs. */
+.row-pill { margin-left: var(--space-2); vertical-align: baseline; flex: none; }
 
 /* The tile's only control. Dim until hovered: it is chrome on someone's app. */
 .icon-btn {
