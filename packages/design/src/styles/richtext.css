@@ -1,0 +1,87 @@
+/* Prose: one class, and the elements it styles are ones nobody wrote.
+ *
+ * That is the whole reason a class exists here rather than utilities. Inside
+ * the editor the paragraphs, headings and lists are ProseMirror's, built
+ * from the document — there is no JSX to hang a utility on, so the choice is
+ * descendant rules behind one class or an arbitrary variant per element,
+ * which is the same selector spelled worse. `Markdown` has the same problem
+ * for the same reason and answers it the same way, as `.md` in `base.css`.
+ *
+ * The editor and the view share the class on purpose. They have to look
+ * identical and one set of rules is what guarantees it; two sets maintained
+ * separately is precisely how a what-you-see-is-what-you-get editor stops
+ * being one. Everything the components *do* render — the box, the toolbar,
+ * the writing surface's own padding and focus ring — is utilities in the
+ * component, where it belongs.
+ *
+ * `.rich-text` and not `.prose`: this package's classes ship unprefixed into
+ * other people's stylesheets, and `.prose` is the one name in CSS most
+ * likely to already be taken — Tailwind's typography plugin defines exactly
+ * it. A consumer with that plugin and this package would have had two sets
+ * of margins fighting, and it would have read as a theming bug.
+ *
+ * Every value here is a token. The vertical rhythm is `--space-*`, four
+ * pixels a step and scaling with `--density`; the type steps are `--text-*`,
+ * scaling with `--font-size`. A heading two sizes apart from its body at one
+ * density is two sizes apart at every density.
+ */
+
+.rich-text > * {
+  margin: 0;
+}
+
+.rich-text > * + * {
+  margin-top: var(--space-3);
+}
+
+.rich-text h2 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-strong);
+  letter-spacing: -0.01em;
+}
+
+.rich-text h3 {
+  font-size: var(--text-md);
+  font-weight: var(--weight-strong);
+}
+
+/* A heading after prose needs more room above it than below: the space
+   belongs to the section it opens, not to the paragraph it follows. */
+.rich-text > * + :is(h2, h3) {
+  margin-top: var(--space-6);
+}
+
+.rich-text :is(ul, ol) {
+  padding-left: var(--space-5);
+}
+
+.rich-text li + li {
+  margin-top: var(--space-1);
+}
+
+.rich-text a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rich-text strong {
+  font-weight: var(--weight-strong);
+}
+
+/* An empty editor says what goes in it. The placeholder extension puts the
+   words on the empty node as `data-placeholder` and marks it, so `attr()` is
+   reading an attribute of the element it is drawn on — which is the part a
+   hand-rolled rule got wrong twice: a rule on the paragraph cannot reach an
+   attribute on the box, and ProseMirror's empty paragraph holds a trailing
+   `<br>` so `:empty` never matches it either. `pointer-events: none` so a
+   click on the words still lands in the text.
+
+   Harmless on the view, which never produces the class. */
+.rich-text p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--muted);
+  pointer-events: none;
+}

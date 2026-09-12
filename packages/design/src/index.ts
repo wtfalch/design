@@ -59,6 +59,14 @@ export type { Props as InputProps } from './components/Input'
  *  of, now one component a consumer can reach. */
 export { default as Kbd } from './components/Kbd'
 export { default as Markdown } from './components/Markdown'
+/** Prose written with `RichTextEditor` (`@wtfalch/design/editor`), drawn.
+ *  Here rather than in that entry because reading prose should not download
+ *  an editor; the schema the two agree on ships with it. */
+export { default as RichText } from './components/RichText'
+/** The value's shape and the three helpers that need no validator. The schema
+ *  itself is `@wtfalch/design/rich-text`, because zod is an optional peer. */
+export type { BlockNode, RichTextMark, RichTextValue } from './rich-text/schema'
+export { emptyRichText, isEmptyRichText, richTextToPlain } from './rich-text/value'
 export { default as Menu } from './components/Menu'
 export type { Item as MenuItem, Section as MenuSection } from './components/Menu'
 export { default as Modal } from './components/Modal'

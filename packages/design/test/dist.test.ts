@@ -39,7 +39,12 @@ describe('the built package', () => {
     expect(existsSync(join(dist, 'index.js')), 'no dist: run pnpm build first').toBe(true)
   })
 
-  it('loads in plain Node, with no bundler resolving its imports', () => {
+  /* Four child Node processes, each a cold module graph, against vitest's
+     5s default -- which this has been one busy machine away from all along,
+     and tripped at 9.4s once the front door gained a component. The number
+     is not a guess: a passing run is 6-8s here, so 30 is room for a slow
+     one and still fails fast if the package genuinely stops loading. */
+  it('loads in plain Node, with no bundler resolving its imports', { timeout: 30_000 }, () => {
     expect(inNode('index.js', 'typeof m.Brand + " " + m.BRAND_NAMES.join(",")')).toBe(
       'function tf,valet',
     )

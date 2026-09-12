@@ -17,6 +17,8 @@
  * first time the real one changes.
  */
 
+import { type RichTextValue, emptyRichText } from '@wtfalch/design'
+import { RichTextEditor } from '@wtfalch/design/editor'
 import { useState } from 'react'
 
 import {
@@ -46,6 +48,7 @@ import {
   Pill,
   Popover,
   Progress,
+  RichText,
   Rows,
   ScrollArea,
   Select,
@@ -83,6 +86,54 @@ export interface Component {
 /** A row of things to compare, which is most of what a variant is. */
 function Row({ children }: { children: React.ReactNode }) {
   return <div className="spec-row">{children}</div>
+}
+
+const WRITTEN: RichTextValue = {
+  type: 'doc',
+  content: [
+    { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'What it is for' }] },
+    {
+      type: 'paragraph',
+      content: [
+        { type: 'text', text: 'Six things and no more: two heading levels, ' },
+        { type: 'text', text: 'bold', marks: [{ type: 'bold' }] },
+        { type: 'text', text: ', ' },
+        { type: 'text', text: 'italic', marks: [{ type: 'italic' }] },
+        { type: 'text', text: ', a ' },
+        {
+          type: 'text',
+          text: 'link',
+          marks: [{ type: 'link', attrs: { href: 'https://example.com' } }],
+        },
+        { type: 'text', text: ', and two kinds of list.' },
+      ],
+    },
+    {
+      type: 'bulletList',
+      content: [
+        {
+          type: 'listItem',
+          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'No tables' }] }],
+        },
+        {
+          type: 'listItem',
+          content: [{ type: 'paragraph', content: [{ type: 'text', text: 'No colours' }] }],
+        },
+      ],
+    },
+  ],
+}
+
+function RichTextEditorDemo({ empty = false }: { empty?: boolean }) {
+  const [value, setValue] = useState<RichTextValue>(empty ? emptyRichText : WRITTEN)
+  return (
+    <RichTextEditor
+      label="Body"
+      placeholder={empty ? 'Write something.' : undefined}
+      value={value}
+      onChange={setValue}
+    />
+  )
 }
 
 function SelectDemo({ block = false }: { block?: boolean }) {
@@ -2098,6 +2149,31 @@ export const COMPONENTS: Component[] = [
             }
           />
         ),
+      },
+    ],
+  },
+  {
+    id: 'richtext',
+    name: 'Rich text',
+    blurb:
+      'Prose, written and drawn. The toolbar offers six things and the schema ' +
+      'admits exactly those six, so what somebody can type is what a page ' +
+      'can render — the restriction is the component, not a style guide.',
+    variants: [
+      {
+        name: 'Written in',
+        note: 'The editor, with something in it.',
+        render: () => <RichTextEditorDemo />,
+      },
+      {
+        name: 'Empty',
+        note: 'What it says before anybody has typed.',
+        render: () => <RichTextEditorDemo empty />,
+      },
+      {
+        name: 'Drawn',
+        note: 'The same value as a page shows it. No editor loaded.',
+        render: () => <RichText value={WRITTEN} />,
       },
     ],
   },

@@ -43,3 +43,7 @@
 @import './command.css';
 @import './pagination.css';
 @import './identity.css';
+/* Prose and the surface it is written on, added in 0.8.0. Last, because
+   `.prose` styles the elements the reset in `base.css` flattened and has to
+   win over it, and because the editor's box sits over nothing. */
+@import './richtext.css';
