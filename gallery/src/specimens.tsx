@@ -26,6 +26,8 @@ import {
   Card,
   Checkbox,
   Command,
+  DangerAction,
+  DangerZone,
   Row as DataRow,
   Dialog,
   Empty,
@@ -60,6 +62,7 @@ import {
   ToastHost,
   Toggle,
   Tooltip,
+  Tour,
   useToast,
 } from '@wtfalch/design'
 
@@ -770,6 +773,58 @@ function ChipsDemo() {
       ))}
       {people.length === 0 && <span className="g-hint">All removed. Reload to reset.</span>}
     </Row>
+  )
+}
+
+/* The asking state and the unavailable state, which are the two halves of
+   `DangerAction` a static render cannot show at once. */
+function DangerZoneDemo() {
+  return (
+    <DangerZone note="Neither of these can be undone.">
+      <DangerAction
+        title="Remove every member"
+        description="They lose access immediately and have to be invited again."
+        label="Remove all"
+        onConfirm={() => {}}
+      />
+      <DangerAction
+        title="Transfer ownership"
+        description="The new owner can remove you."
+        label="Transfer"
+        onConfirm={() => {}}
+        unavailable="You are the only member, so there is nobody to transfer it to."
+      />
+    </DangerZone>
+  )
+}
+
+/* The tour needs something to point at, so the stage carries its own target.
+   `onDone` puts it back rather than unmounting it: a specimen that can be
+   dismissed for good is a specimen that is blank the second time you open it. */
+function TourDemo() {
+  const [run, setRun] = useState(0)
+  return (
+    <div className="demo-stack">
+      <Row>
+        <Button id="tour-demo-target" kind="primary">
+          New applet
+        </Button>
+        <Button kind="ghost" onPress={() => setRun(run + 1)}>
+          Replay
+        </Button>
+      </Row>
+      <Tour
+        key={run}
+        stops={[
+          {
+            target: '#tour-demo-target',
+            title: 'Applets live here',
+            body: 'An applet is a small thing a model writes for you and keeps on this view.',
+          },
+        ]}
+        onDone={() => setRun(run + 1)}
+      />
+    </div>
   )
 }
 
@@ -2552,6 +2607,77 @@ export const COMPONENTS: Component[] = [
           'Each remove button is named for its own recipient, because six buttons ' +
           'all called “Remove” is a list a screen reader cannot choose from.',
         render: () => <ChipsDemo />,
+      },
+    ],
+  },
+  {
+    id: 'dangerzone',
+    name: 'Danger zone',
+    blurb:
+      'The bottom of a settings page, where the things that cannot be undone ' +
+      'live together instead of sitting next to the things that can. `confirm` ' +
+      'is the whole of the difference between the actions in it: a second click ' +
+      'for something with a way back, typing the name for something without one.',
+    variants: [
+      {
+        name: 'The three confirmations',
+        note:
+          'Read top to bottom, the cost goes up and so does what it takes to ' +
+          'agree to it. `plain` is in the same box because "rename" belongs ' +
+          'beside "delete" in a person\u2019s head, not because it is dangerous.',
+        render: () => (
+          <DangerZone note="Renaming is reversible. The other two are not.">
+            <DangerAction
+              kind="plain"
+              confirm="none"
+              title="Rename this instance"
+              description="Everyone who has the link keeps it; only the label changes."
+              label="Rename"
+              onConfirm={() => {}}
+            />
+            <DangerAction
+              title="Revoke every key"
+              description="Anything signing with one stops working the moment this is pressed."
+              label="Revoke all keys"
+              onConfirm={() => {}}
+            />
+            <DangerAction
+              confirm="type"
+              match="orion-prod"
+              title="Delete this instance"
+              description="The database, its backups and the domain go with it."
+              label="Delete instance"
+              onConfirm={() => {}}
+            />
+          </DangerZone>
+        ),
+      },
+      {
+        name: 'When it cannot be done',
+        note:
+          '`unavailable` replaces the controls rather than disabling them, ' +
+          'because a disabled button does not say why. The asking state needs a ' +
+          'press to reach, so `windows.spec.ts` is where it is photographed.',
+        render: () => <DangerZoneDemo />,
+      },
+    ],
+  },
+  {
+    id: 'tour',
+    name: 'Tour',
+    blurb:
+      'A coach mark over the real chrome: a hole cut in a dimmed window around ' +
+      'one control, and a card beside it saying what the control is for. The ' +
+      'stops name their targets by selector, and a stop whose target is not on ' +
+      'the page is skipped rather than pointing at nothing.',
+    variants: [
+      {
+        name: 'Pointing at a control',
+        note:
+          'The spotlight is a single enormous spread shadow, so it needs no clip ' +
+          'path and the ring around the hole is the highlight. The card carries ' +
+          'the count, because "Next" with no idea how many is a corridor.',
+        render: () => <TourDemo />,
       },
     ],
   },

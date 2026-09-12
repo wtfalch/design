@@ -74,9 +74,16 @@ export default function Empty({
         /* `currentColor` reaches the figure through the two rules the
            illustrations ship with, so the colour is set here and the drawing
            follows it -- the same grey as the sentence under it, in every
-           theme. `.illo` sets `color: inherit`, so this has to out-rank a
-           single class: `text-muted` on the element itself does. */
-        <Illustration name={illustration} size={160} className="nothing-figure" />
+           theme.
+
+           This wanted a rule of its own for a while. `.illo` sets
+           `color: inherit`, and while the package's sheets were unlayered an
+           unlayered declaration beat a layered utility whatever the
+           specificity, so `text-muted` lost silently and the figure came out
+           full text black beside a muted sentence. Wrapping the sheets in
+           `@layer components` put them *below* `@layer utilities` in the
+           declared order, and the utility has won ever since. */
+        <Illustration name={illustration} size={160} className="text-muted" />
       ) : (
         icon && (
           <span className="text-muted leading-[0]" aria-hidden="true">

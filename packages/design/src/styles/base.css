@@ -715,23 +715,6 @@ input:active, textarea:active, select:active { transform: none; }
    template are allowed to diverge, and this is only saying that they have. */
 .set-hint.drifted { color: var(--warn); }
 
-/* What an applet drew, read back. A tree rather than prose, so it is left as
-   preformatted text and given a ceiling -- a busy applet is a hundred lines and
-   this sits inside a settings pane. */
-.drawn {
-  margin: var(--space-2) 0 0;
-  padding: var(--space-2) var(--space-2);
-  max-height: 220px;
-  overflow: auto;
-  font-size: var(--text-xs);
-  line-height: 1.45;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--panel-2);
-}
-
 /* One applet, alone on the page, at `/applet/<id>`. Fills the window: there is
    no grid here to decide a height, and a screenshot of an applet letterboxed
    inside a page is mostly not the applet. */

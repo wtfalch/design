@@ -133,7 +133,10 @@ export default function Slider({
     <div
       className={`slider-row slider-${size}${disabled ? ' is-disabled' : ''}${className ? ` ${className}` : ''}`}
     >
-      <label htmlFor={id} className={labelHidden ? 'sr-only' : 'slider-body'}>
+      <label
+        htmlFor={id}
+        className={labelHidden ? 'sr-only' : 'flex-[1_1_260px] min-w-0 grid gap-px'}
+      >
         <span className="text-text">{label}</span>
         {hint && <span className="slider-hint">{hint}</span>}
       </label>

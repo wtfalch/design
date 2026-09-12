@@ -1,9 +1,5 @@
 /* tour ----------------------------------------------------------------- */
 
-/* The layer sits over everything and catches nothing: the scrim is painted by
-   the hole's shadow, so there is no full-screen element to swallow a click. */
-.tour { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
-
 /* The control the tour is currently pointing at.
    
    Much of this chrome is invisible until you touch it -- `.view-add` lives at
@@ -14,11 +10,14 @@
    what every control does at rest, and the alternative is naming each one here
    and watching that list drift from the rules that hide them. One declaration
    that outranks whatever the resting state is beats an enumeration that goes
-   stale. It is scoped to a class only ever present on one element at a time. */
-.tour-target {
-  opacity: 1 !important;
-  color: var(--text) !important;
-}
+   stale. It is scoped to a class only ever present on one element at a time.
+
+   Opacity and nothing else. This forced `color: var(--text)` too, from the
+   original port, with no case on record that needed it -- and it broke the
+   first target that painted its own background, turning a primary button's
+   label dark on accent at 2.2:1. The spotlight makes a control visible; what
+   colour it is at rest is the control's business. */
+.tour-target { opacity: 1 !important; }
 
 /* The spotlight. An enormous spread shadow dims the whole window except the
    rectangle it is drawn on, which needs no clip path and no arithmetic. */
@@ -51,8 +50,6 @@
 }
 
 .tour-card:focus { outline: none; }
-
-.tour-title { font-size: var(--text-base); }
 
 .tour-body { margin: 0; color: var(--muted); font-size: var(--text-sm); line-height: 1.5; }
 

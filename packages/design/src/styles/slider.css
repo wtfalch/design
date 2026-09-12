@@ -24,8 +24,6 @@
 
 .slider-row.is-disabled { opacity: 0.55; }
 
-.slider-body { flex: 1 1 260px; min-width: 0; display: grid; gap: 1px; }
-
 .set-row > .slider-row { flex: 1; min-width: 0; padding-block: 0; }
 
 .slider-hint { font-size: var(--text-sm); color: var(--muted); }

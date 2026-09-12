@@ -126,6 +126,9 @@ export default function Tour({
 
   return createPortal(
     <div
+      /* Over everything and catching nothing: the scrim is painted by the
+         hole's own shadow, so there is no full-screen element here to swallow
+         a click meant for the page underneath. */
       className="fixed inset-0 z-[60] pointer-events-none"
       onKeyDown={(e) => {
         if (e.key === 'Escape') finish()
@@ -154,7 +157,7 @@ export default function Tour({
         aria-labelledby="tour-title"
         tabIndex={-1}
       >
-        <strong id="tour-title" className="tour-title">
+        <strong id="tour-title" className="text-base">
           {stop.title}
         </strong>
         <p className="tour-body">{stop.body}</p>
