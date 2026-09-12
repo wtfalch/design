@@ -175,7 +175,10 @@ export default function SplitPane({
       className={`split dir-${direction}${className ? ` ${className}` : ''}`}
       style={{ '--split': `${size}%` } as React.CSSProperties}
     >
-      <div className="split-pane split-first" id={firstPaneId}>
+      <div
+        className="min-w-0 min-h-0 overflow-hidden flex flex-col flex-[0_0_var(--split)]"
+        id={firstPaneId}
+      >
         {first}
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: the semantic element for
@@ -201,7 +204,7 @@ export default function SplitPane({
       >
         <span className="split-grip" aria-hidden="true" />
       </div>
-      <div className="split-pane split-second">{second}</div>
+      <div className="min-w-0 min-h-0 overflow-hidden flex flex-col flex-[1_1_0]">{second}</div>
     </div>
   )
 }

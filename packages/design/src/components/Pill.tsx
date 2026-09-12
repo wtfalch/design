@@ -22,8 +22,7 @@
  * label from 4.7:1 to 3.9:1. The tones mix at 10% into the panel for that
  * reason and not for taste.
  *
- * This was the second-most-copied markup in the app — `<span className="pill
- * pill-info">` at every call site, and a gallery page teaching it. A page that
+ * This was the second-most-copied markup in the app — `<span className="pill * pill-info">` at every call site, and a gallery page teaching it. A page that
  * documents hand-written markup is a page that will be copied.
  */
 

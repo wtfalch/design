@@ -28,8 +28,6 @@
 
 .set-row > .slider-row { flex: 1; min-width: 0; padding-block: 0; }
 
-.slider-label { color: var(--text); }
-
 .slider-hint { font-size: var(--text-sm); color: var(--muted); }
 
 /* The box, with the value printed inside it at the right where a select

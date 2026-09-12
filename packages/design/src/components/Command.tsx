@@ -127,11 +127,15 @@ export default function Command({
       isDismissable
     >
       <AriaModal className={`cmd${className ? ` ${className}` : ''}`}>
-        <Dialog className="cmd-body" aria-label={label}>
+        <Dialog className="outline-none flex flex-col min-h-0" aria-label={label}>
           {({ close }) => (
             <Autocomplete inputValue={query} onInputChange={setQuery} filter={() => true}>
-              <SearchField className="cmd-field" aria-label={label} autoFocus>
-                <Icon name="chat" className="cmd-mark" />
+              <SearchField
+                className="flex items-center gap-2 py-3 px-4 border-b border-border"
+                aria-label={label}
+                autoFocus
+              >
+                <Icon name="chat" className="flex-none w-4 h-4 text-muted" />
                 <Input className="cmd-input" placeholder={placeholder} />
               </SearchField>
 
@@ -142,10 +146,16 @@ export default function Command({
                   Nothing matches <strong>{query}</strong>.
                 </p>
               ) : (
-                <ListBox className="cmd-list" aria-label={label} selectionMode="none">
+                <ListBox
+                  className="p-2 overflow-auto overscroll-contain outline-none min-h-0"
+                  aria-label={label}
+                  selectionMode="none"
+                >
                   {shown.map((group) => (
                     <ListBoxSection key={group.title}>
-                      <Header className="cmd-group-title">{group.title}</Header>
+                      <Header className="pt-2 px-2 pb-1 text-2xs uppercase tracking-normal text-muted">
+                        {group.title}
+                      </Header>
                       {group.commands.map((command) => (
                         <ListBoxItem
                           key={command.id}
@@ -162,7 +172,7 @@ export default function Command({
                           }}
                         >
                           {command.icon && <Icon name={command.icon} className="cmd-icon" />}
-                          <span className="cmd-text">
+                          <span className="flex-[1_1_auto] min-w-0 grid">
                             <Text slot="label" className="cmd-label">
                               {command.label}
                             </Text>
