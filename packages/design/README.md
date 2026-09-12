@@ -13,9 +13,12 @@ The components, and the tokens. Not the classes.
 
 A class in this package is an implementation detail: `.card`, `.set-row`,
 `.pill` and the rest may be renamed or deleted whenever the component that
-draws them changes, and 0.9.0 did exactly that to several of them. If you
-need a card, render `<Card>`; if you need a row of your own, write it in the
-token vocabulary:
+draws them changes. 0.9.0 did exactly that to several of them, and 0.10.0
+deleted 41 more: the components that drew them draw themselves now, so the
+rules had no reader left.
+
+If you need a card, render `<Card>`; if you need a row of your own, write it
+in the token vocabulary:
 
 ```css
 .app-row { display: flex; gap: var(--space-3); align-items: center; }
