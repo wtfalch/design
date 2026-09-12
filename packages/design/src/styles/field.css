@@ -26,8 +26,6 @@
 
 /* Not red. The asterisk marks which fields are required; colouring it the same
    as a failure says something has already gone wrong with every one of them. */
-.field-required { color: var(--muted); }
-
 .field-hint,
 .field-error { margin: 0; font-size: var(--text-sm); line-height: 1.45; }
 
@@ -49,8 +47,6 @@
 /* Fields stacked down a form. Wider than the gap inside one field, so the
    label of the next belongs to the input under it rather than to the error
    above it. */
-.field-stack { display: grid; gap: var(--space-4); }
-
 .field-row > .field { flex: 1; min-width: 0; }
 
 /* A password with an eye -- `Input type="password"`.

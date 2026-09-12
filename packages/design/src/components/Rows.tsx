@@ -80,7 +80,7 @@ export function Rows({
   const none = Array.isArray(items) ? items.length === 0 : !items
 
   if (none) {
-    return empty ? <div className="set-hint rows-empty">{empty}</div> : null
+    return empty ? <div className="set-hint py-3">{empty}</div> : null
   }
   return (
     <div
@@ -157,7 +157,7 @@ export function Row({
         </span>
         {hint && <div className="set-hint">{hint}</div>}
       </span>
-      {trail && <span className="row-trail set-hint mono">{trail}</span>}
+      {trail && <span className="flex-none ml-auto whitespace-nowrap set-hint mono">{trail}</span>}
     </>
   )
 

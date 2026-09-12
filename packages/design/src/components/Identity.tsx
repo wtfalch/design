@@ -77,14 +77,18 @@ export default function Identity({
         {initials}
       </span>
 
-      <span className="ident-text">
-        <span className="ident-name">{shown}</span>
+      <span className="grid min-w-0">
+        <span className="overflow-hidden text-ellipsis whitespace-nowrap font-normal">{shown}</span>
         {/* Only when the name is not already the address, or the row says the
             same thing twice. */}
-        {kind === 'full' && shown !== address && <span className="ident-address">{address}</span>}
+        {kind === 'full' && shown !== address && (
+          <span className="overflow-hidden text-ellipsis whitespace-nowrap text-xs text-muted">
+            {address}
+          </span>
+        )}
       </span>
 
-      {aside && <span className="ident-aside">{aside}</span>}
+      {aside && <span className="flex-none text-muted text-xs">{aside}</span>}
 
       {onRemove && (
         <button

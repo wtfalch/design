@@ -108,7 +108,7 @@ export default function Callout({
       onBlurCapture={() => running && setPaused(false)}
     >
       {mark && (
-        <span className="callout-mark" aria-hidden="true">
+        <span className="flex-none grid place-items-center mt-px opacity-90" aria-hidden="true">
           <Icon name={mark} size={16} />
         </span>
       )}

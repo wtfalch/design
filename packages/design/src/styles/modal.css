@@ -89,8 +89,6 @@
    `<strong>` rule above is the one that sets the size. */
 /* Under the title, on the header's padding rather than the body's, so it reads
    as part of the heading rather than as the first line of content. */
-.modal-desc { line-height: 1.5; }
-
 .modal-body { padding: var(--space-2) var(--space-4) var(--space-3); overflow-y: auto; }
 
 /* The close cross. Its rule stayed behind in tf's stylesheet when the split

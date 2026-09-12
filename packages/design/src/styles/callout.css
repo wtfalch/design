@@ -51,8 +51,6 @@
 /* A callout that leaves on its own.
    Room at the bottom for the bar, and `position: relative` so the bar can sit
    on the border rather than inside the text. */
-.callout-timed { position: relative; padding-bottom: var(--space-5); overflow: hidden; }
-
 /* The countdown. Drawn as a shrinking bar rather than a number: nobody wants to
    read a clock, they want to know whether they have time. Animated width rather
    than a transition, so it starts the moment it is painted. */
@@ -113,14 +111,6 @@
    is the operating system's font drawing a glyph beside an app that has an icon
    set for exactly this. The ring went with it: a circle around a warning
    triangle is two shapes saying one thing. */
-.callout-mark {
-  flex: none;
-  display: grid;
-  place-items: center;
-  margin-top: 1px;
-  opacity: 0.9;
-}
-
 /* Held-back history when a local conversation would cross to a hosted model.
    Deliberately loud: the cost of missing it is uploading work that was kept
    local on purpose. */
@@ -136,3 +126,17 @@
 }
 
 .callout button { flex: none; }
+/* A state, so it stays a class.
+ *
+ * `Callout` applies this as `running ? ' callout-timed' : ''` inside a
+ * template literal -- which is not a class list a rewrite can read, and the
+ * first pass at converting it deleted the rule while leaving the usage. The
+ * box lost five spacing steps of padding and the countdown bar had nothing
+ * to sit in. A class that appears only inside a conditional is a state; the
+ * sheet is where those belong. */
+.callout-timed {
+  position: relative;
+  padding-bottom: var(--space-5);
+  overflow: hidden;
+}
+

@@ -209,8 +209,6 @@
 
 .rows-split:first-of-type { margin-top: var(--space-2); }
 
-.rows-empty { padding: var(--space-3) 0; }
-
 /* The name, the pills and the line underneath. `min-width: 0` is the whole
    reason this is a class: a flex item will not shrink below its content, so
    without it the name pushes the pills off the end -- and the pills are the
@@ -227,8 +225,6 @@
 
 /* The aligned column. `margin-left: auto` rather than a grid, because the rows
    are flex and a size that varies by two characters does not need a track. */
-.row-trail { flex: none; margin-left: auto; white-space: nowrap; }
-
 .rows-row.rows-top { align-items: flex-start; }
 
 .rows-row.rows-bad .truncate { color: var(--bad); }

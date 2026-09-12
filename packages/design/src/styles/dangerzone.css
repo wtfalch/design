@@ -87,8 +87,6 @@
   border-radius: 4px;
 }
 
-.danger-unavailable { margin-top: var(--space-2); opacity: 0.85; }
-
 /* Label beside the control, for a settings pane: a column of names on the left
    and their controls on the right reads as a list of what is set, where the
    same rows stacked read as a form waiting to be filled in. The description

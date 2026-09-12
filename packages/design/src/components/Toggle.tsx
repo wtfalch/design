@@ -213,10 +213,10 @@ export default function Toggle({
       isReadOnly={pending}
     >
       <span className={labelHidden ? 'sr-only' : 'switch-body'}>
-        <span className="switch-label">{label}</span>
+        <span className="text-text">{label}</span>
         {hint && <span className="switch-hint">{hint}</span>}
       </span>
-      {said && <span className="switch-said mono">{said}</span>}
+      {said && <span className="flex-none text-xs text-muted mono">{said}</span>}
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: the track is aria-hidden and takes no focus -- the keyboard operates the input; onClick here only swallows the click a gesture leaves behind */}
       <span
         className="toggle"

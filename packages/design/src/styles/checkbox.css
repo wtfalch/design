@@ -30,8 +30,6 @@
 /* A run of checkboxes is one choice, not several settings that happen to be
    adjacent. Tight enough that the group reads as a block -- at the spacing a
    form field wants, four tools look like four unrelated questions. */
-.choice-group { display: grid; gap: var(--space-1); }
-
 /* The same choice, laid out as tiles instead of a column.
    
    Four short names down the full width of a card is four wide bands for four
@@ -154,8 +152,6 @@
 /* Explanation, not decoration: every one of these rows is a permission, and the
    second line is what the first line is actually asking for. */
 .choice-why { display: block; color: var(--muted); font-size: var(--text-sm); margin-top: 1px; }
-
-.choice-meta { color: var(--muted); font-size: var(--text-xs); font-family: var(--font-mono); }
 
 .choice[data-disabled] {
   cursor: not-allowed;

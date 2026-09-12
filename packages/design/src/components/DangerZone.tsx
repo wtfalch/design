@@ -102,7 +102,7 @@ export function DangerAction({
       <div className="set-hint">{description}</div>
 
       {unavailable ? (
-        <div className="set-hint danger-unavailable">{unavailable}</div>
+        <div className="set-hint mt-2 opacity-[0.85]">{unavailable}</div>
       ) : confirm === 'type' ? (
         <>
           <div className="row danger-row field-row">
