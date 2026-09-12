@@ -85,8 +85,10 @@
 }
 
 /* Only where there is something to pick. A row without `row-hit` is not a
-   choice, and lighting it up on hover promises something that does not happen. */
-.rows-pick > .rows-row:has(.row-hit):hover {
+   choice, and lighting it up on hover promises something that does not happen.
+   Nor is a row whose hit is disabled: a waiting row lit up under its own
+   `not-allowed` cursor, and `disabled` would have made that permanent. */
+.rows-pick > .rows-row:has(.row-hit:enabled):hover {
   border-color: var(--accent);
   background: var(--panel-2);
 }
@@ -138,9 +140,16 @@
 /* And nothing else can be chosen while it happens: picking a second model
    mid-load queues a second load, which is how a machine ends up swapping two
    sets of weights it cannot hold at once. */
-.rows-pick > .rows-row.is-waiting { opacity: 0.5; }
+.rows-pick > .rows-row.is-waiting,
+.rows-pick > .rows-row.is-disabled { opacity: 0.5; }
 
-.rows-pick > .rows-row.is-waiting .row-hit { cursor: not-allowed; }
+.rows-pick > .rows-row.is-waiting .row-hit,
+.rows-pick > .rows-row.is-disabled .row-hit { cursor: not-allowed; }
+
+/* Dimmed once. `.row-hit:disabled` dims the button as well, and under the
+   row's own opacity the hint of a disabled row, the line saying why it cannot
+   be chosen, came out at a quarter strength. */
+.rows-pick > .rows-row.is-disabled > .row-hit:disabled { opacity: 1; }
 
 @media (prefers-reduced-motion: reduce) {
   /* The border still says which one, without the breathing. */
@@ -192,7 +201,7 @@
   margin-bottom: calc(var(--space-2) * -1);
 }
 
-.rows-pick > .rows-row.is-picked:has(.row-hit):hover {
+.rows-pick > .rows-row.is-picked:has(.row-hit:enabled):hover {
   background: color-mix(in srgb, var(--accent) 13%, var(--panel));
 }
 
@@ -251,6 +260,6 @@
   border-radius: var(--radius-sm);
 }
 
-.row-hit:hover .truncate { color: var(--accent); }
+.row-hit:enabled:hover .truncate { color: var(--accent); }
 
 .row-hit:focus-visible { outline: none; box-shadow: var(--focus-ring); }

@@ -249,6 +249,10 @@
   },
   {
     "c": "rows",
+    "v": "A choice that cannot be made"
+  },
+  {
+    "c": "rows",
     "v": "Clickable"
   },
   {

@@ -558,6 +558,27 @@ function PickCard() {
   )
 }
 
+function PickRows() {
+  const [at, setAt] = useState('automatic')
+  return (
+    <Rows look="pick" label="When an update arrives">
+      <DataRow
+        name="Automatically"
+        hint="This build is unsigned, so nothing can apply an update on its own."
+        picked={at === 'automatic'}
+        disabled
+        onClick={() => setAt('automatic')}
+      />
+      <DataRow
+        name="When I say so"
+        hint="Nothing is downloaded or replaced until you press it."
+        picked={at === 'manual'}
+        onClick={() => setAt('manual')}
+      />
+    </Rows>
+  )
+}
+
 function TimedCallout() {
   const [shown, setShown] = useState(true)
   const [slow, setSlow] = useState(true)
@@ -1081,6 +1102,14 @@ export const COMPONENTS: Component[] = [
             />
           </Rows>
         ),
+      },
+      {
+        name: 'A choice that cannot be made',
+        note:
+          '`look="pick"` with one row `disabled`: dimmed, its button disabled, and ' +
+          'still showing as picked, because a stored choice can be the one this ' +
+          'build cannot honour. The hint says why; `waiting` is for a reason that passes.',
+        render: () => <PickRows />,
       },
       {
         name: 'Empty',
