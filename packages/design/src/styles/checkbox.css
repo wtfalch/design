@@ -30,25 +30,12 @@
 /* A run of checkboxes is one choice, not several settings that happen to be
    adjacent. Tight enough that the group reads as a block -- at the spacing a
    form field wants, four tools look like four unrelated questions. */
-/* The same choice, laid out as tiles instead of a column.
-   
-   Four short names down the full width of a card is four wide bands for four
-   words -- the row is sized by the card, not by anything in it, so `Read` gets
-   the same 1000px as a sentence would. As tiles they are sized by their
-   content and the group reads as one set of four rather than a stack of four
-   settings.
-   
-   `auto-fit` with a floor rather than a fixed four: the pane is a modal that
-   narrows with the window, and four columns of 40px is worse than two of 160.
-   The floor is the width at which a two-word name still fits on one line. */
-.choice-tiles {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-2);
-}
-
 /* Room for the tick, which is absolutely positioned at the top right. In a
-   full-width row the text never reached it; in a tile it would run underneath. */
-.choice-tiles .choice-body { padding-right: var(--space-6); }
+   full-width row the text never reaches it; in a tile it would run underneath.
+   `tile` is a prop on the component now: this was keyed on a `.choice-tiles`
+   container that no component renders, so the class only ever existed in a
+   consumer's markup and the package was styling itself through it. */
+.choice-tile .choice-body { padding-right: var(--space-6); }
 
 /* The floor is 220px and not 150px because of what four items do at the widths
    in between. The settings pane gives this group 514px: at a 150px floor that

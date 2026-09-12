@@ -429,3 +429,12 @@
 @media (prefers-reduced-motion: reduce) {
   .g-spin { animation: none; }
 }
+
+/* The gallery's own grid for the Checkbox `tile` specimen. It is here rather
+   than in the package on purpose: a run of tiles is the page's layout, and the
+   package deliberately stopped shipping a `.choice-tiles` container class. */
+.g-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-2);
+}
