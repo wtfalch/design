@@ -11,9 +11,15 @@
     "test": "echo 'the gallery is checked by gallery-e2e'"
   },
   "dependencies": {
+    "@tiptap/extension-link": "3.31.3",
+    "@tiptap/extensions": "3.31.3",
+    "@tiptap/pm": "3.31.3",
+    "@tiptap/react": "3.31.3",
+    "@tiptap/starter-kit": "3.31.3",
     "@wtfalch/design": "workspace:*",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^4"
   },
   "devDependencies": {
     "@types/react": "^19",

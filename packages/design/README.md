@@ -194,6 +194,36 @@ Icons and illustrations are the system's, shared by every product the way
 `Button` is. A product wanting its own inside the package's components is a
 case nobody has had; when it comes, the product entry is where to bind it.
 
+## Rich text
+
+Prose, written and drawn, added in `0.11.0` for the CMS and the forum.
+
+```tsx
+import { RichText, isEmptyRichText } from '@wtfalch/design'      // drawing it
+import { RichTextEditor } from '@wtfalch/design/editor'          // writing it
+import { richTextSchema } from '@wtfalch/design/rich-text'       // storing it
+```
+
+Three entries and not one, because they cost different things. Drawing prose
+is a server component with no dependencies. Writing it loads TipTap, which is
+ProseMirror, and a site that only reads should not download an editor.
+Validating it needs zod. TipTap and zod are **optional peer dependencies**:
+install them if you import those entries, and the front door works without
+either.
+
+**The restriction is the component.** The toolbar offers two heading levels,
+bold, italic, a link and two kinds of list. `richTextSchema` admits exactly
+those and `RichText` draws exactly those, so a document cannot contain
+something a page cannot render — and a consumer that validates on the way
+into its database gets that guarantee against a crafted request too, not just
+against the toolbar. Tables, colours, fonts, code blocks and quotes are off,
+each one a line in the component with the reason beside it. A seventh thing
+is added in all three places, on purpose.
+
+Nothing here produces an HTML string: `RichText` walks the value into React
+elements, so there is no sanitiser to configure and none to get wrong. That
+is the difference from `Markdown`, which parses and must sanitise.
+
 ## Status
 
 `0.3.1`. Twenty-eight components, every one of the 70 gallery specimens

@@ -48,7 +48,15 @@
       "default": "./dist/themes/index.js"
     },
     "./tokens.css": "./dist/tokens.css",
-    "./styles.css": "./dist/styles/index.css"
+    "./styles.css": "./dist/styles/index.css",
+    "./editor": {
+      "types": "./dist/editor.d.ts",
+      "default": "./dist/editor.js"
+    },
+    "./rich-text": {
+      "types": "./dist/rich-text.d.ts",
+      "default": "./dist/rich-text.js"
+    }
   },
   "sideEffects": ["*.css"],
   "engines": {
@@ -61,8 +69,14 @@
     "test": "vitest run"
   },
   "peerDependencies": {
+    "@tiptap/extension-link": "^3.31.0",
+    "@tiptap/extensions": "^3.31.0",
+    "@tiptap/pm": "^3.31.0",
+    "@tiptap/react": "^3.31.0",
+    "@tiptap/starter-kit": "^3.31.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^4.0.0"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",
@@ -72,6 +86,11 @@
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.3.3",
+    "@tiptap/extension-link": "^3.31.3",
+    "@tiptap/extensions": "^3.31.3",
+    "@tiptap/pm": "^3.31.3",
+    "@tiptap/react": "^3.31.3",
+    "@tiptap/starter-kit": "^3.31.3",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -79,6 +98,27 @@
     "react-dom": "^19",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.0",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.6",
+    "zod": "^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@tiptap/extension-link": {
+      "optional": true
+    },
+    "@tiptap/extensions": {
+      "optional": true
+    },
+    "@tiptap/pm": {
+      "optional": true
+    },
+    "@tiptap/react": {
+      "optional": true
+    },
+    "@tiptap/starter-kit": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
   }
 }

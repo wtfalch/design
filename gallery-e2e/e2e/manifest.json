@@ -236,6 +236,18 @@
     "v": "Indeterminate"
   },
   {
+    "c": "richtext",
+    "v": "Drawn"
+  },
+  {
+    "c": "richtext",
+    "v": "Empty"
+  },
+  {
+    "c": "richtext",
+    "v": "Written in"
+  },
+  {
     "c": "rows",
     "v": "Clickable"
   },
