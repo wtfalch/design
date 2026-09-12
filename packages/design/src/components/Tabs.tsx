@@ -149,8 +149,10 @@ export default function Tabs({
               const g = groups.find((x) => x.id === t.group)
               return g ? (
                 <div className="tab-group" role="presentation">
-                  <span className="tab-group-label">{g.label}</span>
-                  {g.hint && <span className="tab-hint">{g.hint}</span>}
+                  <span className="block text-sm font-strong text-text">{g.label}</span>
+                  {g.hint && (
+                    <span className="block mt-px text-xs text-muted leading-[1.35]">{g.hint}</span>
+                  )}
                 </div>
               ) : null
             })()}
@@ -190,7 +192,7 @@ export default function Tabs({
               </span>
             )}
             {t.hint && orientation === 'vertical' && !(grouped && t.group) && (
-              <span className="tab-hint">{t.hint}</span>
+              <span className="block mt-px text-xs text-muted leading-[1.35]">{t.hint}</span>
             )}
           </button>
         </React.Fragment>

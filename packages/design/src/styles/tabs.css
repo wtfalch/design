@@ -65,14 +65,6 @@
 
 .tabs-vertical .tab.on .tab-label { color: var(--accent); }
 
-.tab-hint {
-  display: block;
-  margin-top: 1px;
-  font-size: var(--text-xs);
-  color: var(--muted);
-  line-height: 1.35;
-}
-
 /* A heading above a run of tabs. Set apart from the run above by space, not
    a rule -- the rail already has one edge -- and the tabs under it step in
    by the label's own padding so the label reads as theirs. */
@@ -82,8 +74,6 @@
 }
 
 .tabs-vertical .tab-group:first-child { padding-top: var(--space-2); }
-
-.tab-group-label { display: block; font-size: var(--text-sm); font-weight: 600; color: var(--text); }
 
 .tabs-vertical .tab.in-group { padding-left: var(--space-5); }
 
