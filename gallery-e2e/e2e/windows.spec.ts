@@ -289,16 +289,31 @@ for (const o of OPENED) {
 }
 
 /*
- * The tooltip's tip is NOT photographed, and that is a known gap rather than
- * an oversight.
+ * The tooltip's tip, photographed at last.
  *
- * It opens on a pointer timer and fades in, so a screenshot of it is a race:
- * with `page.clock` installed the timer never fires and the tip never
- * arrives, and without it the shot lands mid-transition and differs every
- * run. Three attempts at making it deterministic all flaked, and a flaky
- * baseline is worse than none -- it trains people to re-run until green.
+ * This was a documented gap for three attempts: the tip opens on a pointer
+ * timer and fades in, so `page.clock` froze the timer and the tip never
+ * arrived, and without the clock the shot landed mid-fade and differed every
+ * run. Both problems came from driving it with the mouse.
  *
- * What this means in practice: `.explain-tip` is the one surface in the
- * package with no picture. `keyboard.spec.ts` covers that it opens and
- * closes; nothing covers what it looks like.
+ * Tab does not have either. `delay={0}` means focus opens the tip with no
+ * timer to freeze, and React Aria marks the box `data-entering` for exactly
+ * as long as the fade lasts -- so the attribute going away *is* the settle
+ * signal, and there is nothing left to guess at. `keyboard.spec.ts` already
+ * opens it this way to prove the wiring; this takes the picture.
  */
+for (const theme of THEMES) {
+  test(`tooltip · open · ${theme}`, async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'tooltip', v: 'Default' }, theme))
+    await themeApplied(page, theme)
+    await page.keyboard.press('Tab')
+
+    const tip = page.getByRole('tooltip')
+    await expect(tip).toBeVisible()
+    await expect(tip, 'the fade is over once React Aria drops the attribute').not.toHaveAttribute(
+      'data-entering',
+    )
+    await page.evaluate(() => document.fonts.ready)
+    await expect(tip).toHaveScreenshot(`tooltip--open--${theme}.png`)
+  })
+}
