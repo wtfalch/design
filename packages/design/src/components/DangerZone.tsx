@@ -105,8 +105,9 @@ export function DangerAction({
         <div className="set-hint mt-2">{unavailable}</div>
       ) : confirm === 'type' ? (
         <>
-          <div className="row danger-row field-row">
+          <div className="danger-row danger-field-row">
             <Field
+              inRow
               label="Confirm"
               hint={
                 <>
@@ -136,7 +137,7 @@ export function DangerAction({
           </div>
         </>
       ) : confirm === 'none' ? (
-        <div className="row danger-row">
+        <div className="danger-row">
           <Button
             kind={kind === 'plain' ? 'primary' : 'danger'}
             isDisabled={disabled || busy}
@@ -146,7 +147,7 @@ export function DangerAction({
           </Button>
         </div>
       ) : asking ? (
-        <div className="row danger-row">
+        <div className="danger-row">
           <Button kind="danger" isDisabled={disabled || busy} onPress={onConfirm}>
             {busy ? (busyLabel ?? '…') : label}
           </Button>
@@ -155,7 +156,7 @@ export function DangerAction({
           </Button>
         </div>
       ) : (
-        <div className="row danger-row">
+        <div className="danger-row">
           <Button kind="danger" isDisabled={disabled || busy} onPress={() => setAsking(true)}>
             {label}
           </Button>

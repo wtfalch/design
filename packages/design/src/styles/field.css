@@ -49,7 +49,10 @@
 /* Fields stacked down a form. Wider than the gap inside one field, so the
    label of the next belongs to the input under it rather than to the error
    above it. */
-.field-row > .field { flex: 1; min-width: 0; }
+/* `inRow`: a field sharing a line with other controls rather than stacked in a
+   column. Was `.field-row > .field`, which reached through a container class
+   the caller had to write and this package does not hand out. */
+.field-in-row { flex: 1; min-width: 0; }
 
 /* A password with an eye -- `Input type="password"`.
    A grid rather than `position: absolute`: both children take the one cell, the

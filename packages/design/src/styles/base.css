@@ -448,13 +448,6 @@ select:disabled { opacity: 0.45; cursor: not-allowed; }
   to { transform: scaleX(0); }
 }
 
-/* (The bordered head bar that used to live here is gone. It was a second
-   `.card-head` -- same name, different thing -- and the only place it was ever
-   used was the gallery page documenting it. A card that holds rows now takes
-   `title` like any other, and the header the component draws is the one
-   header.) */
-.row { display: flex; align-items: center; gap: var(--space-3); }
-
 .ctl-grow { flex: 1; min-width: 0; }
 
 .mono { font-family: var(--font-mono); font-size: var(--text-sm); }
@@ -714,13 +707,6 @@ input:active, textarea:active, select:active { transform: none; }
 /* A copy that no longer holds the same file. Not a failure -- two copies of one
    template are allowed to diverge, and this is only saying that they have. */
 .set-hint.drifted { color: var(--warn); }
-
-/* One applet, alone on the page, at `/applet/<id>`. Fills the window: there is
-   no grid here to decide a height, and a screenshot of an applet letterboxed
-   inside a page is mostly not the applet. */
-.bare { height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
-
-.bare > * { flex: 1; min-height: 0; }
 
 /* A round is in flight. On the button that asks for one, because that is where
    you are looking when you have just pressed it -- and not in the foot, which
