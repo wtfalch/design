@@ -23,10 +23,20 @@ export interface Props
    *  characters are the content. */
   mono?: boolean
   className?: string
+  /** Accepted and not rendered. `Field`'s render prop hands a caller every
+   *  piece of its wiring at once, and the documented way to use it is
+   *  `<Field>{(f) => <Input {...f} />}</Field>` -- so `labelId` arrives here
+   *  whether or not this control wants it. `Select` does want it, because a
+   *  button takes its name from its contents; an `<input>` does not, because
+   *  `Field`'s `<label for>` already names it. Taking it out of the props is
+   *  what keeps it off the DOM node: React passes through anything it does
+   *  not recognise, and the browser got `labelid="…"` with a console warning
+   *  on every field in valet and tf. */
+  labelId?: string
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, Props>(function Textarea(
-  { size = 'md', mono, className, ...rest },
+  { size = 'md', mono, className, labelId: _labelId, ...rest },
   ref,
 ) {
   const classes = [size === 'md' ? '' : `size-${size}`, mono ? 'mono' : '', className ?? '']

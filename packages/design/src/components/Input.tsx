@@ -73,10 +73,31 @@ export interface Props
    *  opens this, which is what the mail client's `.mail-search-key` was. */
   trailing?: React.ReactNode
   className?: string
+  /** Accepted and not rendered. `Field`'s render prop hands a caller every
+   *  piece of its wiring at once, and the documented way to use it is
+   *  `<Field>{(f) => <Input {...f} />}</Field>` -- so `labelId` arrives here
+   *  whether or not this control wants it. `Select` does want it, because a
+   *  button takes its name from its contents; an `<input>` does not, because
+   *  `Field`'s `<label for>` already names it. Taking it out of the props is
+   *  what keeps it off the DOM node: React passes through anything it does
+   *  not recognise, and the browser got `labelid="…"` with a console warning
+   *  on every field in valet and tf. */
+  labelId?: string
 }
 
 const Input = forwardRef<HTMLInputElement, Props>(function Input(
-  { size = 'md', mono, block, className, type = 'text', icon, onClear, trailing, ...rest },
+  {
+    size = 'md',
+    mono,
+    block,
+    className,
+    type = 'text',
+    icon,
+    onClear,
+    trailing,
+    labelId: _labelId,
+    ...rest
+  },
   ref,
 ) {
   /* What the `Field` above wired, when the caller did not thread it by hand.
