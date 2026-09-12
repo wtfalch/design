@@ -5,8 +5,9 @@
    reason they can live in an app with four palettes: `ink` becomes the current
    text colour and `paper` becomes the surface behind it, so one file covers
    Night, Paper and both halves of System. Give the wrapper a `color` and
-   the figure follows it -- `.muted` for a quiet empty state, `--accent` for the
-   one thing on screen worth looking at. */
+   the figure follows it: `--muted` for a quiet empty state, `--accent` for the
+   one thing on screen worth looking at. Set that colour on the wrapper --
+   `Empty` reaches for `text-muted`, and any token works. */
 .illo {
   display: inline-block;
   /* Height is the given dimension and the width comes from the drawing, so a
@@ -24,14 +25,3 @@
    a shirt that lets the arm behind it show through reads as a hole. */
 .illo .paper { fill: var(--illo-paper); }
 
-/* The figure in a whole-surface `Empty`, drawn in the muted grey of the
-   sentence under it.
- *
- * A utility cannot do this, and the reason is worth keeping: `.illo` sets
- * `color: inherit` and is unlayered, while every Tailwind utility lives in
- * `@layer utilities` -- and an unlayered declaration beats a layered one
- * whatever the specificity. So `text-muted` on the figure lost, silently,
- * and the shirt came out full text black beside a muted sentence. The
- * original rule already carried a note about needing two classes to beat
- * `.illo`; layers make that impossible rather than merely fiddly. */
-.nothing-figure { color: var(--muted); }
