@@ -20,13 +20,6 @@
   z-index: 60;
 }
 
-.pop-body {
-  padding: var(--space-3);
-  outline: none;
-  color: var(--text);
-  font-size: var(--text-sm);
-}
-
 /* Entry, and the direction it comes from. `data-placement` is React Aria's,
    set to where the surface actually went rather than where it was asked to go,
    so the movement agrees with the flip. */

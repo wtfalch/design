@@ -76,7 +76,6 @@
 .cmd-icon { flex: none; width: var(--space-4); height: var(--space-4); color: var(--muted); }
 .cmd-item[data-focused] .cmd-icon { color: var(--text); }
 
-.cmd-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cmd-desc {
   font-size: var(--text-xs);
   color: var(--muted);

@@ -54,11 +54,7 @@
    tooltip ended up orphaned under it. */
 .set-row > .switch-row { flex: 1; min-width: 0; padding-block: 0; }
 
-.switch-label { color: var(--text); }
-
 .switch-hint { font-size: var(--text-sm); color: var(--muted); }
-
-.switch-said { flex: none; font-size: var(--text-xs); color: var(--muted); }
 
 /* Three sizes, the same names every other control uses. The switch scales with
    the row: a 30x18 track beside 12px text is a different control from the same

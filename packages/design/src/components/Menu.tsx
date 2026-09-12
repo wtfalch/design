@@ -106,11 +106,11 @@ function renderItem(item: Item): React.ReactNode {
       textValue={typeof item.label === 'string' ? item.label : item.id}
     >
       {item.icon && <Icon name={item.icon} className="menu-icon" />}
-      <span className="menu-text">
+      <span className="flex-[1_1_auto] min-w-0 grid">
         {/* `slot="label"` and `slot="description"` are React Aria's: they wire
             the description to the row with `aria-describedby`, so it is read
             after the name rather than as a second unrelated item. */}
-        <Text slot="label" className="menu-label">
+        <Text slot="label" className="overflow-hidden text-ellipsis whitespace-nowrap">
           {item.label}
         </Text>
         {item.description && (

@@ -173,7 +173,10 @@ export default function Command({
                         >
                           {command.icon && <Icon name={command.icon} className="cmd-icon" />}
                           <span className="flex-[1_1_auto] min-w-0 grid">
-                            <Text slot="label" className="cmd-label">
+                            <Text
+                              slot="label"
+                              className="overflow-hidden text-ellipsis whitespace-nowrap"
+                            >
                               {command.label}
                             </Text>
                             {command.description && (

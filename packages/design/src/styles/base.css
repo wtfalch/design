@@ -778,11 +778,6 @@ input:active, textarea:active, select:active { transform: none; }
    that belongs to a conversation lives here any more, so it can breathe. */
 .topbar .ctl-grow { flex: 1; min-width: 0; }
 
-/* Back on the left, Next on the right, with the gap between them doing the
-   separating -- so the button that goes forward is in the same place on both
-   pages instead of sliding when Back appears. */
-.first-run-actions { align-items: center; }
-
 @keyframes listening-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 
 /* table ---------------------------------------------------------------- */

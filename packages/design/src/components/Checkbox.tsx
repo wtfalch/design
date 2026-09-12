@@ -96,7 +96,7 @@ export default function Checkbox({
       <span className="choice-body">
         <span className="choice-name">{label}</span>
         {hint && <span className="choice-why">{hint}</span>}
-        {meta && <span className="choice-meta">{meta}</span>}
+        {meta && <span className="text-muted text-xs font-mono">{meta}</span>}
       </span>
     </AriaCheckbox>
   )

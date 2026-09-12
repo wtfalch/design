@@ -126,7 +126,7 @@ export default function Tour({
 
   return createPortal(
     <div
-      className="tour"
+      className="fixed inset-0 z-[60] pointer-events-none"
       onKeyDown={(e) => {
         if (e.key === 'Escape') finish()
         if (e.key === 'Enter' || e.key === 'ArrowRight') next()

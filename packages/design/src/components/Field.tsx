@@ -125,7 +125,7 @@ export default function Field({
             anyone the convention was never explained to, which is most
             people. */}
         {required && (
-          <span className="field-required" aria-label="required">
+          <span className="text-muted" aria-label="required">
             {' '}
             *
           </span>

@@ -51,7 +51,7 @@ export default function Table<T>({
   className?: string
 }) {
   if (!rows.length) {
-    return empty ? <div className="set-hint rows-empty">{empty}</div> : null
+    return empty ? <div className="set-hint py-3">{empty}</div> : null
   }
   return (
     /* The one thing about a table that is a property of one element. Its

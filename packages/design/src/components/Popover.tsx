@@ -82,7 +82,7 @@ export default function Popover({
             element that has to be told which way is up on every flip; the
             surface is already attached by being six pixels from the control
             that opened it. */}
-        <Dialog className="pop-body" aria-label={label}>
+        <Dialog className="p-3 outline-none text-text text-sm" aria-label={label}>
           {({ close }) => (typeof children === 'function' ? children(close) : children)}
         </Dialog>
       </AriaPopover>
