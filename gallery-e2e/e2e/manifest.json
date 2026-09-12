@@ -84,6 +84,14 @@
     "v": "Open it"
   },
   {
+    "c": "dangerzone",
+    "v": "The three confirmations"
+  },
+  {
+    "c": "dangerzone",
+    "v": "When it cannot be done"
+  },
+  {
     "c": "dialog",
     "v": "Default"
   },
@@ -402,5 +410,9 @@
   {
     "c": "tooltip",
     "v": "Default"
+  },
+  {
+    "c": "tour",
+    "v": "Pointing at a control"
   }
 ]

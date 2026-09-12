@@ -317,3 +317,49 @@ for (const theme of THEMES) {
     await expect(tip).toHaveScreenshot(`tooltip--open--${theme}.png`)
   })
 }
+
+/*
+ * The tour's card, which the stage shot cannot reach.
+ *
+ * `visual.spec.ts` photographs the specimen stage, and the tour portals to
+ * `document.body` -- so the stage baseline is the spotlit button and nothing
+ * else, and the card beside it, which is the part with words on it, went
+ * unwatched. Same gap the menu and the select had.
+ *
+ * Nothing here needs settling: only `.tour-hole` carries a transition, and
+ * shooting the card element crops to it, so where in the window it was placed
+ * does not enter the picture.
+ */
+for (const theme of THEMES) {
+  test(`tour · card · ${theme}`, async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'tour', v: 'Pointing at a control' }, theme))
+    await themeApplied(page, theme)
+
+    const card = page.locator('.tour-card')
+    await expect(card).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    await expect(card).toHaveScreenshot(`tour--card--${theme}.png`)
+  })
+}
+
+/*
+ * A destructive action mid-question.
+ *
+ * `confirm="click"` swaps the button for the question, and a specimen shot at
+ * rest can only ever be the button -- so the state the whole control exists
+ * for was the one state with no picture. The swap is synchronous React state
+ * with no transition on it, so there is nothing to wait for beyond the
+ * question appearing.
+ */
+for (const theme of THEMES) {
+  test(`dangerzone · asking · ${theme}`, async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'dangerzone', v: 'When it cannot be done' }, theme))
+    await themeApplied(page, theme)
+    await page.getByRole('button', { name: 'Remove all' }).click()
+
+    const act = page.locator('.danger-act').first()
+    await expect(act.getByRole('button', { name: /cancel/i })).toBeVisible()
+    await page.evaluate(() => document.fonts.ready)
+    await expect(act).toHaveScreenshot(`dangerzone--asking--${theme}.png`)
+  })
+}
