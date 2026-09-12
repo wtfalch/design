@@ -757,10 +757,6 @@ input:active, textarea:active, select:active { transform: none; }
   40% { opacity: 1; transform: translateY(-3px); }
 }
 
-/* The top bar carries the title, the views and the way into settings. Nothing
-   that belongs to a conversation lives here any more, so it can breathe. */
-.topbar .ctl-grow { flex: 1; min-width: 0; }
-
 @keyframes listening-pulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 
 /* table ---------------------------------------------------------------- */

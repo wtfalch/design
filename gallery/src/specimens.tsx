@@ -1628,6 +1628,26 @@ export const COMPONENTS: Component[] = [
       'checkbox styles down to a square and the tick inside stays the OS’s.',
     variants: [
       {
+        name: 'Tiles',
+        note:
+          '`tile` reserves room for the tick on the right. In a full-width row ' +
+          'the label never reaches it; in a narrow tile it would run underneath. ' +
+          'The grid is the page\u2019s, not the component\u2019s \u2014 a run of tiles is a ' +
+          'layout decision, so `Checkbox` says only that it is in one.',
+        render: () => (
+          <div className="g-tiles">
+            <Checkbox
+              tile
+              label="Read files"
+              hint="Anything under the project root."
+              defaultChecked
+            />
+            <Checkbox tile label="Write files" hint="Creates and edits, never deletes." />
+            <Checkbox tile label="Run commands" hint="A shell, with the project as its cwd." />
+          </div>
+        ),
+      },
+      {
         name: 'A set',
         note: 'The whole row is the label, so clicking anywhere in it toggles.',
         render: () => <CheckboxDemo />,

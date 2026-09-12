@@ -44,11 +44,6 @@
   width: min(760px, 100%);
 }
 
-/* Settings is wider than the others: the rail carries group headings with a
-   hint each and indented tabs under them, and a pane beside it that draws
-   cards with a control on the right -- 760 gave one or the other room. */
-.modal.modal-settings { width: min(880px, 100%); }
-
 .modal {
   /* The window, less the backdrop's padding at each end -- `--space-15` is 60px
      and there are two of them, above and below.

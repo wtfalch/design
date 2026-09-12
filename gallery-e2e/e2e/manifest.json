@@ -80,6 +80,10 @@
     "v": "The parts"
   },
   {
+    "c": "checkbox",
+    "v": "Tiles"
+  },
+  {
     "c": "command",
     "v": "Open it"
   },

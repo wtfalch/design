@@ -51,6 +51,7 @@ export default function Checkbox({
   name,
   value,
   disabled,
+  tile,
   className,
 }: {
   label: React.ReactNode
@@ -71,6 +72,16 @@ export default function Checkbox({
    *  which is rarely the word a Server Action wants to read. */
   value?: string
   disabled?: boolean
+  /** In a grid of tiles rather than a run of full-width rows.
+   *
+   *  The tick is positioned at the top right, and in a full-width row the
+   *  label never reaches it. In a tile it runs underneath, so the body needs
+   *  the room reserved. This was a `.choice-tiles .choice-body` rule, which
+   *  meant the package styling its own component through a class the caller
+   *  had to know to write on the container -- and there is no such container
+   *  component, so the class was only ever a private name in a consumer's
+   *  markup. A prop says the same thing and belongs to the component. */
+  tile?: boolean
   className?: string
 }) {
   /* React Aria's `Checkbox` is the `<label>`. It keeps the real input in the
@@ -81,7 +92,7 @@ export default function Checkbox({
      those attributes instead of `:has(input:checked)`. */
   return (
     <AriaCheckbox
-      className={`choice${className ? ` ${className}` : ''}`}
+      className={`choice${tile ? ' choice-tile' : ''}${className ? ` ${className}` : ''}`}
       /* `undefined` is what makes React Aria leave the box uncontrolled, so
          the controlled and uncontrolled cases are the same call: pass both and
          let whichever was given decide. Passing `isSelected={false}` here

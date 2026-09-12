@@ -15,23 +15,6 @@
   border-color: var(--bad);
 }
 
-/* Three fields on one line, and their inputs on one line too.
-   
-   `Field` puts the description *above* the control, which is the house rule and
-   right -- but only `Arguments` has one here, so as a flex row the other two
-   inputs floated a description's height above it and the row read as broken.
-   Aligned to the end instead: the labels sit where their text needs them and
-   the three boxes share a baseline, which is the edge the eye actually follows.
-   
-   A grid rather than flex, so `Arguments` gets the room it needs by declaration
-   instead of by an inline pixel width on each of its neighbours. */
-.mcp-local .field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 2fr;
-  align-items: end;
-  gap: var(--space-3);
-}
-
 /* How an applet's polling is going, said the same way on every tile. Muted
    when it is going fine -- this is a fact you glance at, not one you are being
    told. */
