@@ -3,7 +3,7 @@
  * the CSS they govern on 2026-09-05. Each is here because it shipped wrong
  * once and was invisible until measured.
  */
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -39,5 +39,46 @@ describe('the stylesheet, measured', () => {
        point it is two pixels wider than the sibling it is supposed to sit
        concentric with. */
     expect(sheet('base.css')).toMatch(/\*,\s*\*::before,\s*\*::after \{\s*box-sizing: border-box;/)
+  })
+})
+
+/**
+ * Every sheet closes every brace it opens, in the source and in what ships.
+ *
+ * 0.9.0 shipped `select.css` with one unmatched `}`: a regex had stopped at a
+ * `}` inside a comment and left the rest of a rule dangling as text. Browsers
+ * skip what they cannot parse, so nothing failed and nothing looked obviously
+ * wrong -- what it cost was `.sel-list`'s `box-shadow`, and it took a release
+ * to notice. tf lost two hundred lines of its own stylesheet the same way a
+ * few days later, from a merge rather than a regex.
+ *
+ * The built bundle is checked as well as the source, because the flatten is
+ * its own opportunity: an unbalanced sheet swallows every sheet concatenated
+ * after it, which is how one bad rule became a release.
+ */
+describe('the stylesheet, parsed', () => {
+  // a brace inside a comment is prose, not structure
+  const bare = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '')
+  const count = (css: string, ch: string) => (css.match(new RegExp(`\\${ch}`, 'g')) ?? []).length
+
+  const dir = resolve(here, '../src/styles')
+  const sheets = readdirSync(dir).filter((f) => f.endsWith('.css'))
+
+  it('has sheets to check', () => {
+    expect(sheets.length).toBeGreaterThan(10)
+  })
+
+  for (const name of sheets) {
+    it(`${name} is brace-balanced`, () => {
+      const css = bare(readFileSync(resolve(dir, name), 'utf8'))
+      expect(count(css, '}')).toBe(count(css, '{'))
+    })
+  }
+
+  it('the built bundle is brace-balanced', () => {
+    const built = resolve(here, '../dist/styles/index.css')
+    if (!existsSync(built)) return // `pnpm build` has not run; `dist.test.ts` owns that complaint
+    const css = bare(readFileSync(built, 'utf8'))
+    expect(count(css, '}')).toBe(count(css, '{'))
   })
 })
