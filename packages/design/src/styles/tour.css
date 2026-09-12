@@ -2,8 +2,6 @@
 
 /* The layer sits over everything and catches nothing: the scrim is painted by
    the hole's shadow, so there is no full-screen element to swallow a click. */
-.tour { position: fixed; inset: 0; z-index: 60; pointer-events: none; }
-
 /* The control the tour is currently pointing at.
    
    Much of this chrome is invisible until you touch it -- `.view-add` lives at

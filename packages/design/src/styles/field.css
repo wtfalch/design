@@ -5,7 +5,9 @@
    to what was typed, so it goes after. */
 .field { display: grid; gap: var(--space-1); }
 
-.field-stack-layout { /* the default: label, description, control, error */ }
+/* `.field-stack-layout` carries no rules: stacking is what `.field` already
+   does, and the class is emitted only so that both layouts name themselves
+   the same way (`field-${layout}-layout`). Only the row layout overrides. */
 
 .field-row-layout > .field-label { grid-column: 1; }
 

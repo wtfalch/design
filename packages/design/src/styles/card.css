@@ -52,16 +52,6 @@
    which reads as a different column of content. */
 .card:has(.card-icon) .card-inline { padding-left: calc(var(--card-icon) + var(--space-3)); }
 
-/* Its own line, above the sentence it introduces. */
-.card-inline-label {
-  display: block;
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  margin-bottom: 2px;
-}
-
 .card-title { display: block; font-size: var(--text-base); }
 
 .card-desc { margin-top: var(--space-1); color: var(--muted); font-size: var(--text-sm); line-height: 1.5; }
