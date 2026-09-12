@@ -44,9 +44,12 @@
 /* Sized to its words, for a switch that sits in a row of other controls rather
    than owning a row of its own. `flex: 1` there would push the label away from
    the switch by the whole width of the bar. */
-.row > .switch-row { flex: none; padding-block: 0; }
+/* `inRow`: a toggle beside other controls rather than in a column of
+   settings. Was `.row > .switch-row`, which reached through `.row` -- a class
+   no component here renders. */
+.switch-in-row { flex: none; padding-block: 0; }
 
-.row > .switch-row .switch-body { flex: none; }
+.switch-in-row .switch-body { flex: none; }
 
 /* The opposite case: a switch that *is* the row, with something small beside it
    -- a tooltip, a state word. `.set-row` wraps, so a switch that does not grow

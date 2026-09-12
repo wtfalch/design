@@ -17,6 +17,12 @@ draws them changes. 0.9.0 did exactly that to several of them, and 0.10.0
 deleted 41 more: the components that drew them draw themselves now, so the
 rules had no reader left.
 
+0.11.0 went the other way and removed the rules that reached *through* a
+class, which is the same mistake seen from the other side. `.row > .switch-row`
+styled a Toggle by the container a caller had written round it, so the caller
+had to know to write `.row` -- a class no component here renders. Those are
+props now: `inRow` on `Toggle` and on `Field`, `tile` on `Checkbox`.
+
 If you need a card, render `<Card>`; if you need a row of your own, write it
 in the token vocabulary:
 

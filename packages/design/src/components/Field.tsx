@@ -58,6 +58,7 @@ export default function Field({
   children,
   labelHidden,
   layout = 'stack',
+  inRow,
   className,
 }: {
   /** What the field is. Always given -- there is no unlabelled case, only
@@ -98,6 +99,13 @@ export default function Field({
    * rendered somewhere the provider does not reach.
    */
   children: React.ReactNode | ((field: FieldWiring) => React.ReactNode)
+  /** Sitting in a row of controls rather than in a column of settings.
+   *
+   *  This was a rule keyed on the container -- `.field-row > .field` -- which
+   *  meant the package reaching through a class the caller had to know to
+   *  write, and `.field-row` is not a class this package hands out. A prop says the
+   *  same thing and travels with the component. */
+  inRow?: boolean
   className?: string
 }) {
   const id = useId()
@@ -117,7 +125,7 @@ export default function Field({
 
   return (
     <div
-      className={`field field-${layout}-layout${error ? ' field-bad' : ''}${className ? ` ${className}` : ''}`}
+      className={`field field-${layout}-layout${error ? ' field-bad' : ''}${inRow ? ' field-in-row' : ''}${className ? ` ${className}` : ''}`}
     >
       <label id={labelId} className={labelHidden ? 'sr-only' : 'field-label'} htmlFor={id}>
         {label}

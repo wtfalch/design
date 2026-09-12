@@ -62,6 +62,7 @@ export default function Toggle({
   said,
   labelHidden,
   size = 'md',
+  inRow,
   className,
 }: {
   label: React.ReactNode
@@ -87,6 +88,13 @@ export default function Toggle({
   /** The same three the rest of the controls take. `sm` for a switch in a
    *  toolbar or a dense row; `lg` where it is the only thing on the screen. */
   size?: 'sm' | 'md' | 'lg'
+  /** Sitting in a row of controls rather than in a column of settings.
+   *
+   *  This was a rule keyed on the container -- `.row > .switch-row` -- which
+   *  meant the package reaching through a class the caller had to know to
+   *  write, and `.row` is not a class this package hands out. A prop says the
+   *  same thing and travels with the component. */
+  inRow?: boolean
   className?: string
 }) {
   /* React Aria's `Switch` is the `<label>`: it owns a visually-hidden
@@ -203,7 +211,7 @@ export default function Toggle({
   return (
     <Switch
       ref={rowRef}
-      className={`switch-row switch-${size}${className ? ` ${className}` : ''}`}
+      className={`switch-row switch-${size}${inRow ? ' switch-in-row' : ''}${className ? ` ${className}` : ''}`}
       isSelected={shown}
       onChange={commit}
       isDisabled={disabled}
