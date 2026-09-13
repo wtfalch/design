@@ -106,6 +106,7 @@ export function Row({
   picked,
   loading,
   waiting,
+  disabled,
   align = 'center',
   className,
 }: {
@@ -141,6 +142,13 @@ export function Row({
   loading?: boolean
   /** Something else is working, so this one cannot be chosen yet. */
   waiting?: boolean
+  /** This one cannot be chosen, and nothing on the page will change that: the
+   *  build lacks something, or a setting elsewhere rules it out. Say why in
+   *  `hint`. Drawn as `waiting` is -- dimmed, its hit area a disabled button,
+   *  `picked` still showing through -- but a separate word, because tf's
+   *  About pane borrowed `waiting` for "this build cannot apply updates", and
+   *  a row that says it is waiting is a row somebody waits on. */
+  disabled?: boolean
   /** `start` when the row has enough text that vertically centred buttons drift
    *  away from the name they belong to. */
   align?: 'center' | 'start'
@@ -165,6 +173,7 @@ export function Row({
     `set-row rows-row${tone ? ` rows-${tone}` : ''}` +
     `${align === 'start' ? ' rows-top' : ''}${picked ? ' is-picked' : ''}` +
     `${loading ? ' is-loading' : ''}${waiting ? ' is-waiting' : ''}` +
+    `${disabled ? ' is-disabled' : ''}` +
     `${className ? ` ${className}` : ''}`
 
   return (
@@ -172,7 +181,12 @@ export function Row({
       {/* biome-ignore lint/a11y/useSemanticElements: see `Rows` -- same reason, one level down. */}
       <div className={rowClass} role="listitem">
         {onClick ? (
-          <button type="button" className="row-hit" disabled={waiting} onClick={onClick}>
+          <button
+            type="button"
+            className="row-hit"
+            disabled={waiting || disabled}
+            onClick={onClick}
+          >
             {body}
           </button>
         ) : (
