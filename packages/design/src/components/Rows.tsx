@@ -145,7 +145,7 @@ export function Row({
   /** This one cannot be chosen, and nothing on the page will change that: the
    *  build lacks something, or a setting elsewhere rules it out. Say why in
    *  `hint`. Drawn as `waiting` is -- dimmed, its hit area a disabled button,
-   *  `picked` still showing through -- but a separate word, because tf's
+   *  `picked` still showing through -- but a separate word, because otf's
    *  About pane borrowed `waiting` for "this build cannot apply updates", and
    *  a row that says it is waiting is a row somebody waits on. */
   disabled?: boolean

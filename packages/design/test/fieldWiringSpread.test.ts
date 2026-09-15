@@ -10,7 +10,7 @@
  *
  * The spread does not know that. React passes through any prop it does not
  * recognise, so `labelId` reached the DOM as `labelid="…"`, and every field
- * in valet and tf logged a React warning about it. Nothing failed, which is
+ * in valet and otf logged a React warning about it. Nothing failed, which is
  * why it survived four releases: the attribute is inert and the warning only
  * appears in a console nobody was reading.
  *

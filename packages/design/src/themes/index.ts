@@ -9,7 +9,7 @@
  * than a property that silently does nothing — which is exactly the failure a
  * string-keyed map would produce, at run time, invisibly. That property is the
  * reason this file is exported from the package at all: a consumer writing a
- * theme gets the same compile error tf gets, and a theme that ships as JSON or
+ * theme gets the same compile error otf gets, and a theme that ships as JSON or
  * as a hand-written CSS file does not.
  *
  * ---
@@ -38,7 +38,7 @@
  * becoming a fourth, undocumented category.
  */
 
-import { TF_THEMES } from '../products/tf'
+import { OTF_THEMES } from '../products/otf'
 import { VALET_THEMES } from '../products/valet'
 
 /** Every token a theme may set. */
@@ -277,13 +277,13 @@ export function defineTheme(theme: Theme): Theme {
  * mark is, and 0.2.0 already made `Brand` the home of every product's mark by
  * name; keeping each product's palette in its own repo meant each repo
  * re-deriving first paint, the contrast measurement and a page to look at it
- * on. So `products/tf.ts` holds tf's three and `products/valet.ts` valet's two,
+ * on. So `products/otf.ts` holds otf's three and `products/valet.ts` valet's two,
  * this is the union, and the contrast test and the gallery read the union.
  *
  * A consumer that wants only its own imports the product module, or the CSS
  * `build-products.mjs` generates from it, and bundles nobody else's.
  */
-export const THEMES: Record<string, Theme> = { ...TF_THEMES, ...VALET_THEMES }
+export const THEMES: Record<string, Theme> = { ...OTF_THEMES, ...VALET_THEMES }
 
 export const DEFAULT_THEME = 'system'
 
@@ -295,7 +295,7 @@ export function isTheme(name: unknown): name is string {
  * Put a theme on an element.
  *
  * **The element is an argument, and that is the whole difference between this
- * and the version that lived in the app.** tf owns its document, so writing to
+ * and the version that lived in the app.** otf owns its document, so writing to
  * `documentElement` was free. A package does not: mounted inside a page it did
  * not build, it has to be able to theme a subtree and leave the rest alone.
  * Defaulting to `documentElement` keeps the app case a no-op.
@@ -310,7 +310,7 @@ export function applyTheme(
   el: HTMLElement = document.documentElement,
 ): void {
   /* A registered name, or a `Theme` object straight from `defineTheme`.
-     The second is how an app that is not tf applies its own palette without
+     The second is how an app that is not otf applies its own palette without
      first pushing it into a registry it does not own -- `THEMES` is the
      built-ins, and a consumer's theme is theirs. */
   const resolved = typeof theme === 'string' ? (THEMES[theme] ?? THEMES[DEFAULT_THEME]) : theme

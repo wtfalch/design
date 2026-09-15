@@ -3,7 +3,7 @@
  *
  * Each product's themes are applied as that product wears them -- the palette
  * over the product's identity -- so valet's night is Plex and sharp corners
- * here as it is in valet, not valet's colours on tf's type. tf's identity is
+ * here as it is in valet, not valet's colours on otf's type. otf's identity is
  * the base, so its three are unchanged and so are their baselines. `brand` is
  * the fixture from `brand.ts`, applied as an object the way a consumer's own
  * theme is.

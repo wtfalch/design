@@ -81,7 +81,7 @@ export interface Props
    *  `Field`'s `<label for>` already names it. Taking it out of the props is
    *  what keeps it off the DOM node: React passes through anything it does
    *  not recognise, and the browser got `labelid="…"` with a console warning
-   *  on every field in valet and tf. */
+   *  on every field in valet and otf. */
   labelId?: string
 }
 

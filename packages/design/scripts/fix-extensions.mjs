@@ -5,7 +5,7 @@
  * `moduleResolution: bundler` resolves and native Node ESM refuses. So
  * `import '@wtfalch/design'` in plain Node, or under vitest, died on the first
  * relative import with ERR_MODULE_NOT_FOUND, and both consumers' tests read
- * the built table with a regex to get round it (tf's `brandMark.test.ts`,
+ * the built table with a regex to get round it (otf's `brandMark.test.ts`,
  * valet's `icon.test.ts`). A bundler never noticed, which is how 0.1.0 through
  * 0.3.0 shipped that way. Found 2026-09-06.
  *

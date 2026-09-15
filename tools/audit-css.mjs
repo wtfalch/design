@@ -29,7 +29,7 @@
  *   node tools/audit-css.mjs ../tf/dashboard/src/tokens.css ../tf/dashboard/src/styles.css ...
  *
  * This becomes a test inside the package once the component sheets exist. It is
- * a script first because it had to be run against tf to find out what was
+ * a script first because it had to be run against otf to find out what was
  * there.
  */
 import { readFileSync } from 'node:fs'

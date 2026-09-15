@@ -1,9 +1,9 @@
 /**
  * The tour's memory, held to the three things that went wrong with it.
  *
- * Ported from tf's `tour.test.ts`. The case that reads tf's `App.tsx` -- that
- * onboarding calls `forgetTour()` -- stays in tf, because the call site is
- * tf's; the marker's own contract is here.
+ * Ported from otf's `tour.test.ts`. The case that reads otf's `App.tsx` -- that
+ * onboarding calls `forgetTour()` -- stays in otf, because the call site is
+ * otf's; the marker's own contract is here.
  */
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'

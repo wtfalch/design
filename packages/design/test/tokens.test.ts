@@ -81,7 +81,7 @@ describe('the spacing scale', () => {
   it('is a multiple of four at every step, and the name is the multiple', () => {
     /* `--space-3` is 12px and cannot quietly become 13. A scale whose names do
        not predict its values is a lookup table, and nobody memorises a lookup
-       table. tf's `spacing.test.ts` held this until the vocabulary moved. */
+       table. otf's `spacing.test.ts` held this until the vocabulary moved. */
     const steps = [...css.matchAll(/--space-(\d+): calc\((\d+)px \* var\(--density\)\)/g)]
     expect(steps.length, 'the scale is missing').toBeGreaterThanOrEqual(8)
     for (const [, n, px] of steps) {

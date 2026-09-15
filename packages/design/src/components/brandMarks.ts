@@ -9,11 +9,11 @@
  * mark that is a figure rather than a line carries a fill rule instead of a
  * weight, and `Brand` draws whichever it is handed.
  *
- * A product that animates its mark does that in its own code: tf's lowercase
- * tf becomes a cog under the pointer, and that morph is
+ * A product that animates its mark does that in its own code: otf's
+ * lowercase otf becomes a cog under the pointer, and that morph is
  * `tf/dashboard/src/components/Brand.tsx`, not this package's business. What
  * ships here is the still mark, which is also what the product's app icon is
- * rendered from -- tf's `brandMark.test.ts` holds the icon, this row and its
+ * rendered from -- otf's `brandMark.test.ts` holds the icon, this row and its
  * own animated copy to one path.
  *
  * A sibling module rather than part of `Brand.tsx`, so that file keeps its
@@ -22,7 +22,7 @@
 /**
  * A mark: one path in its own ink box, stroked or filled.
  *
- * tf's is a stroke, one line at the weight it was drawn at. valet's is a
+ * otf's is a stroke, one line at the weight it was drawn at. valet's is a
  * figure: a filled badge with the shirt cut out of it and the bow drawn back
  * inside the cut, which is one path under `evenodd` -- the jacket, the shirt
  * and the bow are subpaths, and the rule makes the shirt a hole the surface
@@ -46,13 +46,16 @@ export interface FillMark {
 }
 
 export const BRAND_MARKS = {
-  /** A lowercase tf in one unbroken stroke -- down the t, round the foot, up
-   *  the f, over its head, and back along the crossbar through both stems.
-   *  The view is the stroke's outer bounds, not the canvas: the stroke is 96
-   *  wide, so 48 of cap and arc on every side is already in these. */
-  tf: {
-    view: '248 190 556 578',
-    d: 'M372 262V620A100 100 0 0 0 572 620V330A92 92 0 0 1 756 330A100 100 0 0 1 656 430H296',
+  /** A lowercase tf merged into an O, in one unbroken stroke. Both ends of
+   *  the tf start on the O -- the crossbar runs left and folds down onto it,
+   *  the stem runs up and turns right onto it -- and the 95 degrees of ring
+   *  between those two points is left out, so the O reads as open across the
+   *  top left rather than closed. One stroke, no loose ends. The view is the
+   *  stroke's outer bounds, not the canvas: the stroke is 96 wide, so 48 of
+   *  cap and arc on every side is already in these. */
+  otf: {
+    view: '69.3 -12.2 958.4 958.4',
+    d: 'M470.2 43.0A120 120 0 0 0 372 161.0V620A100 100 0 0 0 572 620V330A92 92 0 0 1 756 330A100 100 0 0 1 656 430H248.6A120 120 0 0 0 132.9 582.0A431.2 431.2 0 1 0 470.2 43.0',
     stroke: 96,
   },
   /** valet's badge. The rounded square is the jacket, the shirt is cut out of

@@ -4,7 +4,7 @@
  * Twenty-one Open Peeps figures can be in a themed app at all because they are
  * two colours -- ink and paper -- and take them from the page. A drawing that
  * carries a hex of its own is right in exactly one theme; one with a
- * hard-coded width does not scale. Ported from tf's `illustrations.test.ts`
+ * hard-coded width does not scale. Ported from otf's `illustrations.test.ts`
  * when the package took ownership of the SVGs.
  */
 import { readFileSync, readdirSync } from 'node:fs'

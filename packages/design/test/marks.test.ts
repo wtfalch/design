@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 import { BRAND_MARKS, BRAND_NAMES } from '../src/components/brandMarks'
 
 /**
- * The table of marks. tf's own `brandMark.test.ts` reads tf's row out of the
+ * The table of marks. otf's own `brandMark.test.ts` reads otf's row out of the
  * compiled copy of it, so the table is where every product's path lives.
  */
 describe('the marks', () => {
-  it('holds every product, tf first', () => {
-    expect(BRAND_NAMES).toEqual(['tf', 'valet'])
+  it('holds every product, otf first', () => {
+    expect(BRAND_NAMES).toEqual(['otf', 'valet'])
   })
 
   it('each is one path in a measured box, stroked or filled', () => {

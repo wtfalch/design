@@ -1,5 +1,5 @@
 /**
- * A theme that is not tf's.
+ * A theme that is not otf's.
  *
  * The built-ins are examples, and an example proves nothing about whether
  * the vocabulary is wide enough for an app that looks nothing like the one

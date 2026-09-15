@@ -347,7 +347,7 @@ function FieldDemo() {
   /* Wrong on purpose, so the error state is the one you can actually look at
      rather than a screenshot in a docstring. */
   const bad = !url.startsWith('https://')
-    ? 'Has to start with https:// — TF will not send a token over http.'
+    ? 'Has to start with https:// — otf will not send a token over http.'
     : ''
   return (
     <div style={{ display: 'grid', gap: 'var(--space-5)', maxWidth: 400 }}>
@@ -373,7 +373,7 @@ function SliderDemo() {
   return (
     <div style={{ maxWidth: 560 }}>
       <Slider
-        label="Memory tf may take"
+        label="Memory otf may take"
         hint="Half-gigabyte steps between what the smallest model needs and what this machine has."
         value={gb}
         min={2}
@@ -906,9 +906,9 @@ export const COMPONENTS: Component[] = [
     name: 'Brand',
     blurb:
       "Every wtfalch product's mark, by name — `brandMarks.ts` is the table and " +
-      'adding a product is adding a row. tf is the first: a lowercase tf in one ' +
+      'adding a product is adding a row. otf is the first: a lowercase otf in one ' +
       'unbroken stroke, the same path its app icon is rendered from, held to it ' +
-      "by tf's `brandMark.test.ts`. Still, on purpose: tf's cog-morph is tf's " +
+      "by otf's `brandMark.test.ts`. Still, on purpose: otf's cog-morph is otf's " +
       'own component, layered over this path. valet is the second: a filled badge, ' +
       'the jacket with the shirt cut out of it and a bow tie in the cut, one path ' +
       'under `evenodd`. `currentColor`, so `.brand` decides the green and a theme ' +
@@ -925,7 +925,7 @@ export const COMPONENTS: Component[] = [
       {
         name: 'valet',
         note:
-          "The second product's mark, filled where tf's is stroked. Drawn 24-first, " +
+          "The second product's mark, filled where otf's is stroked. Drawn 24-first, " +
           'which is this size: the sliver of jacket over the bow is the pixel that ' +
           'keeps it a bow rather than a notch in the edge.',
         render: () => <Brand name="valet" />,
@@ -1221,7 +1221,7 @@ export const COMPONENTS: Component[] = [
     name: 'Slider',
     blurb:
       'A number chosen from a range, by dragging. For a setting whose answer is ' +
-      '“about this much” rather than one of a list — how much memory tf may take. ' +
+      '“about this much” rather than one of a list — how much memory otf may take. ' +
       'Bounded always, stepped optionally, and it applies when the knob is let go ' +
       'while the value beside it follows the drag.',
     variants: [
@@ -1566,7 +1566,7 @@ export const COMPONENTS: Component[] = [
           <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
             <Callout>A plain one. No tone, no mark — most of them are this.</Callout>
             <Callout tone="info" icon>
-              Ollama is already running, so TF will use it.
+              Ollama is already running, so otf will use it.
             </Callout>
             <Callout tone="good" icon>
               Installed and answering.
@@ -2489,7 +2489,7 @@ export const COMPONENTS: Component[] = [
             <Shell
               wide
               brand={<strong>Northwind</strong>}
-              who={<ThemeSwitch product="tf" labelHidden />}
+              who={<ThemeSwitch product="otf" labelHidden />}
               nav={
                 <Row>
                   <Pill quiet inRow>
@@ -2522,12 +2522,12 @@ export const COMPONENTS: Component[] = [
       {
         name: 'Labelled',
         note: 'The apps passed `aria-label="Appearance"` beside a visible “Appearance” span — the same string twice, which is the drift `Field` exists to stop. The label is rendered and pointed at, or hidden and used as the name, never both.',
-        render: () => <ThemeSwitch product="tf" />,
+        render: () => <ThemeSwitch product="otf" />,
       },
       {
         name: 'In a header',
         note: 'A subset, in the order to show them. An id the product does not offer is dropped rather than thrown on.',
-        render: () => <ThemeSwitch product="tf" only={['night', 'paper']} labelHidden />,
+        render: () => <ThemeSwitch product="otf" only={['night', 'paper']} labelHidden />,
       },
     ],
   },

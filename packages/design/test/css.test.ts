@@ -1,5 +1,5 @@
 /**
- * Two pixel rules that used to live in tf's `pillTones.test.ts`, moved with
+ * Two pixel rules that used to live in otf's `pillTones.test.ts`, moved with
  * the CSS they govern on 2026-09-05. Each is here because it shipped wrong
  * once and was invisible until measured.
  */
@@ -49,7 +49,7 @@ describe('the stylesheet, measured', () => {
  * `}` inside a comment and left the rest of a rule dangling as text. Browsers
  * skip what they cannot parse, so nothing failed and nothing looked obviously
  * wrong -- what it cost was `.sel-list`'s `box-shadow`, and it took a release
- * to notice. tf lost two hundred lines of its own stylesheet the same way a
+ * to notice. otf lost two hundred lines of its own stylesheet the same way a
  * few days later, from a merge rather than a regex.
  *
  * The built bundle is checked as well as the source, because the flatten is

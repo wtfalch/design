@@ -20,8 +20,8 @@
  *  Settings and is said here rather than left implied. */
 /** Where a product records that the tour was seen. Every product that installs
  *  the package gets its own key by passing one; the default is the package's,
- *  so two products on one origin do not share a memory. tf passes
- *  `tf-tour-seen`, the key its users already hold. */
+ *  so two products on one origin do not share a memory. otf passes
+ *  `otf-tour-seen`, the key its users already hold. */
 export const DEFAULT_TOUR_KEY = 'design-tour-seen'
 
 export function tourSeen(key = DEFAULT_TOUR_KEY): boolean {

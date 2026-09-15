@@ -7,7 +7,7 @@
  * So the rail selects, and the pane shows that one component and every variant
  * it has.
  *
- * **The theme switch is the point, not decoration.** TF ships three themes and
+ * **The theme switch is the point, not decoration.** otf ships three themes and
  * each is a set of token values, so a component is only as good as its worst
  * theme -- and the only way to know is to flip between them with one component
  * held still in front of you.

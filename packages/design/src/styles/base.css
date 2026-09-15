@@ -197,7 +197,7 @@ select:focus { outline: none; border-color: var(--accent); }
 
 /* The checkbox, drawn rather than inherited.
    The native one is the platform's, which means it is a different shape, a
-   different blue and a different size on every machine tf runs on -- the one
+   different blue and a different size on every machine otf runs on -- the one
    control in the app that refused to join the design system. It is also the
    only form control that can be replaced in pure CSS: unlike a select, whose
    dropdown belongs to the OS, a checkbox is a box and a tick.
@@ -421,7 +421,7 @@ select:disabled { opacity: 0.45; cursor: not-allowed; }
    whatever next needs to know. */
 /* The wordmark, and the same mark the app icon carries: `Brand.tsx` draws the
    path `desktop/build/icon.html` draws, and `test/brandMark.test.ts` holds
-   them to one string. It was "TF" set in the system font at -0.14em, matching
+   them to one string. It was "otf" set in the system font at -0.14em, matching
    an icon that did the same; both are now one drawn line, and the tracking
    arithmetic that used to live here went with the letters.
    The height comes off the type scale rather than being a pixel: 1.5 times
@@ -439,7 +439,7 @@ select:disabled { opacity: 0.45; cursor: not-allowed; }
   width: auto;
   color: var(--good);
   /* A product that animates its mark turns it about its own centre, which is
-     the ink box's; tf's cog does. */
+     the ink box's; otf's cog does. */
   transform-origin: center;
 }
 
@@ -738,7 +738,7 @@ input:active, textarea:active, select:active { transform: none; }
   .spin { animation: none; opacity: 0.6; }
 }
 
-@keyframes tf-bounce {
+@keyframes otf-bounce {
   0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
   40% { opacity: 1; transform: translateY(-3px); }
 }

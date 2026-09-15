@@ -25,7 +25,7 @@ Read `packages/design/README.md` for the vocabulary and how to write a theme.
 ## Everything is linted
 
 The components spent the migration exempt from biome, because they were copied
-verbatim from tf and reformatting them would have made every React Aria diff a
+verbatim from otf and reformatting them would have made every React Aria diff a
 mix of "this is now React Aria" and "biome moved a quote". That exemption is
 gone. The seventeen findings it hid are resolved rather than waved through:
 three style autofixes, two lists re-keyed by their data instead of their index,

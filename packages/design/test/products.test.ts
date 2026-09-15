@@ -35,7 +35,7 @@ describe('the products', () => {
   it("a palette does not restate its product's identity", () => {
     // The identity is the layer under the palettes. valet's two each carried
     // the same font and corner block once, and a theme shared between products
-    // would have shown tf's font on valet wherever it kept quiet.
+    // would have shown otf's font on valet wherever it kept quiet.
     for (const p of Object.values(PRODUCTS)) {
       const identity = Object.keys(p.identity)
       for (const [id, t] of Object.entries(p.themes)) {
@@ -46,8 +46,8 @@ describe('the products', () => {
     }
   })
 
-  it("tf's identity is the base values, and valet's is Plex and sharper corners", () => {
-    expect(PRODUCTS.tf.identity).toEqual({})
+  it("otf's identity is the base values, and valet's is Plex and sharper corners", () => {
+    expect(PRODUCTS.otf.identity).toEqual({})
     expect(PRODUCTS.valet.identity['--radius']).toBe('4px')
     expect(PRODUCTS.valet.identity['--font']).toContain('IBM Plex Sans')
   })
@@ -90,7 +90,7 @@ describe('the products', () => {
     const own = renderToStaticMarkup(createElement(Brand))
     expect(own).toContain('fill-rule="evenodd"')
     expect(own).toContain('aria-label="valet"')
-    expect(renderToStaticMarkup(createElement(Brand, { name: 'tf' }))).toContain(
+    expect(renderToStaticMarkup(createElement(Brand, { name: 'otf' }))).toContain(
       'stroke-width="96"',
     )
   })
@@ -110,8 +110,8 @@ describe('the products', () => {
     expect(css).toContain('color-scheme:light}')
   })
 
-  it("tf's stylesheet writes no identity and no default, because the base is tf and system is a media query", () => {
-    const css = productStylesheet(PRODUCTS.tf, ':root{--x:1}', '.card{}')
+  it("otf's stylesheet writes no identity and no default, because the base is otf and system is a media query", () => {
+    const css = productStylesheet(PRODUCTS.otf, ':root{--x:1}', '.card{}')
     expect(css).not.toContain(':root{--font')
     expect(css).not.toContain(':root:not([data-theme])')
     expect(css).toContain(":root[data-theme='night']{")

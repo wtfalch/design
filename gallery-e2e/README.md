@@ -5,7 +5,7 @@ component looks like, whether axe can fault it, and whether motion actually
 stops when the OS asks.
 
 ```bash
-# the gallery still lives in tf until the components move (phase 3)
+# the gallery still lives in otf until the components move (phase 3)
 cd ../../tf/dashboard && npm run build
 
 cd ../../design/gallery-e2e
@@ -81,6 +81,6 @@ because "axe says so and we disagree" should be written down somewhere.
 
 ## CI
 
-Not wired yet, and deliberately: the gallery still lives in tf, so CI here has
+Not wired yet, and deliberately: the gallery still lives in otf, so CI here has
 nothing to build. Phase 3 moves it into this repo and the workflow lands with
 it.

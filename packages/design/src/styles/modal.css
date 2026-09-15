@@ -86,7 +86,7 @@
    as part of the heading rather than as the first line of content. */
 .modal-body { padding: var(--space-2) var(--space-4) var(--space-3); overflow-y: auto; }
 
-/* The close cross. Its rule stayed behind in tf's stylesheet when the split
+/* The close cross. Its rule stayed behind in otf's stylesheet when the split
    ran -- a one-letter class name, and the scan that finds classes in source
    dropped it -- so in the package the cross had only `.icon-btn`, which is the
    picker's 34px square tile with a panel behind it. The head is laid out for
@@ -163,7 +163,7 @@
 /* The tone is on the box, not only on the button. A destructive question that
    looks like every other question is one the reader skims.
    `Dialog` writes this as `dialog-${tone}`, which a literal scan of the source
-   never sees -- so the rule was left behind in tf's stylesheet by the split and
+   never sees -- so the rule was left behind in otf's stylesheet by the split and
    the package shipped a `tone="bad"` prop that changed nothing. */
 .dialog-bad { border-color: color-mix(in oklab, var(--bad) 45%, var(--border)); }
 

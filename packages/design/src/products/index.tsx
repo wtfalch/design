@@ -3,7 +3,7 @@ import BrandDefault from '../components/Brand'
 import type { BrandName } from '../components/brandMarks'
 import { type Theme, type ThemeTokens, applyTheme } from '../themes'
 import { themeId } from '../themes/css'
-import { tf } from './tf'
+import { otf } from './otf'
 import { valet } from './valet'
 
 /**
@@ -18,7 +18,7 @@ import { valet } from './valet'
  *
  * The middle layer is what lets a theme be shared between products. A theme
  * is a sparse map, and what it is sparse *over* decides what a silent token
- * shows: over the base it shows tf, over the product it shows the product.
+ * shows: over the base it shows otf, over the product it shows the product.
  * Before this layer valet's two palettes each restated valet's font and
  * corners, because there was nowhere else to put them.
  *
@@ -40,7 +40,7 @@ export interface Product {
 }
 
 /** Every product, by the name of its mark. */
-export const PRODUCTS = { tf, valet } as const
+export const PRODUCTS = { otf, valet } as const
 
 /** Declare a product, so a default that is not a theme or a key `applyTheme`
  *  would not use is an error where it is written. */
@@ -65,7 +65,7 @@ export function defineProduct(product: Product): Product {
  *
  * An id the product does not offer resolves to the product's default rather
  * than the package's, so a valet setting that remembers a theme valet has
- * since dropped comes up as valet, not as tf.
+ * since dropped comes up as valet, not as otf.
  */
 export function productTheme(
   product: Product,
