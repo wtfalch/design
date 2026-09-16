@@ -229,7 +229,7 @@ is the difference from `Markdown`, which parses and must sanitise.
 `0.3.1`. Twenty-eight components, every one of the 70 gallery specimens
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
-It came out of [tf](https://github.com/wtfalch/tf), which is its first consumer;
+It came out of [otf](https://github.com/wtfalch/otf), which is its first consumer;
 valet is the second. A product is a layer: otf and valet each ship as one
 stylesheet and one entry, with their identity under their themes and their
 mark in the table.
