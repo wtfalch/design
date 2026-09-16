@@ -11,14 +11,14 @@ import type { Product } from './index'
  * tones are what the system says. They never share a colour.
  *
  * Every colour is measured, not judged: `contrast.test.ts` holds both palettes
- * to the same pairs as tf's.
+ * to the same pairs as otf's.
  *
  * The palettes name colours and nothing else. What makes valet valet under
  * either of them -- the type and the corners -- is the identity below, on
  * `:root` in valet's stylesheet and under every palette `applyTheme` lays on.
  * Both palettes used to restate it, which is the shape that breaks the moment
  * a theme is shared between products: silent on the font, it would have fallen
- * back to tf's.
+ * back to otf's.
  */
 
 const FONT =

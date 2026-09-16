@@ -66,7 +66,7 @@ export function themeChoices(
 /**
  * The blocking script, as a string to put in a `<script>` in `<head>`.
  *
- * `dangerouslySetInnerHTML={{ __html: themeChoiceScript('tf') }}` in a Next
+ * `dangerouslySetInnerHTML={{ __html: themeChoiceScript('otf') }}` in a Next
  * root layout, above everything. It reads the stored id, checks it against
  * what this app offers, and writes `data-theme` on `<html>`.
  *

@@ -1,6 +1,6 @@
 # CLAUDE.md — agent guide for `design`
 
-`@wtfalch/design` is wtfalch's design system. It came out of tf's dashboard and
+`@wtfalch/design` is wtfalch's design system. It came out of otf's dashboard and
 is published so every product can use it and none of them have to look alike.
 Nothing in it is one product's: a mark lives in `Brand` by name, a product's
 animation of its mark lives in that product, and no class or keyframe carries a
@@ -29,7 +29,7 @@ with utilities where its own class is private, which is now all of them. The
 package README has the vocabulary and how to write a theme. This file has the
 rules, each with the bug that produced it, because a rule without its reason
 gets argued away by the next person who finds it inconvenient. Most of them
-were learned in tf and moved here with the code on 2026-09-05; tf's
+were learned in otf and moved here with the code on 2026-09-05; otf's
 `dashboard/CLAUDE.md` keeps the ones about *using* the system.
 
 ## The package hands out components and tokens, not classes
@@ -64,7 +64,7 @@ extra steps.
 
 The visual suite answers one question: did a change move a pixel it did not
 mean to. That only works if the baseline predates the change. The components
-were photographed **as they were in tf**, before a line of React Aria landed, so
+were photographed **as they were in otf**, before a line of React Aria landed, so
 every migration arrived as a diff against the thing it replaced. A migration
 that changes nothing visible is the target; one that changes something is
 allowed to, once, explained in the commit.
@@ -158,7 +158,7 @@ allowed to, once, explained in the commit.
   `applyTheme` are the product's. A site imports its product and nothing of
   anyone else's. The identity layer exists because valet's two palettes each
   restated valet's font and corners, and a theme shared between products would
-  otherwise fall back to tf's font wherever it kept quiet: a theme is a sparse
+  otherwise fall back to otf's font wherever it kept quiet: a theme is a sparse
   map, and what it is sparse *over* has to be the product, not the base.
   Nobody writes a `:root[data-theme]` rule by hand, because a copy drifts from
   the object the contrast test measured. Before 0.3.0 valet kept its theme in
@@ -198,9 +198,9 @@ allowed to, once, explained in the commit.
   any consumer that has ever written a `.card` rule — it reads as a theming
   bug. Known and open: the prefix ends up in every consumer's stylesheet and in
   every baseline, so it is cheap now and expensive later, and it is the first
-  open question in tf's `plans/design-system-package.md`.
-- **The split out of tf was generated, not hand-edited.** `tools/extract-css.mjs`
-  lifted the package's rules out of tf's one 4,530-line stylesheet by which
+  open question in otf's `plans/design-system-package.md`.
+- **The split out of otf was generated, not hand-edited.** `tools/extract-css.mjs`
+  lifted the package's rules out of otf's one 4,530-line stylesheet by which
   classes each component names, keeping comments and order, and wrote what
   stayed behind with `--remainder`. Four things it got wrong first, each of
   which produced something that looked like a working component: rules with no
@@ -211,11 +211,11 @@ allowed to, once, explained in the commit.
   argument for baselining first, in one paragraph.
 
 - **Icons and illustrations are the system's; the mark is the product's.**
-  `brandMarks.ts` is the table of every product's mark by name, stroked (tf,
+  `brandMarks.ts` is the table of every product's mark by name, stroked (otf,
   one line at a weight) or filled (valet, a badge with the shirt cut out and
   the bow inside the cut, one path under `evenodd` so the shirt is a hole the
   surface shows through); `Brand` draws either, and a product entry's `Brand`
-  defaults to its own. tf's `brandMark.test.ts` reads tf's row out of the
+  defaults to its own. otf's `brandMark.test.ts` reads otf's row out of the
   compiled table, so the table stays where it is. The glyph table with its
   measured views is `components/icons.ts`; `Icon.tsx` keeps the reasons. 0.3.0
   briefly had an `ArtProvider` that put a per-product pack of icons,
@@ -235,7 +235,7 @@ allowed to, once, explained in the commit.
   `data-disabled`. Budget a migration as stylesheet work — the React diff per
   component is small and the CSS diff is not.
 - **A modal traps focus, and focus returns to the opener.** Both are invisible
-  to a mouse, which is how all eight of tf's hand-built modals once shipped
+  to a mouse, which is how all eight of otf's hand-built modals once shipped
   without either. Both are keyboard tests now rather than rules on trust.
 - **`Toggle` owns the request it applies.** An `onChange` that returns a
   promise moves the knob at once, marks the row busy (`aria-busy`, chef's
@@ -295,14 +295,14 @@ because a rename after it is a breaking change for everyone.
   where; a list kept beside the specimens goes stale in the direction that hides
   work.
 - **It renders the real thing.** A page that documents hand-written markup is a
-  page that will be copied — that is how tf ended up with five gallery pages and
+  page that will be copied — that is how otf ended up with five gallery pages and
   no component behind them. When you build a component, point its page at it.
 - **A specimen of a control that moves has to move.** The Sizes toggles were
   `checked onChange={() => {}}` -- controlled, wired to nothing -- so on the
   page they could be pressed and would not budge, and the first person to try
   read the component as broken rather than the demo as static. A demo holds
   its own state.
-- **A theme that is not tf's is photographed too.** The built-ins are examples,
+- **A theme that is not otf's is photographed too.** The built-ins are examples,
   and an example proves nothing about whether the vocabulary is wide enough for
   an app that looks nothing like the one it came from. `gallery/src/brand.ts` is
   that app, in every specimen.
@@ -313,7 +313,7 @@ because a rename after it is a breaking change for everyone.
 runs, and stops if the tag disagrees with `package.json`. A markup change after
 publication is breaking for anyone who styled against the first version.
 `files: ["dist"]`; `pnpm pack` in `packages/design` makes the tarball a consumer
-can install by path, which is how tf runs until `0.1.0` is on npm.
+can install by path, which is how otf runs until `0.1.0` is on npm.
 
 **`dist` carries file extensions, and the build writes them.** `tsc` emits
 relative imports as the sources write them, `./Brand`, which a bundler resolves

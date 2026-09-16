@@ -13,7 +13,7 @@ import { useEffect, useId, useRef, useState } from 'react'
  * A number chosen from a range, by dragging.
  *
  * For a setting whose answer is "about this much" rather than one of a list:
- * how much memory tf may take, say. A `Select` with eight sizes on it makes
+ * how much memory otf may take, say. A `Select` with eight sizes on it makes
  * the person pick the nearest wrong one; a box you type a number into asks
  * them to know the ceiling. A slider shows the ceiling, the floor, and where
  * between them they are.

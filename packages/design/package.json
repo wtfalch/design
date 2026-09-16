@@ -1,6 +1,6 @@
 {
   "name": "@wtfalch/design",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "description": "wtfalch's design system: themeable components on a fixed token vocabulary.",
   "keywords": [
     "design-system",
@@ -33,15 +33,15 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./tf": {
-      "types": "./dist/tf.d.ts",
-      "default": "./dist/tf.js"
+    "./otf": {
+      "types": "./dist/otf.d.ts",
+      "default": "./dist/otf.js"
     },
     "./valet": {
       "types": "./dist/valet.d.ts",
       "default": "./dist/valet.js"
     },
-    "./tf.css": "./dist/tf.css",
+    "./otf.css": "./dist/otf.css",
     "./valet.css": "./dist/valet.css",
     "./themes": {
       "types": "./dist/themes/index.d.ts",

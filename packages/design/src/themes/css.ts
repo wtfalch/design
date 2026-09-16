@@ -61,7 +61,7 @@ export function productCss(themes: Record<string, Theme>): string {
  * wins over the base values by coming later at the same specificity; the
  * default theme on `:root:not([data-theme])`, so the first paint is right with
  * no attribute at all; the components; and one rule per theme. A default with
- * no tokens -- tf's `system`, which is a media query rather than a palette --
+ * no tokens -- otf's `system`, which is a media query rather than a palette --
  * writes no default rule, and neither does an empty identity.
  *
  * Structural, not typed to `Product`: that type lives beside the React

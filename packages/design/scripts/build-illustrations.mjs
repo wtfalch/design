@@ -22,7 +22,7 @@ import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
-/* The package owns its art. The SVGs came from tf on 2026-09-04 and the
+/* The package owns its art. The SVGs came from otf on 2026-09-04 and the
    generator used to read them there; a package that depends on a sibling
    checkout for its own drawings cannot be built from a clone. */
 const from = resolve(here, process.argv[2] ?? '../illustrations')

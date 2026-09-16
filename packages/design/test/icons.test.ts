@@ -4,7 +4,7 @@
  * Six hand-drawn icon components at six different optical sizes is where this
  * started. Every glyph is now measured -- its `view` is the drawn extent, not
  * the source file's viewBox -- so a set of them sits together at 14px. Ported
- * from tf's `icons.test.ts`.
+ * from otf's `icons.test.ts`.
  */
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
@@ -17,7 +17,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const src = readFileSync(resolve(here, '../src/components/icons.ts'), 'utf8')
 const gallery = readFileSync(resolve(here, '../../../gallery/src/specimens.tsx'), 'utf8')
 
-/* `name: {` and then the nearest `view: '…'` before the entry closes. tf's
+/* `name: {` and then the nearest `view: '…'` before the entry closes. otf's
    original regex matched a one-line form the file had before biome ever
    formatted it; the table is `name: {` over `view:` now, and one entry
    (`minimize`) carries a comment between the two. The interface's own

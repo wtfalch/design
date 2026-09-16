@@ -46,10 +46,10 @@ describe('the built package', () => {
      one and still fails fast if the package genuinely stops loading. */
   it('loads in plain Node, with no bundler resolving its imports', { timeout: 30_000 }, () => {
     expect(inNode('index.js', 'typeof m.Brand + " " + m.BRAND_NAMES.join(",")')).toBe(
-      'function tf,valet',
+      'function otf,valet',
     )
     expect(inNode('valet.js', 'm.DEFAULT_THEME + " " + m.product.name')).toBe('valet valet')
-    expect(inNode('tf.js', 'm.DEFAULT_THEME + " " + m.product.name')).toBe('system tf')
+    expect(inNode('otf.js', 'm.DEFAULT_THEME + " " + m.product.name')).toBe('system otf')
     expect(inNode('themes/index.js', 'Object.keys(m.THEMES).join(",")')).toBe(
       'system,night,paper,valet,valet-night',
     )

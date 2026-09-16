@@ -3,7 +3,7 @@
  *
  * A module that exports a value beside a component loses its Fast Refresh
  * boundary: editing it re-runs every importer instead of swapping the
- * component in place. tf enforces this over its app components; this is the
+ * component in place. otf enforces this over its app components; this is the
  * same rule over the package's, ported so it holds here too. `iconNames.ts`
  * and `tourMarker.ts` exist because of it.
  */

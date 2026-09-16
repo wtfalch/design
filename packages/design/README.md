@@ -70,20 +70,20 @@ Three layers, each falling back to the one under it:
 | | |
 |---|---|
 | **the system** | The components, the base values in `tokens.css`, the shared icons and illustrations. |
-| **the product** | Its mark, and its identity: the tokens that make it itself under every theme — font, shape, density. On `:root` in the product's stylesheet, so a theme that is silent on them gets the product, not tf. `src/products/<name>.ts`. |
+| **the product** | Its mark, and its identity: the tokens that make it itself under every theme — font, shape, density. On `:root` in the product's stylesheet, so a theme that is silent on them gets the product, not otf. `src/products/<name>.ts`. |
 | **the theme** | A palette and a colour scheme, plus anything it deliberately changes. One `:root[data-theme='<id>']` rule each, generated from the object. |
 
 The middle layer is what lets a theme be shared between products: it names its
 colours and inherits the identity of whichever product wears it. Before it
 existed, valet's two palettes each restated valet's font and corners, and a
-palette written for two products would have shown tf's font on valet wherever
+palette written for two products would have shown otf's font on valet wherever
 it kept quiet.
 
 The product's default theme is also written on `:root` when no `data-theme` is
 set, so the first paint is right with no attribute at all; set the attribute
 before the bundle loads only to restore a theme somebody picked (see First
-paint). tf's default is `system`, a `prefers-color-scheme` rule rather than a
-palette, so tf still sets the attribute.
+paint). otf's default is `system`, a `prefers-color-scheme` rule rather than a
+palette, so otf still sets the attribute.
 
 The main entry is the neutral view of all of it: `PRODUCTS` by name, `THEMES`
 as the union every product's picker and the contrast test read,
@@ -178,7 +178,7 @@ Your server stays the source of truth. `localStorage` only beats the paint.
 
 ## Marks
 
-Every product's mark, by name, in `brandMarks.ts`. tf's is one stroke. valet's
+Every product's mark, by name, in `brandMarks.ts`. otf's is one stroke. valet's
 is a filled badge: the jacket with the shirt cut out of it and a bow tie in the
 cut, one path under `evenodd` so the surface shows through the shirt. Both are
 `currentColor`, so the stylesheet decides the colour and a theme can move it.
@@ -229,8 +229,8 @@ is the difference from `Markdown`, which parses and must sanitise.
 `0.3.1`. Twenty-eight components, every one of the 70 gallery specimens
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
-It came out of [tf](https://github.com/wtfalch/tf), which is its first consumer;
-valet is the second. A product is a layer: tf and valet each ship as one
+It came out of [otf](https://github.com/wtfalch/otf), which is its first consumer;
+valet is the second. A product is a layer: otf and valet each ship as one
 stylesheet and one entry, with their identity under their themes and their
 mark in the table.
 

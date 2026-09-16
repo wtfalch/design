@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { TF_THEMES } from '../src/products/tf'
+import { OTF_THEMES } from '../src/products/otf'
 import { VALET_THEMES } from '../src/products/valet'
 import { THEMES, TOKEN_KEYS, applyTheme } from '../src/themes'
 import { productCss, themeId } from '../src/themes/css'
@@ -15,7 +15,7 @@ describe('the themes, per product', () => {
     for (const [id, theme] of Object.entries(THEMES)) {
       expect(themeId(theme), theme.name).toBe(id)
     }
-    expect(Object.keys(THEMES)).toEqual([...Object.keys(TF_THEMES), ...Object.keys(VALET_THEMES)])
+    expect(Object.keys(THEMES)).toEqual([...Object.keys(OTF_THEMES), ...Object.keys(VALET_THEMES)])
   })
 
   it('names only tokens a theme may set', () => {
@@ -28,7 +28,7 @@ describe('the themes, per product', () => {
   })
 
   it('generates one rule per theme, and none for the one with no palette', () => {
-    const css = productCss(TF_THEMES)
+    const css = productCss(OTF_THEMES)
     expect(css).not.toContain("[data-theme='system']")
     expect(css).toContain(":root[data-theme='night']{")
     expect(css).toContain(":root[data-theme='paper']{")

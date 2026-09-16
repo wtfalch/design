@@ -19,7 +19,7 @@ const { productStylesheet } = await import(resolve(dist, 'themes/css.js'))
 const tokens = readFileSync(resolve(dist, 'tokens.css'), 'utf8')
 const components = readFileSync(resolve(dist, 'styles/index.css'), 'utf8')
 
-for (const name of ['tf', 'valet']) {
+for (const name of ['otf', 'valet']) {
   const mod = await import(resolve(dist, `products/${name}.js`))
   const product = mod[name]
   writeFileSync(resolve(dist, `${name}.css`), productStylesheet(product, tokens, components))
