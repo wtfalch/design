@@ -2,7 +2,10 @@
 
 /* The switcher's own frame. `SideList` renders whatever the caller hands it
    here -- Manage's organisation `Select` -- so the only thing this owns is
-   the seam between it and the groups below. */
+   the seam between it and the groups below. Padding, not a narrower box: the
+   border-bottom below sits on this element's own border box, which is why it
+   already reaches both edges of the column -- narrower would have meant
+   inserting a second element just to hold the rule. */
 .side-list-switcher {
   padding: var(--space-3);
   border-bottom: var(--border-width) solid var(--border);
@@ -25,8 +28,12 @@
   gap: var(--space-1);
 }
 
+/* Flush with the item box's own left edge -- the same `--space-3` inset
+   `.side-list-groups-inner`'s padding already gives every item -- and not
+   with the label text past it. The label indents for the icon column below;
+   the heading does not follow it there, the way `Tabs`' vertical rail keeps
+   its group label at the rail's own edge rather than the tab's. */
 .side-list-heading {
-  padding: 0 var(--space-2);
   margin-bottom: var(--space-1);
   font-size: var(--text-xs);
   font-weight: var(--weight-strong);
@@ -35,29 +42,65 @@
   letter-spacing: 0.04em;
 }
 
-/* The item. `Slot` merges this class onto whatever the caller passed --
-   usually a Next.js `<Link>` -- so it has to read correctly on a bare `<a>`
-   with no React Aria state attributes to key off: `:hover` and
-   `[aria-current]` rather than `data-hovered`/`data-selected`. */
-.side-list-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+/* The row. Position context for the icon below; no box of its own beyond
+   that -- `.side-list-link` draws the background, the padding and the
+   states, because it is the piece that is actually the anchor. */
+.side-list-item { position: relative; }
+
+/* Drawn over the row at a fixed inset whether or not an item has one, so
+   every label starts at the same x -- see `SideList`'s docblock for why this
+   is a prop the component draws rather than markup a caller supplies.
+   `pointer-events: none` lets a press on the glyph's own pixels fall through
+   to `.side-list-link` underneath instead of landing on a non-interactive
+   `<svg>` and missing the row. */
+.side-list-item-icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  translate: 0 -50%;
+  pointer-events: none;
+  color: var(--muted);
+}
+
+/* The item's real element. `Slot` merges this class onto whatever the caller
+   passed -- usually a Next.js `<Link>` -- so it has to read correctly on a
+   bare `<a>` with no React Aria state attributes to key off: `:hover` and
+   `[aria-current]` rather than `data-hovered`/`data-selected`.
+
+   `padding-left` reserves the icon column unconditionally: `var(--space-3)`
+   to match the row's own inset, `var(--space-4)` for the glyph -- `Icon`'s
+   `size={16}` above, the same square `.menu-icon` uses -- and `var(--space-2)`
+   between them. An item with no `icon` gets the same indent as one that has
+   one, which is the whole point: two items one row apart with different
+   label columns is what sent this here in the first place. */
+.side-list-link {
+  display: block;
   padding: var(--space-2) var(--space-3);
+  padding-left: calc(var(--space-3) + var(--space-4) + var(--space-2));
   border-radius: var(--radius-md);
   color: var(--muted);
   text-decoration: none;
   font-size: var(--text-sm);
 }
 
-.side-list-item:hover { background: var(--panel-2); color: var(--text); }
+.side-list-link:hover { background: var(--panel-2); color: var(--text); }
+/* The icon is a sibling of the link, not its descendant -- `Slot` can only
+   clone the one element it is given, so the glyph is drawn outside it. `:has()`
+   is what lets the two still read as one control: without it the icon would
+   sit at `--muted` while its own label brightened under it. */
+.side-list-item:has(.side-list-link:hover) .side-list-item-icon { color: var(--text); }
 
 /* The place the visitor is on. Background and weight both move, not colour
    alone -- craft-floor's contrast rule is about text on the surface, and a
    current row that only shifted a text colour a shade darker would be the
-   kind of change a glance misses entirely. */
-.side-list-item[aria-current='page'] {
+   kind of change a glance misses entirely. Inset to match the switcher's own
+   padding rather than the row's full bleed, because the highlight is a
+   choice drawn *inside* the column, not a second divider. */
+.side-list-link[aria-current='page'] {
   background: var(--panel-2);
   color: var(--text);
   font-weight: var(--weight-strong);
+}
+.side-list-item:has(.side-list-link[aria-current='page']) .side-list-item-icon {
+  color: var(--text);
 }

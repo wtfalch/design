@@ -382,7 +382,7 @@ test.describe('SideList · phone sheet', () => {
       await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') })
       await page.goto(specimenUrl({ c: 'sidelist', v: 'Default' }, theme))
       await themeApplied(page, theme)
-      await page.getByRole('button', { name: 'Menu' }).click()
+      await page.getByRole('button', { name: 'Places' }).click()
 
       const dialog = page.getByRole('dialog')
       await expect(dialog).toBeVisible()

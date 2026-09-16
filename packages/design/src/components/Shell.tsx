@@ -25,10 +25,11 @@
  * instead -- Manage's redesign is the case this was built for. `Shell`
  * itself stays a layout, not a state holder: it does not know the rail
  * collapses to a menu button on a phone, only that when `side` is present
- * there is a column to make room for at `md` and up. The button that opens
- * the phone sheet is an ordinary control the app puts in `who`, because
- * `SideList`'s own docblock explains why it cannot live inside `side` and
- * still reach the header.
+ * there is a column to make room for at `md` and up. `SideList.Trigger` is
+ * what the app puts in `who` to open the phone sheet -- it renders and
+ * hides itself, so an app never writes the breakpoint by hand; `SideList`'s
+ * own docblock explains why the button has to live in `who` rather than in
+ * `side` itself.
  */
 
 export default function Shell({
@@ -87,7 +88,15 @@ export default function Shell({
            `Shell` with no `side` renders the identical markup it did before
            this branch existed. */
         <div className="flex-1 min-h-0 flex min-w-0">
-          <div className="shell-side hidden md:flex md:flex-none w-[var(--shell-side-width)] border-r border-border surface-panel overflow-hidden">
+          {/* `md:block`, not `md:flex`: this wrapper has exactly one child and
+              does not need a flex formatting context of its own -- giving it
+              one made it a *row* (the default direction), whose cross axis is
+              height, not width, so the rail inside stopped stretching to fill
+              it and sat at its own content width instead. The divider under
+              `SideList`'s switcher and the current-item highlight both read
+              as narrower than the column for this one reason: a block box
+              fills its container's width by default and needed nothing else. */}
+          <div className="shell-side hidden md:block md:flex-none w-[var(--shell-side-width)] border-r border-border surface-panel overflow-hidden">
             {side}
           </div>
           <main className={`${band} flex-1 py-6 min-w-0`}>{children}</main>

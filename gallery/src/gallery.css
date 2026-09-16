@@ -438,18 +438,3 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-2);
 }
-
-/* The SideList demo's own menu button, shown only below the rail's own
-   breakpoint. The gallery has no Tailwind of its own -- it imports the
-   package's compiled `styles.css`, which only carries the utilities the
-   package's *own* source used, and `md:hidden` is not among them because
-   nothing inside the package hides anything at `md` and up. A real app
-   gets `md:hidden` for free by running Tailwind over its own source, which
-   `README.md` already asks it to; the gallery is the one place that does
-   not, so this is a plain media query instead. 768px matches `SideList`'s
-   own `md:flex` -- not a token, because the breakpoint is Tailwind's own
-   default and nothing here defines a second one to drift from it. */
-.g-phone-only { display: inline-flex; }
-@media (min-width: 768px) {
-  .g-phone-only { display: none; }
-}

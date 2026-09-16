@@ -816,9 +816,10 @@ function SheetDemo({ edge }: { edge: 'right' | 'bottom' }) {
 
 /* A realistic Manage-like rail: an organisation switcher, an unheaded group
    of the app's own places, then "Tools" and "Platform" beneath. `open` is
-   `SideList`'s own required state -- there is no trigger inside it, so the
-   menu button that flips it sits in `who`, the same composition Manage's
-   own layout will use. */
+   the one piece of state the app holds and hands to both `SideList` and
+   `SideList.Trigger` -- the trigger renders and hides itself, which is the
+   whole point of it being a component here rather than a `<Button>` the
+   demo built by hand. */
 function SideListDemo() {
   const [open, setOpen] = useState(false)
   return (
@@ -827,14 +828,7 @@ function SideListDemo() {
         brand={<strong>Manage</strong>}
         who={
           <>
-            <Button
-              iconOnly
-              aria-label="Menu"
-              className="g-phone-only"
-              onClick={() => setOpen(true)}
-            >
-              <Icon name="menu" />
-            </Button>
+            <SideList.Trigger label="Places" onOpenChange={setOpen} />
             <span className="quiet">will@wtfalch.dev</span>
           </>
         }
@@ -863,60 +857,36 @@ function SideListDemo() {
               <SideList.Item>
                 <a href="#roles">Roles</a>
               </SideList.Item>
-              <SideList.Item>
-                <a href="#activity">
-                  <Icon name="bolt" />
-                  Activity
-                </a>
+              <SideList.Item icon="bolt">
+                <a href="#activity">Activity</a>
               </SideList.Item>
-              <SideList.Item>
-                <a href="#settings">
-                  <Icon name="settings" />
-                  Settings
-                </a>
+              <SideList.Item icon="settings">
+                <a href="#settings">Settings</a>
               </SideList.Item>
             </SideList.Group>
             <SideList.Group heading="Tools">
-              <SideList.Item>
-                <a href="#email">
-                  <Icon name="mail" />
-                  Email
-                </a>
+              <SideList.Item icon="mail">
+                <a href="#email">Email</a>
               </SideList.Item>
-              <SideList.Item>
-                <a href="#ai">
-                  <Icon name="stars" />
-                  AI
-                </a>
+              <SideList.Item icon="stars">
+                <a href="#ai">AI</a>
               </SideList.Item>
-              <SideList.Item>
-                <a href="#storage">
-                  <Icon name="cloud" />
-                  Storage
-                </a>
+              <SideList.Item icon="cloud">
+                <a href="#storage">Storage</a>
               </SideList.Item>
               <SideList.Item>
                 <a href="#keys">Keys</a>
               </SideList.Item>
             </SideList.Group>
             <SideList.Group heading="Platform">
-              <SideList.Item>
-                <a href="#organisations">
-                  <Icon name="folder" />
-                  Organisations
-                </a>
+              <SideList.Item icon="folder">
+                <a href="#organisations">Organisations</a>
               </SideList.Item>
-              <SideList.Item>
-                <a href="#support">
-                  <Icon name="chat" />
-                  Support sessions
-                </a>
+              <SideList.Item icon="chat">
+                <a href="#support">Support sessions</a>
               </SideList.Item>
-              <SideList.Item>
-                <a href="#estate-log">
-                  <Icon name="book" />
-                  Estate log
-                </a>
+              <SideList.Item icon="book">
+                <a href="#estate-log">Estate log</a>
               </SideList.Item>
             </SideList.Group>
           </SideList>

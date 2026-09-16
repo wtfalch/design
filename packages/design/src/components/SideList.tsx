@@ -28,22 +28,37 @@
  * does when `asChild` is left off, because a place with nothing to link to is
  * not a place -- there is no sensible link-less mode to fall back to.
  *
+ * **`icon` is a prop, not part of the child's own content, and that is the
+ * opposite of what `Button` does.** `Button` leaves an icon to the caller's
+ * children because `Slot` clones one element and cannot also inject a sibling
+ * into it -- so this component draws the icon itself, absolutely positioned
+ * over the row, `pointer-events: none`, with the slotted link's own
+ * `padding-left` reserving the same width whether or not an item passes one.
+ * A rail whose items only sometimes carry icons is the case this exists for
+ * -- Home/Accounts/Teams have none, Activity/Settings do -- and without a
+ * reserved column every label starts at a different x, one indent for the
+ * icon and none for its absence. The click target stays the whole row:
+ * `pointer-events: none` on the icon lets a press on its pixels fall through
+ * to the anchor underneath rather than missing it.
+ *
  * **The current place is marked, not only coloured.** `current` sets
  * `aria-current="page"` on the slotted anchor, merged the way `Button` merges
  * `aria-disabled` onto a disabled link -- a colour alone tells a mouse where
  * it is and tells a screen reader nothing.
  *
- * **The phone sheet is always controlled, and that is a real constraint, not
- * a style choice.** `Popover` hands you an uncontrolled default because its
- * trigger renders right where the surface opens. This list's trigger cannot:
- * the requirement is a menu button in `Shell`'s header, and the header and
- * this column are siblings under `Shell`, not ancestor and descendant -- there
- * is no DOM position inside both. So opening the sheet is always the caller's
- * call: an ordinary `<Button iconOnly>` in `who`, wired to `onOpenChange`.
- * `open`/`onOpenChange` are required rather than optional for the same
- * reason `Popover`'s are not: without them the sheet has no way to open at
- * all, and a prop that can never do anything is worse than one that must be
- * passed.
+ * **The phone sheet is controlled, and `SideList.Trigger` is the button that
+ * opens it.** The trigger has to live in `Shell`'s header -- that is the
+ * requirement -- and the header and this column are siblings under `Shell`,
+ * not ancestor and descendant, so there is no DOM position inside both and
+ * therefore no uncontrolled default the way `Popover` has one: the app holds
+ * `open` and hands the same `onOpenChange` to both `SideList` and
+ * `SideList.Trigger`. What the trigger owns on its own is the part an app
+ * must not have to: it renders the button, names it, and hides itself at
+ * `md` and up (`md:hidden`, compiled into this package because the trigger
+ * lives here rather than in an app's own source) -- the earlier shape put a
+ * plain `<Button className="md:hidden">` in the app's hands instead, which is
+ * exactly the utility-class-in-app-code every consumer's own lint rule
+ * exists to catch.
  *
  * **The rail and the sheet render the same children twice, not once
  * repositioned.** A `<nav>` docked beside `main` and a `<nav>` inside a
@@ -64,8 +79,11 @@
 import { Slot } from '@radix-ui/react-slot'
 import { createContext, useContext } from 'react'
 
+import Button from './Button'
+import Icon from './Icon'
 import Modal from './Modal'
 import ScrollArea from './ScrollArea'
+import type { IconName } from './iconNames'
 
 interface Ctx {
   /** No-op in the docked rail, where nothing is open to close. Real in the
@@ -154,6 +172,36 @@ function SideList({ switcher, children, label, open, onOpenChange, className }: 
   )
 }
 
+export interface SideListTriggerProps {
+  /** Names the button for a screen reader -- there is no visible label
+   *  beside the icon. Defaults to a generic name rather than requiring the
+   *  same string `SideList.label` takes twice, since a caller that wants
+   *  them to match can just pass `label` through both. */
+  label?: string
+  /** Opens the sheet. The same setter passed to `SideList`'s `onOpenChange`
+   *  -- one piece of state in the app, read by both. */
+  onOpenChange: (open: boolean) => void
+  className?: string
+}
+
+function SideListTrigger({ label = 'Open places', onOpenChange, className }: SideListTriggerProps) {
+  return (
+    <Button
+      iconOnly
+      aria-label={label}
+      /* `md:hidden`, compiled here rather than asked of the app: this module
+         is inside the package, so Tailwind's own scan of *its* source finds
+         the class, which is the whole difference from the shape this
+         replaced -- the same utility written in an app or a gallery that
+         does not run Tailwind over its own source compiles to nothing. */
+      className={`side-list-trigger md:hidden${className ? ` ${className}` : ''}`}
+      onPress={() => onOpenChange(true)}
+    >
+      <Icon name="menu" />
+    </Button>
+  )
+}
+
 export interface SideListGroupProps {
   /** The small heading above this group's places. Omit it for the group at
    *  the top of the list that needs no name -- Home, Accounts, Teams... --
@@ -174,30 +222,38 @@ function SideListGroup({ heading, children, className }: SideListGroupProps) {
 
 export interface SideListItemProps {
   /** The place: a single element that is or renders an anchor, usually a
-   *  Next.js `<Link>`. Its own icon and label are its own content -- the same
-   *  contract `Button`'s `asChild` uses, for the same reason: this component
-   *  merges attributes onto whatever element it is given and cannot also
-   *  inject content into it. */
+   *  Next.js `<Link>`. Its label is its own content -- the same contract
+   *  `Button`'s `asChild` uses, for the same reason: this component merges
+   *  attributes onto whatever element it is given and cannot also inject
+   *  content into it. The icon is the one exception; see `icon` below. */
   children: React.ReactElement
+  /** Drawn over the row at a fixed inset, present or not -- see the
+   *  docblock above for why this is a prop instead of the caller's own
+   *  markup. */
+  icon?: IconName
   /** This is the page the visitor is on. */
   current?: boolean
   className?: string
 }
 
-function SideListItem({ children, current, className }: SideListItemProps) {
+function SideListItem({ children, icon, current, className }: SideListItemProps) {
   const ctx = useContext(SideListContext)
   return (
-    <Slot
-      className={`side-list-item${className ? ` ${className}` : ''}`}
-      aria-current={current ? 'page' : undefined}
-      onClick={() => ctx?.close()}
-    >
-      {children}
-    </Slot>
+    <div className="side-list-item">
+      {icon && <Icon name={icon} size={16} className="side-list-item-icon" />}
+      <Slot
+        className={`side-list-link${className ? ` ${className}` : ''}`}
+        aria-current={current ? 'page' : undefined}
+        onClick={() => ctx?.close()}
+      >
+        {children}
+      </Slot>
+    </div>
   )
 }
 
 SideList.Group = SideListGroup
 SideList.Item = SideListItem
+SideList.Trigger = SideListTrigger
 
 export default SideList
