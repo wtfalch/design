@@ -19,12 +19,23 @@
  * Server-renderable: no hooks, no handlers. `who` and `brand` are slots, so
  * the client parts an app needs -- a user menu, the theme switch -- are the
  * app's to pass and stay its own client boundaries.
+ *
+ * **`side` is the same kind of slot, additive.** A `SideList` beside `main`
+ * is what an app with more places than `nav`'s one row can hold wants
+ * instead -- Manage's redesign is the case this was built for. `Shell`
+ * itself stays a layout, not a state holder: it does not know the rail
+ * collapses to a menu button on a phone, only that when `side` is present
+ * there is a column to make room for at `md` and up. The button that opens
+ * the phone sheet is an ordinary control the app puts in `who`, because
+ * `SideList`'s own docblock explains why it cannot live inside `side` and
+ * still reach the header.
  */
 
 export default function Shell({
   brand,
   who,
   nav,
+  side,
   wide = false,
   children,
   className,
@@ -36,6 +47,9 @@ export default function Shell({
   /** A row under the header, for an app whose pages hang off a context --
    *  manage's organisation nav is this. */
   nav?: React.ReactNode
+  /** A column beside `main`, docked from `md` up -- a `SideList`, usually.
+   *  Omit it and `Shell` renders exactly as it did before this existed. */
+  side?: React.ReactNode
   /** A wider measure, for a page that is a table rather than a form. */
   wide?: boolean
   children: React.ReactNode
@@ -66,7 +80,21 @@ export default function Shell({
       </header>
       {/* `min-w-0` because a flex child will not shrink below its content, and
           one wide table inside then pushes the whole page sideways. */}
-      <main className={`${band} flex-1 py-6 min-w-0`}>{children}</main>
+      {side ? (
+        /* A row wrapping the rail and `main`, rather than a rail sitting
+           beside `band`'s own centred measure -- so `main` still centres
+           itself in whatever width is left, the way it always has, and a
+           `Shell` with no `side` renders the identical markup it did before
+           this branch existed. */
+        <div className="flex-1 min-h-0 flex min-w-0">
+          <div className="shell-side hidden md:flex md:flex-none w-[var(--shell-side-width)] border-r border-border surface-panel overflow-hidden">
+            {side}
+          </div>
+          <main className={`${band} flex-1 py-6 min-w-0`}>{children}</main>
+        </div>
+      ) : (
+        <main className={`${band} flex-1 py-6 min-w-0`}>{children}</main>
+      )}
     </div>
   )
 }

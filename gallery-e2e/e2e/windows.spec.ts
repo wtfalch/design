@@ -363,3 +363,37 @@ for (const theme of THEMES) {
     await expect(act).toHaveScreenshot(`dangerzone--asking--${theme}.png`)
   })
 }
+
+/*
+ * The side list's phone sheet.
+ *
+ * `SideList`'s docked rail is `hidden md:flex`, so at the suite's default
+ * 1000px viewport -- above `md` -- the rail is the state `visual.spec.ts`
+ * photographs, and the sheet, portalled like every other overlay here, has no
+ * baseline at all. A narrow viewport is the only way to reach it: below `md`
+ * the menu button this needs is the one thing on the page that is not
+ * `display: none`.
+ */
+test.describe('SideList · phone sheet', () => {
+  test.use({ viewport: { width: 390, height: 800 } })
+
+  for (const theme of THEMES) {
+    test(`sidelist · phone sheet · ${theme}`, async ({ page }) => {
+      await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') })
+      await page.goto(specimenUrl({ c: 'sidelist', v: 'Default' }, theme))
+      await themeApplied(page, theme)
+      await page.getByRole('button', { name: 'Menu' }).click()
+
+      const dialog = page.getByRole('dialog')
+      await expect(dialog).toBeVisible()
+      // Merged onto the caller's own anchor by `Slot`, the same way `Button`
+      // merges `aria-disabled` -- measured rather than assumed.
+      await expect(dialog.getByRole('link', { name: 'Accounts' })).toHaveAttribute(
+        'aria-current',
+        'page',
+      )
+      await page.evaluate(() => document.fonts.ready)
+      await expect(page).toHaveScreenshot(`sidelist--phone-sheet--${theme}.png`)
+    })
+  }
+})

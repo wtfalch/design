@@ -1,0 +1,63 @@
+/* side list -------------------------------------------------------------- */
+
+/* The switcher's own frame. `SideList` renders whatever the caller hands it
+   here -- Manage's organisation `Select` -- so the only thing this owns is
+   the seam between it and the groups below. */
+.side-list-switcher {
+  padding: var(--space-3);
+  border-bottom: var(--border-width) solid var(--border);
+}
+
+/* Padding on the child, not on `.side-list-groups` itself -- `ScrollArea`'s
+   own rule: padding on the scroller insets its edge fade and floats the
+   scrollbar in from the side, which is wrong on the one edge that is meant
+   to look like it continues past the box. */
+.side-list-groups-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-3);
+}
+
+.side-list-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.side-list-heading {
+  padding: 0 var(--space-2);
+  margin-bottom: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-strong);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* The item. `Slot` merges this class onto whatever the caller passed --
+   usually a Next.js `<Link>` -- so it has to read correctly on a bare `<a>`
+   with no React Aria state attributes to key off: `:hover` and
+   `[aria-current]` rather than `data-hovered`/`data-selected`. */
+.side-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+  text-decoration: none;
+  font-size: var(--text-sm);
+}
+
+.side-list-item:hover { background: var(--panel-2); color: var(--text); }
+
+/* The place the visitor is on. Background and weight both move, not colour
+   alone -- craft-floor's contrast rule is about text on the surface, and a
+   current row that only shifted a text colour a shade darker would be the
+   kind of change a glance misses entirely. */
+.side-list-item[aria-current='page'] {
+  background: var(--panel-2);
+  color: var(--text);
+  font-weight: var(--weight-strong);
+}

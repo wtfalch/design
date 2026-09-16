@@ -316,6 +316,10 @@
     "v": "With a nav, wide"
   },
   {
+    "c": "sidelist",
+    "v": "Default"
+  },
+  {
     "c": "sizegrid",
     "v": "Interactive"
   },

@@ -53,6 +53,7 @@ import {
   ScrollArea,
   Select,
   Shell,
+  SideList,
   SizeGrid,
   Skeleton,
   Slider,
@@ -809,6 +810,121 @@ function SheetDemo({ edge }: { edge: 'right' | 'bottom' }) {
           </Rows>
         </Modal>
       )}
+    </div>
+  )
+}
+
+/* A realistic Manage-like rail: an organisation switcher, an unheaded group
+   of the app's own places, then "Tools" and "Platform" beneath. `open` is
+   `SideList`'s own required state -- there is no trigger inside it, so the
+   menu button that flips it sits in `who`, the same composition Manage's
+   own layout will use. */
+function SideListDemo() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ height: 720, overflow: 'hidden' }}>
+      <Shell
+        brand={<strong>Manage</strong>}
+        who={
+          <>
+            <Button
+              iconOnly
+              aria-label="Menu"
+              className="g-phone-only"
+              onClick={() => setOpen(true)}
+            >
+              <Icon name="menu" />
+            </Button>
+            <span className="quiet">will@wtfalch.dev</span>
+          </>
+        }
+        side={
+          <SideList
+            label="Places"
+            open={open}
+            onOpenChange={setOpen}
+            switcher={
+              <Select aria-label="Organisation" defaultValue="northwind">
+                <option value="northwind">Northwind</option>
+                <option value="acme">Acme</option>
+              </Select>
+            }
+          >
+            <SideList.Group>
+              <SideList.Item>
+                <a href="#home">Home</a>
+              </SideList.Item>
+              <SideList.Item current>
+                <a href="#accounts">Accounts</a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#teams">Teams</a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#roles">Roles</a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#activity">
+                  <Icon name="bolt" />
+                  Activity
+                </a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#settings">
+                  <Icon name="settings" />
+                  Settings
+                </a>
+              </SideList.Item>
+            </SideList.Group>
+            <SideList.Group heading="Tools">
+              <SideList.Item>
+                <a href="#email">
+                  <Icon name="mail" />
+                  Email
+                </a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#ai">
+                  <Icon name="stars" />
+                  AI
+                </a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#storage">
+                  <Icon name="cloud" />
+                  Storage
+                </a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#keys">Keys</a>
+              </SideList.Item>
+            </SideList.Group>
+            <SideList.Group heading="Platform">
+              <SideList.Item>
+                <a href="#organisations">
+                  <Icon name="folder" />
+                  Organisations
+                </a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#support">
+                  <Icon name="chat" />
+                  Support sessions
+                </a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#estate-log">
+                  <Icon name="book" />
+                  Estate log
+                </a>
+              </SideList.Item>
+            </SideList.Group>
+          </SideList>
+        }
+      >
+        <h1 style={{ margin: 0 }}>Accounts</h1>
+        <p className="quiet">Every account in Northwind.</p>
+      </Shell>
     </div>
   )
 }
@@ -2508,6 +2624,23 @@ export const COMPONENTS: Component[] = [
             </Shell>
           </div>
         ),
+      },
+    ],
+  },
+  {
+    id: 'sidelist',
+    name: 'SideList',
+    blurb:
+      'The grouped place list `Shell`’s `side` slot takes -- built for Manage’s ' +
+      'redesign, which replaces a directory page, a card grid and a tab bar with ' +
+      'one column of this. Docked from `md` up; below it, the button in `who` is ' +
+      'the only way in, because the column and the header are siblings and the ' +
+      'trigger cannot live in both.',
+    variants: [
+      {
+        name: 'Default',
+        note: 'An organisation switcher, an unheaded group of Manage’s own places, then "Tools" and "Platform". Accounts carries aria-current="page". At this width the rail is docked; `windows.spec.ts` photographs the phone sheet, which this stage cannot reach.',
+        render: () => <SideListDemo />,
       },
     ],
   },
