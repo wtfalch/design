@@ -53,6 +53,7 @@ import {
   ScrollArea,
   Select,
   Shell,
+  SideList,
   SizeGrid,
   Skeleton,
   Slider,
@@ -809,6 +810,91 @@ function SheetDemo({ edge }: { edge: 'right' | 'bottom' }) {
           </Rows>
         </Modal>
       )}
+    </div>
+  )
+}
+
+/* A realistic Manage-like rail: an organisation switcher, an unheaded group
+   of the app's own places, then "Tools" and "Platform" beneath. `open` is
+   the one piece of state the app holds and hands to both `SideList` and
+   `SideList.Trigger` -- the trigger renders and hides itself, which is the
+   whole point of it being a component here rather than a `<Button>` the
+   demo built by hand. */
+function SideListDemo() {
+  const [open, setOpen] = useState(false)
+  return (
+    <div style={{ height: 720, overflow: 'hidden' }}>
+      <Shell
+        brand={<strong>Manage</strong>}
+        who={
+          <>
+            <SideList.Trigger label="Places" onOpenChange={setOpen} />
+            <span className="quiet">will@wtfalch.dev</span>
+          </>
+        }
+        side={
+          <SideList
+            label="Places"
+            open={open}
+            onOpenChange={setOpen}
+            switcher={
+              <Select aria-label="Organisation" defaultValue="northwind">
+                <option value="northwind">Northwind</option>
+                <option value="acme">Acme</option>
+              </Select>
+            }
+          >
+            <SideList.Group>
+              <SideList.Item>
+                <a href="#home">Home</a>
+              </SideList.Item>
+              <SideList.Item current>
+                <a href="#accounts">Accounts</a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#teams">Teams</a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#roles">Roles</a>
+              </SideList.Item>
+              <SideList.Item icon="bolt">
+                <a href="#activity">Activity</a>
+              </SideList.Item>
+              <SideList.Item icon="settings">
+                <a href="#settings">Settings</a>
+              </SideList.Item>
+            </SideList.Group>
+            <SideList.Group heading="Tools">
+              <SideList.Item icon="mail">
+                <a href="#email">Email</a>
+              </SideList.Item>
+              <SideList.Item icon="stars">
+                <a href="#ai">AI</a>
+              </SideList.Item>
+              <SideList.Item icon="cloud">
+                <a href="#storage">Storage</a>
+              </SideList.Item>
+              <SideList.Item>
+                <a href="#keys">Keys</a>
+              </SideList.Item>
+            </SideList.Group>
+            <SideList.Group heading="Platform">
+              <SideList.Item icon="folder">
+                <a href="#organisations">Organisations</a>
+              </SideList.Item>
+              <SideList.Item icon="chat">
+                <a href="#support">Support sessions</a>
+              </SideList.Item>
+              <SideList.Item icon="book">
+                <a href="#estate-log">Estate log</a>
+              </SideList.Item>
+            </SideList.Group>
+          </SideList>
+        }
+      >
+        <h1 style={{ margin: 0 }}>Accounts</h1>
+        <p className="quiet">Every account in Northwind.</p>
+      </Shell>
     </div>
   )
 }
@@ -2508,6 +2594,23 @@ export const COMPONENTS: Component[] = [
             </Shell>
           </div>
         ),
+      },
+    ],
+  },
+  {
+    id: 'sidelist',
+    name: 'SideList',
+    blurb:
+      'The grouped place list `Shell`’s `side` slot takes -- built for Manage’s ' +
+      'redesign, which replaces a directory page, a card grid and a tab bar with ' +
+      'one column of this. Docked from `md` up; below it, the button in `who` is ' +
+      'the only way in, because the column and the header are siblings and the ' +
+      'trigger cannot live in both.',
+    variants: [
+      {
+        name: 'Default',
+        note: 'An organisation switcher, an unheaded group of Manage’s own places, then "Tools" and "Platform". Accounts carries aria-current="page". At this width the rail is docked; `windows.spec.ts` photographs the phone sheet, which this stage cannot reach.',
+        render: () => <SideListDemo />,
       },
     ],
   },

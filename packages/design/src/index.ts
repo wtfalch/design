@@ -89,6 +89,16 @@ export { default as Select } from './components/Select'
 export { default as SizeGrid } from './components/SizeGrid'
 /** The frame a signed-in surface stands in. Gates nothing, on purpose. */
 export { default as Shell } from './components/Shell'
+/** The grouped place list `Shell`'s `side` slot takes -- `SideList.Group`,
+ *  `SideList.Item` and `SideList.Trigger` are properties on the default
+ *  export, not separate modules, so this is the only import an app needs. */
+export { default as SideList } from './components/SideList'
+export type {
+  SideListGroupProps,
+  SideListItemProps,
+  SideListProps,
+  SideListTriggerProps,
+} from './components/SideList'
 export { default as Skeleton } from './components/Skeleton'
 /** One figure, with what it counts over it. Three apps drew this before it
  *  was here. */

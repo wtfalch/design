@@ -9,6 +9,11 @@
 .shell {
   --shell-measure: 64rem;
   --shell-measure-wide: 90rem;
+  /* The one other number `Shell` and its `side` column have to agree on. The
+     sheet leaves it to `Modal`'s own default instead: 26rem reads as a panel
+     over the page it slid from, and the docked rail is the page's own
+     furniture rather than something laid over it. */
+  --shell-side-width: 16rem;
 }
 
 /* The label beside the theme control, when it is drawn. */

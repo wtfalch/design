@@ -36,6 +36,7 @@
    sheets they cover happen to set. */
 @import './stat.css';
 @import './shell.css';
+@import './sidelist.css';
 @import './scrollarea.css';
 @import './splitpane.css';
 @import './popover.css';

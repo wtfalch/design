@@ -785,7 +785,8 @@ input:active, textarea:active, select:active { transform: none; }
 .size-cell:focus-visible,
 .pager-step:focus-visible,
 .pager-page:focus-visible,
-.sel-control:focus-visible {
+.sel-control:focus-visible,
+.side-list-link:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
