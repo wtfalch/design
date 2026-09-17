@@ -165,6 +165,12 @@ run the measurement found the built-in information blue at 3.96:1 on white.
 The package measures `system` in both schemes; every other theme is written in
 an app, and that app's tests are the only place it will be measured.
 
+It also measures `CONTRAST_TINTS`: `Card`, `Callout` and `Pill` tint a tone
+into `--panel` with `color-mix()` rather than naming a flat token, and the text
+they draw sits on that tint, not on `--panel` itself. `contrastFailures` mixes
+the same colours the same way and checks the text against the result, which is
+how it catches a status card whose body copy fails on its own tone.
+
 ## Two rules that outrank any theme
 
 **`prefers-reduced-motion` wins.** The motion tokens collapse to `0s` under it,
