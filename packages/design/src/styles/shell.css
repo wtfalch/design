@@ -1,14 +1,15 @@
-/* The measure, and only the measure.
+/* The rail's own width -- the one number left that only `Shell` needs.
  *
- * `Shell` draws itself with utilities -- it is layout and nothing else. What
- * stays here is the one value the header band, the nav band and the main band
- * all have to agree on: a custom property, so an app changes it in one place
- * rather than overriding three rules and missing the fourth. That is how
- * manage ended up carrying `head-inner-wide` and `main-wide` as separate
- * classes it had to remember together. */
+ * `Shell` draws itself with utilities -- it is layout and nothing else.
+ * `--shell-measure` and `--shell-measure-wide` used to live here too: the one
+ * value the header band, the nav band and the main band all had to agree on,
+ * a custom property so an app changed it in one place rather than overriding
+ * three rules and missing the fourth, the way manage once carried
+ * `head-inner-wide` and `main-wide` as separate classes it had to remember
+ * together. They are `--measure` and `--measure-wide` in tokens.css now,
+ * renamed rather than moved -- a reading width is the vocabulary's to own,
+ * and `Shell` was the only thing reading these two. */
 .shell {
-  --shell-measure: 64rem;
-  --shell-measure-wide: 90rem;
   /* The one other number `Shell` and its `side` column have to agree on. The
      sheet leaves it to `Modal`'s own default instead: 26rem reads as a panel
      over the page it slid from, and the docked rail is the page's own

@@ -17,7 +17,7 @@
   overscroll-behavior: contain;
   /* React Aria positions this element inline; nothing here may set `position`,
      `top` or `left` or it fights the measurement and lands in the corner. */
-  z-index: 60;
+  z-index: var(--z-popover);
 }
 
 /* Entry, and the direction it comes from. `data-placement` is React Aria's,
