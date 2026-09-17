@@ -8,9 +8,13 @@
  * 1. A `Shell` call that never passes `context` renders exactly the markup
  *    it rendered before the slot existed -- three apps already call `Shell`
  *    without it, and their markup must not change under them. The golden
- *    strings below were captured from the component as it stood immediately
- *    before this slot was added (commit 9fbe5b5), not derived from the new
- *    code, so this test cannot pass by construction.
+ *    strings below were captured by rendering `Shell.tsx` as it stands on
+ *    `main`, which does not have this slot, not derived from the new code --
+ *    so this test cannot pass by construction. They were recaptured once, at
+ *    the merge that brought in the renamed `--measure` tokens: the old
+ *    strings named `--shell-measure`, and a fixture that encodes a token
+ *    someone else renamed fails for a reason that has nothing to do with
+ *    what it guards.
  * 2. The slot sits between `brand` and `who`, in that order, in every band
  *    that draws a header row -- the single band with no `side`, and both of
  *    `shell-head-phone`/`shell-head-wide` when `side` is present.
@@ -42,10 +46,10 @@ const longContext = createElement('span', null, 'Northwind Traders International
 const children = 'kids'
 
 const GOLDEN_NO_SIDE =
-  '<div class="shell flex flex-col min-h-screen surface-bg text-text"><header class="flex-none border-b border-border surface-panel"><div class="w-full mx-auto px-4 max-w-[var(--shell-measure)] flex items-center justify-between gap-4 py-3 min-w-0"><strong>Brand</strong><div class="flex items-center gap-3 min-w-0"><span>who@example.com</span></div></div><div class="w-full mx-auto px-4 max-w-[var(--shell-measure)] pb-2"><div>nav row</div></div></header><main class="w-full mx-auto px-4 max-w-[var(--shell-measure)] flex-1 py-6 min-w-0">kids</main></div>'
+  '<div class="shell flex flex-col min-h-screen surface-bg text-text"><header class="flex-none border-b border-border surface-panel"><div class="w-full mx-auto px-4 max-w-(--measure) flex items-center justify-between gap-4 py-3 min-w-0"><strong>Brand</strong><div class="flex items-center gap-3 min-w-0"><span>who@example.com</span></div></div><div class="w-full mx-auto px-4 max-w-(--measure) pb-2"><div>nav row</div></div></header><main class="w-full mx-auto px-4 max-w-(--measure) flex-1 py-6 min-w-0">kids</main></div>'
 
 const GOLDEN_WITH_SIDE =
-  '<div class="shell flex flex-col min-h-screen surface-bg text-text"><header class="flex-none border-b border-border surface-panel"><div class="shell-head-phone"><div class="w-full mx-auto px-4 max-w-[var(--shell-measure)] flex items-center justify-between gap-4 py-3 min-w-0"><strong>Brand</strong><div class="flex items-center gap-3 min-w-0"><span>who@example.com</span></div></div><div class="w-full mx-auto px-4 max-w-[var(--shell-measure)] pb-2"><div>nav row</div></div></div><div class="shell-head-wide"><div class="flex items-center min-w-0"><div class="flex-none w-[var(--shell-side-width)] px-3 py-3 flex items-center min-w-0"><strong>Brand</strong></div><div class="w-full mx-auto px-4 max-w-[var(--shell-measure)] flex items-center justify-end gap-4 py-3 min-w-0"><div class="flex items-center gap-3 min-w-0"><span>who@example.com</span></div></div></div><div class="flex min-w-0"><div class="flex-none w-[var(--shell-side-width)]"></div><div class="w-full mx-auto px-4 max-w-[var(--shell-measure)] pb-2"><div>nav row</div></div></div></div></header><div class="flex-1 min-h-0 flex min-w-0"><div class="shell-side hidden md:block md:flex-none w-[var(--shell-side-width)] border-r border-border surface-panel overflow-hidden"><nav>side</nav></div><main class="w-full mx-auto px-4 max-w-[var(--shell-measure)] flex-1 py-6 min-w-0">kids</main></div></div>'
+  '<div class="shell flex flex-col min-h-screen surface-bg text-text"><header class="flex-none border-b border-border surface-panel"><div class="shell-head-phone"><div class="w-full mx-auto px-4 max-w-(--measure) flex items-center justify-between gap-4 py-3 min-w-0"><strong>Brand</strong><div class="flex items-center gap-3 min-w-0"><span>who@example.com</span></div></div><div class="w-full mx-auto px-4 max-w-(--measure) pb-2"><div>nav row</div></div></div><div class="shell-head-wide"><div class="flex items-center min-w-0"><div class="flex-none w-[var(--shell-side-width)] px-3 py-3 flex items-center min-w-0"><strong>Brand</strong></div><div class="w-full mx-auto px-4 max-w-(--measure) flex items-center justify-end gap-4 py-3 min-w-0"><div class="flex items-center gap-3 min-w-0"><span>who@example.com</span></div></div></div><div class="flex min-w-0"><div class="flex-none w-[var(--shell-side-width)]"></div><div class="w-full mx-auto px-4 max-w-(--measure) pb-2"><div>nav row</div></div></div></div></header><div class="flex-1 min-h-0 flex min-w-0"><div class="shell-side hidden md:block md:flex-none w-[var(--shell-side-width)] border-r border-border surface-panel overflow-hidden"><nav>side</nav></div><main class="w-full mx-auto px-4 max-w-(--measure) flex-1 py-6 min-w-0">kids</main></div></div>'
 
 describe('Shell with no `context`', () => {
   it('renders byte-identical markup to before the slot existed, with no side', () => {
