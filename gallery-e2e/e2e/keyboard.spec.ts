@@ -952,6 +952,45 @@ test.describe('Toggle · pointer', () => {
     await page.mouse.up()
     expect(await track(page).getAttribute('data-dragging')).toBeNull()
   })
+
+  test('a click renders nothing while held, and a drag past SLOP still works', async ({ page }) => {
+    /* The bug this pins: `data-held` used to go on at pointerdown, before a
+       tap and a drag were even different things yet, so the knob widened and
+       the track's `left` snapped to the widened position -- on every plain
+       click, before release ever decided anything. It read as the switch
+       flickering. Fixed by not rendering anything until a press actually
+       crosses `SLOP`; this holds the pointer down without moving and checks
+       the knob is pixel-identical to its resting position throughout. */
+    await page.goto(specimenUrl(TOGGLE, 'system'))
+    await themeApplied(page, 'system')
+    const t = track(page)
+    const box = (await t.boundingBox()) ?? { x: 0, y: 0, width: 0, height: 0 }
+    const y = box.y + box.height / 2
+    const restLeft = await t.evaluate((el) => getComputedStyle(el, '::after').left)
+
+    await page.mouse.move(box.x + box.width - 4, y)
+    await page.mouse.down()
+    await page.waitForTimeout(80)
+    expect(await t.getAttribute('data-dragging'), 'a held, unmoved press is not a drag').toBeNull()
+    const held = await t.evaluate((el) => getComputedStyle(el, '::after').left)
+    expect(held, 'the knob must not move or jump before a drag is decided').toBe(restLeft)
+    await page.mouse.up()
+    expect(await t.getAttribute('data-dragging')).toBeNull()
+    expect(await state(page), 'the plain click still toggled it, once, on release').toBe(false)
+
+    // A real drag past SLOP still works and still commits exactly once.
+    await page.mouse.move(box.x + 4, y)
+    await page.mouse.down()
+    await page.mouse.move(box.x + box.width - 2, y, { steps: 8 })
+    const mid = await t.evaluate((el) => ({
+      dragging: el.hasAttribute('data-dragging'),
+      x: Number(el.style.getPropertyValue('--knob-x')),
+    }))
+    expect(mid.dragging, 'past SLOP, it is a drag').toBe(true)
+    expect(mid.x).toBeGreaterThan(0)
+    await page.mouse.up()
+    expect(await state(page), 'the drag turned it back on, once').toBe(true)
+  })
 })
 
 test.describe('Toggle · async', () => {
