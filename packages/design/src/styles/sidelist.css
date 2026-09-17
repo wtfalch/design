@@ -71,12 +71,23 @@
    it the same row, same hover, same `:focus-visible` (keyed off this class in
    `base.css`'s shared list) as every anchor here, for free.
 
-   `height` is the row: `calc(var(--space-1) * 7)` is 28px at the vocabulary's
-   own 4px unit -- William's number, not a literal, so a theme's `--density`
-   still scales it -- and `display: flex` with `align-items: center` centres
-   the label inside it regardless of `--text-sm`'s own line height, which
-   is what lets the box be exactly 28px rather than however tall the font
-   plus padding happens to add up to.
+   `min-height` is the row: `calc(var(--space-1) * 7)` is 28px at the
+   vocabulary's own 4px unit -- William's number, not a literal, so a theme's
+   `--density` still scales it -- and `display: flex` with `align-items:
+   center` centres a single-line label inside it, giving exactly 28px, the
+   same as a fixed `height` would for that case. `min-height` rather than
+   `height` is deliberate: `--density` scales `--space-1` but not the font, so
+   a reduced density (a theme is free to set one) can put a single line of
+   `--text-sm` past 28px on its own, and a caller can hand `SideList.Item` or
+   `SideList.Tool` a label long enough to wrap. A fixed `height` clips or
+   overflows either way -- entries colliding is a legend that has stopped
+   being one. The chosen behaviour is to grow: no `white-space: nowrap`, no
+   `text-overflow: ellipsis`, so a tall label pushes the row taller and its
+   neighbours down the column, the same as any other block content, rather
+   than truncating a name nobody could then read in full. 28px is the row's
+   floor, the one every single-line label still gets, not its ceiling.
+   `sideListRowHeight.test.ts` measures both the floor and the growth in a
+   real Chromium, against the built CSS.
 
    `padding-left` reserves the icon column unconditionally: `var(--space-3)`
    to match the row's own inset, `var(--space-4)` for the glyph -- `Icon`'s
@@ -87,7 +98,7 @@
 .side-list-link {
   display: flex;
   align-items: center;
-  height: calc(var(--space-1) * 7);
+  min-height: calc(var(--space-1) * 7);
   padding-right: var(--space-3);
   padding-left: calc(var(--space-3) + var(--space-4) + var(--space-2));
   border-radius: var(--radius-md);
