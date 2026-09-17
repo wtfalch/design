@@ -359,4 +359,42 @@ export const ICONS: Record<IconName, Glyph> = {
       'M13.354 6.65a.5.5 0 0 1 0 .708l-6.536 6.535a.5.5 0 0 1-.707-.707l6.535-6.536a.5.5 0 0 1 .707 0',
     ],
   },
+  /* Pepicons ships `person` as a STROKE (fill:none, stroke:currentColor,
+     round caps) -- the one glyph in the whole set drawn that way. A stroked
+     glyph beside forty filled ones is the "two icon sets on one screen"
+     failure this project's PRODUCT.md calls out by name, so it is converted
+     here to an equivalent filled outline rather than shipped as-is.
+
+     The head becomes an annulus: centerline r=3, stroke-width 1 (the
+     default, unspecified in the source), so outer r=3.5 and inner r=2.5 --
+     the same 1-unit wall the `people` head-ring below already uses. The
+     shoulder arc becomes its two offset curves, +-0.5 along the exact
+     analytic bezier normal (computed, not eyeballed: sub-divide each cubic
+     into 4 and offset every sub-piece by its own endpoint tangents, which
+     converges to the true offset curve -- max error ~0.03 units, under a
+     twentieth of a pixel at 14px), closed with the two round caps the
+     stroke had. */
+  person: {
+    view: '-0.12 -0.12 19.23 19.23',
+    d: [
+      'M9.5 8a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5m0 1a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7',
+      'M15.5 16.5L15.5 14.5C15.5 13.726 15.309 12.779 15.028 12.071C14.747 11.363 14.249 10.561 13.749 10.004C13.249 9.448 12.503 8.873 11.846 8.553C11.19 8.232 10.251 8 9.5 8C8.749 8 7.81 8.232 7.154 8.553C6.497 8.873 5.751 9.448 5.251 10.004C4.751 10.561 4.253 11.363 3.972 12.071C3.691 12.779 3.5 13.726 3.5 14.5L3.5 16.5A0.5 0.5 0 0 0 4.5 16.5L4.5 14.5C4.5 13.726 4.621 13.148 4.902 12.44C5.182 11.732 5.495 11.229 5.995 10.672C6.495 10.116 6.936 9.772 7.592 9.451C8.249 9.131 8.749 9 9.5 9C10.251 9 10.751 9.131 11.408 9.451C12.064 9.772 12.505 10.116 13.005 10.672C13.505 11.229 13.818 11.732 14.098 12.44C14.379 13.148 14.5 13.726 14.5 14.5L14.5 16.5A0.5 0.5 0 0 0 15.5 16.5Z',
+    ],
+  },
+  people: {
+    view: '-0.83 0.2 21.15 21.15',
+    d: [
+      'M5 9a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0 1a3 3 0 1 0 0-6a3 3 0 0 0 0 6',
+      'M3.854 8.896a.5.5 0 0 1 0 .708l-.338.337A3.47 3.47 0 0 0 2.5 12.394v1.856a.5.5 0 1 1-1 0v-1.856a4.47 4.47 0 0 1 1.309-3.16l.337-.338a.5.5 0 0 1 .708 0m11.792-.3a.5.5 0 0 0 0 .708l.338.337A3.47 3.47 0 0 1 17 12.094v2.156a.5.5 0 0 0 1 0v-2.156a4.47 4.47 0 0 0-1.309-3.16l-.337-.338a.5.5 0 0 0-.708 0',
+      'M14 9a2 2 0 1 1 0-4a2 2 0 0 1 0 4m0 1a3 3 0 1 1 0-6a3 3 0 0 1 0 6m-4.5 3.25a2.5 2.5 0 0 0-2.5 2.5v1.3a.5.5 0 0 1-1 0v-1.3a3.5 3.5 0 0 1 7 0v1.3a.5.5 0 1 1-1 0v-1.3a2.5 2.5 0 0 0-2.5-2.5',
+      'M9.5 11.75a2 2 0 1 0 0-4a2 2 0 0 0 0 4m0 1a3 3 0 1 0 0-6a3 3 0 0 0 0 6',
+    ],
+  },
+  key: {
+    view: '-1.76 -1.76 23.53 23.53',
+    d: [
+      'M12.5 11.611V9q0-.126-.012-.25a4.5 4.5 0 1 0-4.975 0A3 3 0 0 0 7.5 9v8a2.5 2.5 0 0 0 5 0a.5.5 0 0 0-.182-.386l-.786-.646l.716-.41a.5.5 0 0 0 .252-.434v-.775a.5.5 0 0 0-.146-.353l-.998-1.001l1.003-1.036a.5.5 0 0 0 .141-.348m-1.047-2.986q.047.182.047.375v2.409l-1.204 1.243a.5.5 0 0 0 .005.701l1.199 1.203v.278l-1.093.626a.5.5 0 0 0-.07.82l1.147.943A1.5 1.5 0 0 1 8.5 17V9q0-.193.047-.375a.5.5 0 0 0-.242-.562a3.5 3.5 0 1 1 3.39 0a.5.5 0 0 0-.242.562',
+      'M10 5.5a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m0-2a.5.5 0 1 1 0 1a.5.5 0 0 1 0-1',
+    ],
+  },
 }

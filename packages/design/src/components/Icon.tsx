@@ -63,6 +63,10 @@
  *   menu      menu
  *   reply     arrow-up-left
  *   forward   arrow-up-right
+ *   person    person        (stroked upstream; converted to a filled outline
+ *                             here -- see the comment on `person` in icons.ts)
+ *   people    people
+ *   key       key
  */
 
 import type { IconName } from './iconNames'
