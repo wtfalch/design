@@ -44,6 +44,7 @@ import {
   Markdown,
   Menu,
   Modal,
+  PageHeading,
   Pagination,
   Pill,
   Popover,
@@ -67,6 +68,7 @@ import {
   Toggle,
   Tooltip,
   Tour,
+  VisuallyHidden,
   useToast,
 } from '@wtfalch/design'
 import { MARKS, galleryProduct } from './product'
@@ -1896,6 +1898,78 @@ export const COMPONENTS: Component[] = [
     ],
   },
   {
+    id: 'field',
+    name: 'Field',
+    blurb:
+      'A labelled input, its explanation, and what went wrong with it. The ' +
+      'label is an element, never a placeholder that vanishes the moment you ' +
+      'type; the hint sits above the control because it is read before typing, ' +
+      'the error below it because it is the reply to what you typed, and both ' +
+      'are wired in with `aria-describedby` so a screen reader gets the same ' +
+      'story the eye does.',
+    variants: [
+      {
+        name: 'Label and hint',
+        render: () => (
+          <Field label="Display name" hint="Shown to teammates, not to customers.">
+            <Input defaultValue="Ada Lovelace" />
+          </Field>
+        ),
+      },
+      {
+        name: 'Required',
+        note:
+          'An asterisk on its own is a convention nobody explained to most ' +
+          'people, so the word is there too, on its own `aria-label`.',
+        render: () => (
+          <Field label="Workspace name" required hint="Used in the URL. Lowercase, no spaces.">
+            <Input defaultValue="northwind" />
+          </Field>
+        ),
+      },
+      {
+        name: 'In error',
+        note:
+          'Never colour alone: `aria-invalid` on the control and `role="alert"` ' +
+          'on the message, so the reply to what you typed is announced rather ' +
+          'than only tinted.',
+        render: () => (
+          <Field label="Server URL" error="Must be an https:// address.">
+            <Input defaultValue="ftp://old-endpoint" />
+          </Field>
+        ),
+      },
+      {
+        name: 'Hidden label',
+        note:
+          'For a control whose surroundings already name it — a search box ' +
+          'under a heading that says Search. Still announced, just not drawn.',
+        render: () => (
+          <Field label="Search" labelHidden>
+            <Input placeholder="Search…" />
+          </Field>
+        ),
+      },
+      {
+        name: 'Row layout',
+        note:
+          '`layout="row"` puts the label beside the control instead of above ' +
+          'it — a column of names down the left and their controls down the ' +
+          'right, the shape a settings pane wants.',
+        render: () => (
+          <div style={{ display: 'grid', gap: 'var(--space-3)', maxWidth: 360 }}>
+            <Field label="Display name" layout="row">
+              <Input defaultValue="Ada Lovelace" size="sm" />
+            </Field>
+            <Field label="Session length" layout="row" hint="Minutes">
+              <Input size="sm" defaultValue="30" />
+            </Field>
+          </div>
+        ),
+      },
+    ],
+  },
+  {
     id: 'input',
     name: 'Input',
     blurb:
@@ -2911,6 +2985,78 @@ export const COMPONENTS: Component[] = [
           'path and the ring around the hole is the highlight. The card carries ' +
           'the count, because "Next" with no idea how many is a corridor.',
         render: () => <TourDemo />,
+      },
+    ],
+  },
+  {
+    id: 'visuallyhidden',
+    name: 'VisuallyHidden',
+    blurb:
+      'Content for assistive technology alone — present in the accessibility ' +
+      'tree, invisible on screen. The private `sr-only` rule seven components ' +
+      'already draw with, now something a consumer can name instead of ' +
+      'reaching for a class this package does not hand out.',
+    variants: [
+      {
+        name: 'An icon button’s name',
+        note:
+          'The icon carries `aria-hidden` on its own, so the name comes from ' +
+          'the hidden line and only from it — text, not an attribute, so it ' +
+          'can be inspected and translated like any other copy.',
+        render: () => (
+          <Row>
+            <Button iconOnly>
+              <Icon name="settings" />
+              <VisuallyHidden>Settings</VisuallyHidden>
+            </Button>
+            <Button iconOnly>
+              <Icon name="chat" />
+              <VisuallyHidden>Chat</VisuallyHidden>
+            </Button>
+            <Button iconOnly>
+              <Icon name="refresh" />
+              <VisuallyHidden>Refresh</VisuallyHidden>
+            </Button>
+          </Row>
+        ),
+      },
+    ],
+  },
+  {
+    id: 'pageheading',
+    name: 'PageHeading',
+    blurb:
+      'The page’s `<h1>`, styled once. Every signed-in page in wtfalch-manage ' +
+      'retyped the same margin, size, weight and tracking classes on its own ' +
+      '`<h1>` — eighteen call sites, none importing from another.',
+    variants: [
+      {
+        name: 'Default',
+        render: () => <PageHeading>Settings</PageHeading>,
+      },
+      {
+        name: 'With a Pill beside it',
+        note:
+          '`children` is `ReactNode`, not `string` — an org page puts a ' +
+          'status Pill beside the tenant name inside its own heading, and ' +
+          'that is the shape that needs more than text.',
+        render: () => (
+          <PageHeading>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+              Northwind Traders
+              <Pill tone="good" inRow>
+                Active
+              </Pill>
+            </span>
+          </PageHeading>
+        ),
+      },
+      {
+        name: 'as="p"',
+        note:
+          'Draws the same look without being a heading — an organisation ' +
+          'name at the top of a page that already has its own `<h1>`.',
+        render: () => <PageHeading as="p">Northwind Traders</PageHeading>,
       },
     ],
   },

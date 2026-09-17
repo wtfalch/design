@@ -69,6 +69,9 @@ export { emptyRichText, isEmptyRichText, richTextToPlain } from './rich-text/val
 export { default as Menu } from './components/Menu'
 export type { Item as MenuItem, Section as MenuSection } from './components/Menu'
 export { default as Modal } from './components/Modal'
+/** The page's own `<h1>`, once. `as="p"` for a name under a page that already
+ *  has its own. */
+export { default as PageHeading } from './components/PageHeading'
 /** Moving through a list that does not fit, counted in items rather than
  *  pages. `pageWindow` is the elision, exported because it is the arithmetic
  *  worth testing on its own. */
@@ -128,6 +131,9 @@ export type { TourStop } from './components/Tour'
  *  replays the tour rather than leaving it suppressed by a browser that has
  *  seen it. */
 export { DEFAULT_TOUR_KEY, forgetTour, markTourSeen, tourSeen } from './components/tourMarker'
+/** The private `sr-only` rule, nameable. Seven internal uses already draw
+ *  with it; this is the same rule as a component. */
+export { default as VisuallyHidden } from './components/VisuallyHidden'
 
 /** The art. Its own module because it is ~200 KB of inlined SVG — referenced
  *  only by `Illustration`, so a bundler that drops the component drops the art
