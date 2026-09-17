@@ -94,6 +94,7 @@
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jsdom": "^30.0.1",
     "react": "^19",
     "react-dom": "^19",
     "tailwindcss": "^4.3.3",

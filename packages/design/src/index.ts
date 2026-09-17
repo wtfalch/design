@@ -141,6 +141,14 @@ export type { IllustrationName } from './illustrations'
  *  without a trap, which is what this exists to stop happening again. */
 export { useTrapFocus } from './hooks/useTrapFocus'
 
+/** The widths a compact shell becomes more than one column, as pixel values
+ *  and as the matching `min-width` queries -- one source for a stylesheet's
+ *  `@media` rule and a `matchMedia` caller to share -- and the hook built on
+ *  them. Promoted from `@wtfalch/email`'s mailbox shell so a shell built from
+ *  `SplitPane` and `Shell` collapses at the same widths. */
+export { BREAKPOINTS, MEDIA_QUERIES, useMediaQuery } from './layout'
+export type { Breakpoint } from './layout'
+
 export {
   DEFAULT_THEME,
   DERIVED_TOKENS,
