@@ -46,6 +46,9 @@ jobs:
       - run: pnpm build
       - run: pnpm lint
       - run: pnpm typecheck
+      # test/sideListRowHeight.test.ts lays out real text in Chromium, because
+      # jsdom does no layout. Without the browser every run of it fails at launch.
+      - run: pnpm --filter @wtfalch/design exec playwright install --with-deps --only-shell chromium
       - run: pnpm test
 
       # The tag is the version. A tag that disagrees with package.json is a
