@@ -1,14 +1,14 @@
 # gallery-e2e
 
-Four hundred and eighty checks over the design system's gallery: what every
+Checks over the design system's gallery: what every
 component looks like, whether axe can fault it, and whether motion actually
 stops when the OS asks.
 
 ```bash
-# the gallery still lives in otf until the components move (phase 3)
-cd ../../tf/dashboard && npm run build
+pnpm --filter @wtfalch/design build
+pnpm --filter @wtfalch/design-gallery build
 
-cd ../../design/gallery-e2e
+cd gallery-e2e
 pnpm e2e:docker                          # check
 pnpm e2e:docker --update-snapshots        # re-baseline
 pnpm e2e:docker --grep toggle             # one component

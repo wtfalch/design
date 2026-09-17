@@ -1,8 +1,8 @@
 /**
  * Every specimen, in every theme, as an image.
  *
- * 68 specimens across 25 components, three themes each: 204 baselines. They are
- * taken **before** any React Aria lands, so each migration afterwards arrives as
+ * The first baselines, 68 specimens across 25 components in three themes, were
+ * taken **before** any React Aria landed, so each migration afterwards arrives as
  * a diff against the component it replaced. A baseline written during a
  * migration is a picture of the migrated component compared to itself, which
  * proves it renders and nothing else — and rendering was never the question.
