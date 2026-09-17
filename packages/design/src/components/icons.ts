@@ -397,4 +397,22 @@ export const ICONS: Record<IconName, Glyph> = {
       'M10 5.5a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m0-2a.5.5 0 1 1 0 1a.5.5 0 0 1 0-1',
     ],
   },
+  /* Pepicons' `house` ships already filled, fill-rule evenodd, like most of
+     the set -- unlike `person`, no stroke-to-fill conversion was needed.
+     Two subpaths from the source: the roof-and-walls silhouette (with the
+     roofline's own triangular cutout carved by evenodd) and the door.
+
+     `view` measured the set's own way: getBBox() on these paths at their
+     source viewBox (0 0 20 20, from @iconify-json/pepicons-pencil's own
+     per-icon width/height, not the package's 26x26 default), the box grown
+     around the bbox centre until the glyph fills 78% of it, clamped to a
+     zoom of 0.85x-1.45x against that 20-unit grid. Unclamped here (bbox
+     17.99x16.00, box 23.08, zoom ~0.87x) -- within the band, so nothing bit. */
+  home: {
+    view: '-2.04 -2.04 23.08 23.08',
+    d: [
+      'M1 10h1.389v7a.5.5 0 0 0 .5.5H16.11a.5.5 0 0 0 .5-.5v-7H18a.5.5 0 0 0 .33-.875l-8.5-7.5a.5.5 0 0 0-.66 0l-8.5 7.5A.5.5 0 0 0 1 10m1.889-1h-.567L9.5 2.667L16.678 9h-.567a.5.5 0 0 0-.5.5v7H3.39v-7a.5.5 0 0 0-.5-.5',
+      'M10.708 11.5h-2.5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1m-2.5 5v-4h2.5v4z',
+    ],
+  },
 }
