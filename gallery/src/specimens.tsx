@@ -815,12 +815,13 @@ function SheetDemo({ edge }: { edge: 'right' | 'bottom' }) {
   )
 }
 
-/* A realistic Manage-like rail: an organisation switcher, an unheaded group
-   of the app's own places, then "Tools" and "Platform" beneath. `open` is
-   the one piece of state the app holds and hands to both `SideList` and
-   `SideList.Trigger` -- the trigger renders and hides itself, which is the
-   whole point of it being a component here rather than a `<Button>` the
-   demo built by hand. */
+/* A realistic Manage-like rail: an organisation switcher, "Workspace",
+   "Tools" and "Platform" beneath it -- every group named, including the
+   first. `open` is the one piece of state the app holds and hands to both
+   `SideList` and `SideList.Trigger` -- the trigger renders and hides itself,
+   which is the whole point of it being a component here rather than a
+   `<Button>` the demo built by hand. "Storage" is a `SideList.Tool`: closed
+   here because neither of its own places is the current one. */
 function SideListDemo() {
   const [open, setOpen] = useState(false)
   return (
@@ -845,7 +846,7 @@ function SideListDemo() {
               </Select>
             }
           >
-            <SideList.Group>
+            <SideList.Group heading="Workspace">
               <SideList.Item>
                 <a href="#home">Home</a>
               </SideList.Item>
@@ -872,9 +873,14 @@ function SideListDemo() {
               <SideList.Item icon="stars">
                 <a href="#ai">AI</a>
               </SideList.Item>
-              <SideList.Item icon="cloud">
-                <a href="#storage">Storage</a>
-              </SideList.Item>
+              <SideList.Tool label="Storage" icon="cloud">
+                <SideList.Item>
+                  <a href="#storage-buckets">Buckets</a>
+                </SideList.Item>
+                <SideList.Item>
+                  <a href="#storage-backups">Backups</a>
+                </SideList.Item>
+              </SideList.Tool>
               <SideList.Item>
                 <a href="#keys">Keys</a>
               </SideList.Item>

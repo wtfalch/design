@@ -65,7 +65,18 @@
 /* The item's real element. `Slot` merges this class onto whatever the caller
    passed -- usually a Next.js `<Link>` -- so it has to read correctly on a
    bare `<a>` with no React Aria state attributes to key off: `:hover` and
-   `[aria-current]` rather than `data-hovered`/`data-selected`.
+   `[aria-current]` rather than `data-hovered`/`data-selected`. `SideList.Tool`
+   also reuses this class directly on a real `<button>` -- see
+   `.side-list-tool-trigger` below for the element-specific reset that earns
+   it the same row, same hover, same `:focus-visible` (keyed off this class in
+   `base.css`'s shared list) as every anchor here, for free.
+
+   `height` is the row: `calc(var(--space-1) * 7)` is 28px at the vocabulary's
+   own 4px unit -- William's number, not a literal, so a theme's `--density`
+   still scales it -- and `display: flex` with `align-items: center` centres
+   the label inside it regardless of `--text-sm`'s own line height, which
+   is what lets the box be exactly 28px rather than however tall the font
+   plus padding happens to add up to.
 
    `padding-left` reserves the icon column unconditionally: `var(--space-3)`
    to match the row's own inset, `var(--space-4)` for the glyph -- `Icon`'s
@@ -74,8 +85,10 @@
    one, which is the whole point: two items one row apart with different
    label columns is what sent this here in the first place. */
 .side-list-link {
-  display: block;
-  padding: var(--space-2) var(--space-3);
+  display: flex;
+  align-items: center;
+  height: calc(var(--space-1) * 7);
+  padding-right: var(--space-3);
   padding-left: calc(var(--space-3) + var(--space-4) + var(--space-2));
   border-radius: var(--radius-md);
   color: var(--muted);
@@ -103,4 +116,56 @@
 }
 .side-list-item:has(.side-list-link[aria-current='page']) .side-list-item-icon {
   color: var(--text);
+}
+
+/* `SideList.Tool` -- the row that discloses its own nested `SideList.Item`s
+   instead of linking anywhere. `.side-list-link` gives it the row height, the
+   padding, the hover fill and the `:focus-visible` ring (see `base.css`'s
+   shared list, keyed off that class already); this modifier undoes only what
+   a `<button>` brings that an `<a>` never did -- its own border, its own
+   background, the browser's control font, centre-aligned text, a resting
+   cursor -- and spreads the label and the caret to the row's own edges.
+   Reusing the class rather than a second copy of the row's own rules is what
+   keeps 28px, the hover fill and the focus ring one definition instead of
+   two that can drift. */
+.side-list-tool-trigger {
+  width: 100%;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+/* Inline SVG, not a name from `Icon`/`IconName` -- the same call `Select`'s
+   own caret already made (see `Select.tsx`): a chevron used in exactly one
+   place is not worth adding to a forty-two-glyph set shared by every
+   consumer, and Pepicons' own `expand` glyph is a fullscreen arrow, the wrong
+   shape for "opens a list beneath it." Rotates on the trigger's own
+   `aria-expanded` rather than a class, so the two can never read as
+   disagreeing with each other. */
+.side-list-tool-caret {
+  flex: none;
+  color: var(--muted);
+  transform: rotate(-90deg);
+  transition: transform var(--dur-fast) var(--ease);
+}
+.side-list-tool-trigger[aria-expanded='true'] .side-list-tool-caret { transform: rotate(0deg); }
+.side-list-item:has(.side-list-tool-trigger:hover) .side-list-tool-caret { color: var(--text); }
+
+/* The tool's own nested items, indented one step under it -- `var(--space-3)`,
+   12px at the vocabulary's own unit: William's number for how far a tool's
+   sections sit under it, chosen so the rail still reads as one instrument
+   from a single tool to fifteen or more. Gated on `:not([hidden])` rather
+   than styling `.side-list-tool-sections` bare: an author rule with `display:
+   flex` unconditional would outrank the UA's own `[hidden] { display: none }`
+   in the cascade (author beats user-agent at equal specificity regardless of
+   selector order) and the collapsed sections would show anyway. */
+.side-list-tool-sections:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  padding-left: var(--space-3);
 }
