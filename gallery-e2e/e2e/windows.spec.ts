@@ -260,6 +260,34 @@ for (const theme of THEMES) {
 }
 
 /**
+ * The list opens at least as wide as the button that opens it.
+ *
+ * React Aria's `Popover` writes `--trigger-width` on `.sel-list` and leaves
+ * using it to the sheet -- unset, the list sized to its longest option
+ * instead, and a `block` select (a trigger stretched to its row) opened a
+ * list narrower than the control underneath it. The form specimen is where
+ * it showed: a 320px `block` select over three region names shorter than
+ * that, so the popover sat well inside the control's own edges.
+ */
+test('select · popover is at least the trigger’s width · in a form', async ({ page }) => {
+  await page.goto(specimenUrl({ c: 'select', v: 'In a form' }, 'system'))
+  await themeApplied(page, 'system')
+  await page.locator('.sel-control').first().click()
+
+  const list = page.locator('.sel-list')
+  await expect(list).toBeVisible()
+
+  const widths = await page.evaluate(() => ({
+    trigger: document.querySelector('.sel-control')?.getBoundingClientRect().width ?? 0,
+    popover: document.querySelector('.sel-list')?.getBoundingClientRect().width ?? 0,
+  }))
+  expect(
+    widths.popover,
+    `popover ${widths.popover} vs trigger ${widths.trigger}`,
+  ).toBeGreaterThanOrEqual(widths.trigger)
+})
+
+/**
  * Every surface that only exists while it is open.
  *
  * `visual.spec.ts` photographs a specimen's stage at rest, and each of these

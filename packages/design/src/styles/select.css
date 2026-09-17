@@ -102,10 +102,19 @@
  * ordinary state.
  *
  * `box-shadow`: `--shadow-2` is a token, and a utility would have to inline
- * the value, which is the one thing the vocabulary exists to stop. */
+ * the value, which is the one thing the vocabulary exists to stop.
+ *
+ * `min-width`: React Aria's `Popover` measures the trigger and writes
+ * `--trigger-width` on this element, but leaves using it to the sheet. Left
+ * unset, the popover shrinks to its longest option and a `block` select --
+ * a trigger stretched to its row -- opened a list narrower than the control
+ * that opened it, in the form specimen and everywhere else the trigger is
+ * wider than its widest option. `min-width` rather than `width`: an option
+ * label longer than the trigger still gets the room it needs. */
 .sel-list {
   scroll-padding-block: var(--space-1);
   box-shadow: var(--shadow-2);
+  min-width: var(--trigger-width);
 }
 
 /* Hover and keyboard land on the same row, because they are the same idea --

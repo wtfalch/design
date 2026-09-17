@@ -38,7 +38,10 @@ import { readFileSync } from 'node:fs'
  *  will ever contain them, and flagging them is noise. `--ident-hue` (Identity),
  *  `--split` (SplitPane), `--digits` (Pagination) and `--knob-x` (Toggle) are
  *  the same thing: each is set with `style={{ '--x': ... }}` in the component's
- *  TSX, never in a stylesheet, so `declared` never sees it. */
+ *  TSX, never in a stylesheet, so `declared` never sees it. `--trigger-width`
+ *  is the same shape one layer down: React Aria's `Popover` (used by `Select`)
+ *  writes it inline on the popover element, not this package's own TSX, but it
+ *  is still JS setting a variable no stylesheet declares. */
 const SET_FROM_JS = new Set([
   '--cols',
   '--row',
@@ -48,6 +51,7 @@ const SET_FROM_JS = new Set([
   '--split',
   '--digits',
   '--knob-x',
+  '--trigger-width',
 ])
 
 /**
