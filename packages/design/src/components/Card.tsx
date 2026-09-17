@@ -70,7 +70,7 @@ export default function Card({
     <div className={`card-head flex items-start gap-3${body ? ' mb-3' : ''}`}>
       {icon && (
         <span className="card-icon" aria-hidden="true">
-          <Icon name={icon} size={20} />
+          <Icon name={icon} size="lg" />
         </span>
       )}
       <div className="min-w-0 flex-1">

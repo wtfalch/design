@@ -109,7 +109,7 @@ export default function Callout({
     >
       {mark && (
         <span className="flex-none grid place-items-center mt-px opacity-90" aria-hidden="true">
-          <Icon name={mark} size={16} />
+          <Icon name={mark} size="md" />
         </span>
       )}
       <div className="ctl-grow">{children}</div>
