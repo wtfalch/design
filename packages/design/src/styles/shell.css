@@ -61,3 +61,47 @@
     display: block;
   }
 }
+
+/* The `context` slot's own box, between `brand` and `who` in both header
+ * copies -- a class here rather than utilities on the wrapping `div` in
+ * `Shell.tsx`, for the same reason `.shell-head-phone`/`.shell-head-wide`
+ * are: a Tailwind utility named only in that file never reaches a consuming
+ * app's build, and truncation depends on every one of these properties
+ * landing together, not most of them.
+ *
+ * `flex: 1 1 auto` claims whatever space `brand` and `who` leave rather than
+ * any width of its own, so the two never move when this slot appears or
+ * disappears. `min-width: 0` overrides a flex item's default `auto`, which
+ * refuses to shrink a box below its content's natural width -- without it, a
+ * long value would widen the header instead of truncating. The rest is plain
+ * single-line ellipsis, so a 60-character organisation name shortens instead
+ * of wrapping the band or pushing `who` off the edge. */
+.shell-head-context {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* `who`'s own box, once `context` exists to compete with it for shrinkage --
+ * a class here rather than `flex-none`/`shrink-0` written as a utility in
+ * `Shell.tsx`, the same trap the two rules above already avoid.
+ *
+ * `who`'s box carries `min-w-0` regardless (a Tailwind utility, safe because
+ * it already appears throughout `Shell.tsx` and every app already using
+ * `Shell` renders it today), which lets it shrink below its content's width
+ * once the row overflows. With only `brand` beside it that never mattered --
+ * two ordinary flex children only shrink once their combined width overflows
+ * the row, which without a wide sibling essentially never happened. `context`
+ * changes that: it is sized to its own content before anything shrinks, so a
+ * long value can overflow the row by itself, and the browser then shrinks
+ * every flexible sibling to fit -- `who` included, clipping whatever sits at
+ * its trailing edge (a sign-out button, in the case this was caught in).
+ * `flex: none` pins `who` to its content width so `.shell-head-context` --
+ * built to give ground -- absorbs the deficit alone. `Shell.tsx` applies this
+ * class only when `context` is present, so a call without it keeps the exact
+ * `who` markup it always rendered. */
+.shell-head-who {
+  flex: none;
+}

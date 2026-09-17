@@ -82,6 +82,15 @@ export const ICON_NAMES = [
   // reads as going back rather than answering.
   'reply',
   'forward',
+  // The rail's identity/access vocabulary. Downstream's `SectionIcon` names
+  // 'person' | 'people' | 'key' among others, and the rail shipped with six
+  // of ten rows glyphed and four blank until these existed -- a side list
+  // where most rows have an icon and some don't reads as an oversight.
+  // Measured the same way as the rest; see the `Glyph` docstring in
+  // `Icon.tsx`.
+  'person',
+  'people',
+  'key',
 ] as const
 
 export type IconName = (typeof ICON_NAMES)[number]

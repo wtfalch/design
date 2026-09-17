@@ -22,6 +22,7 @@ import { RichTextEditor } from '@wtfalch/design/editor'
 import { useState } from 'react'
 
 import {
+  AccountMenu,
   Brand,
   Button,
   Callout,
@@ -848,12 +849,13 @@ function SheetDemo({ edge }: { edge: 'right' | 'bottom' }) {
   )
 }
 
-/* A realistic Manage-like rail: an organisation switcher, an unheaded group
-   of the app's own places, then "Tools" and "Platform" beneath. `open` is
-   the one piece of state the app holds and hands to both `SideList` and
-   `SideList.Trigger` -- the trigger renders and hides itself, which is the
-   whole point of it being a component here rather than a `<Button>` the
-   demo built by hand. */
+/* A realistic Manage-like rail: an organisation switcher, "Workspace",
+   "Tools" and "Platform" beneath it -- every group named, including the
+   first. `open` is the one piece of state the app holds and hands to both
+   `SideList` and `SideList.Trigger` -- the trigger renders and hides itself,
+   which is the whole point of it being a component here rather than a
+   `<Button>` the demo built by hand. "Storage" is a `SideList.Tool`: closed
+   here because neither of its own places is the current one. */
 function SideListDemo() {
   const [open, setOpen] = useState(false)
   return (
@@ -878,7 +880,7 @@ function SideListDemo() {
               </Select>
             }
           >
-            <SideList.Group>
+            <SideList.Group heading="Workspace">
               <SideList.Item>
                 <a href="#home">Home</a>
               </SideList.Item>
@@ -905,9 +907,14 @@ function SideListDemo() {
               <SideList.Item icon="stars">
                 <a href="#ai">AI</a>
               </SideList.Item>
-              <SideList.Item icon="cloud">
-                <a href="#storage">Storage</a>
-              </SideList.Item>
+              <SideList.Tool label="Storage" icon="cloud">
+                <SideList.Item>
+                  <a href="#storage-buckets">Buckets</a>
+                </SideList.Item>
+                <SideList.Item>
+                  <a href="#storage-backups">Backups</a>
+                </SideList.Item>
+              </SideList.Tool>
               <SideList.Item>
                 <a href="#keys">Keys</a>
               </SideList.Item>
@@ -2654,31 +2661,100 @@ export const COMPONENTS: Component[] = [
         render: () => <VoicePicker />,
       },
       {
-        name: 'A notice inside the menu',
+        name: 'A warning above the actions',
         note:
-          'Not a choice, so it is not a `menuitem` — a `Notice` renders as a `Section` with ' +
-          'no items, which is `role="group"` and carries no `menuitem` descendants, so ' +
-          'arrow-key navigation skips it exactly the way it skips an empty group.',
+          'Not a menu item, and not a dedicated notice type either — `info` takes any ' +
+          'node, so a warning is composition: `<Callout tone="warn">`, the same ' +
+          'component every other warning in the app already uses. It renders outside ' +
+          '`role="menu"`, so arrow-key navigation never reaches it.',
         render: () => (
           <Menu
             label="Choose a voice"
             trigger={<Button>Voice</Button>}
+            info={
+              <Callout tone="warn" icon>
+                Local voices unavailable. The offline engine is not running, so nothing at{' '}
+                <code>localhost:8811</code> can be listed. Run <code>voiced --serve</code>.
+              </Callout>
+            }
             items={[
               { id: 'aria', label: 'Aria', onAction: () => {} },
               { id: 'juniper', label: 'Juniper', onAction: () => {} },
-              {
-                tone: 'warn',
-                title: 'Local voices unavailable',
-                description: (
-                  <>
-                    The offline engine is not running, so nothing at <code>localhost:8811</code> can
-                    be listed.
-                    <br />
-                    <code>voiced --serve</code>
-                  </>
-                ),
-              },
             ]}
+          />
+        ),
+      },
+      {
+        name: 'With an info box above the actions',
+        note:
+          'A generic slot, not a menu item — it renders outside the list, so it ' +
+          'takes no keyboard focus and a screen reader never treats it as a ' +
+          'choice. The package supplies the box; the app supplies what goes in it.',
+        render: () => (
+          <Menu
+            label="Your account"
+            trigger={<Button>Account</Button>}
+            info={
+              <div className="demo-stack" style={{ gap: 'var(--space-1)' }}>
+                <div>ada@example.com</div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--text-xs)' }}>Owner</div>
+              </div>
+            }
+            items={[
+              { id: 'account', label: 'Your account', icon: 'settings' },
+              { id: 'sign-out', label: 'Sign out', separated: true },
+            ]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    id: 'accountmenu',
+    name: 'AccountMenu',
+    blurb:
+      'Who is signed in, at the end of the title block — `Menu` with a fixed ' +
+      'trigger rather than a caller-supplied one. Wrapping the identity chip in ' +
+      'a ghost `Button` used to draw a second, squarer box around it, so a ' +
+      'hover filled a wider area than the pill it was supposed to be a hover ' +
+      'for. Here the interactive element is the chip: a hover or a focus ring ' +
+      'can only trace the one shape actually on screen. `info` is `Menu`’s own ' +
+      'slot, forwarded — the package does not know the second line is a role, ' +
+      'only that the app wants it read before the verbs.',
+    variants: [
+      {
+        name: 'In the title block',
+        note:
+          'The disc, the name, and — opened — an address and a role above ' +
+          '“Your account” and “Sign out”. Hover the chip itself: the accent ' +
+          'shows up on its own border, not on a rectangle around it.',
+        render: () => (
+          <AccountMenu
+            name="Ada Lovelace"
+            address="ada@example.com"
+            label="Your account"
+            info={
+              <div className="demo-stack" style={{ gap: 'var(--space-1)' }}>
+                <div>ada@example.com</div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--text-xs)' }}>Owner</div>
+              </div>
+            }
+            items={[
+              { id: 'account', label: 'Your account', icon: 'settings' },
+              { id: 'sign-out', label: 'Sign out', separated: true },
+            ]}
+          />
+        ),
+      },
+      {
+        name: 'No display name',
+        note: 'Falls through to the address, the same rule `Identity` uses everywhere else.',
+        render: () => (
+          <AccountMenu
+            address="noreply@notifications.example.org"
+            label="Your account"
+            info={<div>noreply@notifications.example.org</div>}
+            items={[{ id: 'sign-out', label: 'Sign out' }]}
           />
         ),
       },
@@ -2739,6 +2815,31 @@ export const COMPONENTS: Component[] = [
               }
             >
               <h1 style={{ margin: 0 }}>Members</h1>
+            </Shell>
+          </div>
+        ),
+      },
+      {
+        name: 'With a context',
+        note: '`context` is the header’s third, fixed position -- between `brand` and `who`, generic all the way down. `Shell` only renders whichever node it is handed; manage’s is which organisation is current, but the package itself never learns the word. Northwind Traders International Holdings Group is 47 characters, long enough to prove it ellipses instead of pushing `who` off the edge or wrapping the band.',
+        render: () => (
+          <div style={{ height: 300, overflow: 'hidden' }}>
+            <Shell
+              brand={<strong>Management</strong>}
+              context={
+                <span className="quiet">Northwind Traders International Holdings Group</span>
+              }
+              who={
+                <>
+                  <span className="quiet">will@wtfalch.dev</span>
+                  <Button kind="ghost" size="sm">
+                    Sign out
+                  </Button>
+                </>
+              }
+            >
+              <h1 style={{ margin: 0 }}>Organisations</h1>
+              <p className="quiet">Every organisation on this estate.</p>
             </Shell>
           </div>
         ),

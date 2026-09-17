@@ -295,25 +295,25 @@ for (const o of OPENED) {
 }
 
 /**
- * The two rows added for otf's model picker, open.
+ * The two Menu variants added for otf's model picker, open.
  *
- * A row's `secondaryAction` and a `Notice` both only exist while the menu is
- * open, and `visual.spec.ts`'s stage shot is the closed trigger -- the same
- * gap `OPENED` above closes for the menu's first variant. This is a block of
- * its own rather than two more rows in `OPENED`, because that array's
- * screenshot name is keyed on `c` alone (`menu--open--*`): a second and third
- * `menu` entry would collide with it and with each other. Named past the
- * variant instead.
+ * A row's `secondaryAction` and a warning composed onto `info` both only
+ * exist while the menu is open, and `visual.spec.ts`'s stage shot is the
+ * closed trigger -- the same gap `OPENED` above closes for the menu's first
+ * variant. This is a block of its own rather than two more rows in `OPENED`,
+ * because that array's screenshot name is keyed on `c` alone
+ * (`menu--open--*`): a second and third `menu` entry would collide with it
+ * and with each other. Named past the variant instead.
  *
  * It is also the only place either surface is ever scanned by axe:
  * `a11y.spec.ts` scans `.spec-stage` as the page loads, before either portals
  * out of it, in every theme -- a `running` pill once sat at 1.67:1 on Paper
  * for weeks while every dark theme looked correct, so a single-theme scan is
- * exactly the one that would miss a tone-tinted `Notice` doing the same.
+ * exactly the one that would miss a tone-tinted box doing the same.
  */
 const MENU_ROWS = [
   { v: 'A row with a settings action', slug: 'menu-row-action' },
-  { v: 'A notice inside the menu', slug: 'menu-row-notice' },
+  { v: 'A warning above the actions', slug: 'menu-row-warning' },
 ] as const
 
 for (const m of MENU_ROWS) {

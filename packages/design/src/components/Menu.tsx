@@ -70,20 +70,6 @@ import type { IconName } from './iconNames'
  * `secondaryAction`; `items` wins if both are given, since a submenu already
  * owns the row's expand affordance.
  *
- * **A `Notice` is a `Section` with no items.** WAI-ARIA's `menu` role allows
- * `group` among its owned elements, and React Aria already renders
- * `MenuSection` as `role="group"`, labelled by its `Header` -- so a `Notice`
- * reuses that machinery instead of a hand-rolled `<div>`. It has to: a plain
- * element mixed into `<AriaMenu>`'s children is not a recognised collection
- * node, and React Aria's collection walker drops it (and, in testing, every
- * item after it) rather than rendering it inert. `group` carries no
- * `menuitem` descendants, so arrow-key roving tabindex skips it exactly the
- * way it skips a section with nothing in it -- the constraint the task asked
- * for, met by the same primitive a real section already uses. "Local models
- * unavailable" plus a command to fix it is content a menu could not carry
- * before this; it still cannot carry a *button* in one, for the same nested-
- * focusable reason as the gear above.
- *
  * **Selecting a row is not a gap here.** React Aria's `Menu`/`MenuItem`
  * already support `selectionMode`, `selectedKeys` and the resulting
  * `isSelected` (which lands as `data-selected`, same as every other React
@@ -91,6 +77,21 @@ import type { IconName } from './iconNames'
  * forward those props yet, which is a small plumbing gap, not an ARIA one;
  * nothing here stops a caller who needs it from adding `selectionMode` to
  * `Props` next.
+ *
+ * **`info` is context, not a choice, and it is not a menu item.** A caller
+ * that wants a line above the actions -- who is signed in, what plan an
+ * account is on -- cannot get there through `items`: a `disabled` entry is
+ * still a stop on the arrow-key path, and a screen reader still announces
+ * "dimmed" or "unavailable" for something that was never a choice to begin
+ * with, only ever a fact. `info` renders as a plain sibling of the menu's own
+ * list instead, inside the popover but outside `role="menu"`, so it takes no
+ * keyboard focus, gets no roving tabindex, and is read as ordinary text if a
+ * screen reader's browse cursor passes over it. Nothing here knows what the
+ * content *is* -- an email, a role, a plan -- only that it goes above the
+ * verbs and is never one of them. A warning belongs here too, composed
+ * rather than built in: `info={<Callout tone="warn">…</Callout>}` reads the
+ * same way and gets the same guarantee, one concept (a menu is choices) doing
+ * the work two used to.
  */
 
 export interface Item {
@@ -141,36 +142,23 @@ export interface Section {
   items: Omit<Item, 'secondaryAction'>[]
 }
 
-/**
- * A block of words inside an open menu that is not a choice -- a warning, a
- * status, an explanation for why the list above it is short. Renders as a
- * `Section` with no items, so it inherits `group`'s place in the ARIA menu
- * role and is skipped by arrow-key navigation the same way an empty group
- * would be.
- */
-export interface Notice {
-  tone: 'info' | 'good' | 'warn' | 'bad'
-  title: string
-  /** The line under the title. Can hold a `<code>` for a command to run. */
-  description?: React.ReactNode
-}
-
 export interface Props {
   /** What opens it. */
   trigger: React.ReactNode
-  items: (Item | Section | Notice)[]
+  items: (Item | Section)[]
   placement?: Placement
   /** Names the menu for a screen reader. */
   label: string
   className?: string
+  /** Static context above the actions -- who is signed in, what plan an
+   *  account is on, anything worth reading before the verbs are offered. Not
+   *  a menu item: see the docblock above for why it renders outside the
+   *  list rather than as a disabled entry inside it. */
+  info?: React.ReactNode
 }
 
-function isSection(entry: Item | Section | Notice): entry is Section {
+function isSection(entry: Item | Section): entry is Section {
   return 'title' in entry && Array.isArray((entry as Section).items)
-}
-
-function isNotice(entry: Item | Section | Notice): entry is Notice {
-  return 'tone' in entry
 }
 
 function renderItem(item: Item): React.ReactNode {
@@ -221,7 +209,15 @@ function renderItem(item: Item): React.ReactNode {
   const body = item.items ? (
     <SubmenuTrigger key={item.id}>
       {row}
-      <AriaPopover className="menu-sheet surface-panel border border-border rounded-md min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-(--z-popover)">
+      {/* The surface -- background, border, radius -- lives on `.menu-sheet`
+          itself now, in `menu.css`, so it is not restated here as
+          utilities: two copies of the same surface is how the top-level
+          popover ended up with none at all. What stays inline is this
+          popover's own sizing, which the top-level one does not share, plus
+          `z-(--z-popover)` from the named layering scale, plus the two-column
+          grid a row's `secondaryAction` needs -- a submenu's rows can carry
+          one too, so it gets the same tracks the top-level list does. */}
+      <AriaPopover className="menu-sheet min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-(--z-popover)">
         <AriaMenu className="p-1 outline-none grid grid-cols-[1fr_auto] gap-y-[var(--border-width)] gap-x-[var(--space-1)]">
           {item.items.map(renderItem)}
         </AriaMenu>
@@ -251,23 +247,13 @@ function renderItem(item: Item): React.ReactNode {
   return Array.isArray(body) ? [rule, ...body] : [rule, body]
 }
 
-function renderNotice(entry: Notice): React.ReactNode {
-  return (
-    <MenuSection key={entry.title} className="menu-section">
-      <Header className={`menu-notice menu-notice-${entry.tone}`}>
-        <div className="menu-notice-title">{entry.title}</div>
-        {entry.description && <div className="menu-notice-desc">{entry.description}</div>}
-      </Header>
-    </MenuSection>
-  )
-}
-
 export default function Menu({
   trigger,
   items,
   placement = 'bottom start',
   label,
   className,
+  info,
 }: Props) {
   return (
     <MenuTrigger>
@@ -277,14 +263,17 @@ export default function Menu({
         placement={placement}
         offset={6}
       >
+        {/* Outside `AriaMenu` on purpose -- see the docblock's `info`
+            paragraph. A sibling here never enters the listbox React Aria
+            builds from `AriaMenu`'s children, so it is invisible to arrow
+            keys, roving tabindex and the menu's own accessible name. */}
+        {info && <div className="menu-info">{info}</div>}
         <AriaMenu
           className="p-1 outline-none grid grid-cols-[1fr_auto] gap-y-[var(--border-width)] gap-x-[var(--space-1)]"
           aria-label={label}
         >
           {items.map((entry) =>
-            isNotice(entry) ? (
-              renderNotice(entry)
-            ) : isSection(entry) ? (
+            isSection(entry) ? (
               <MenuSection key={entry.title} className="menu-section">
                 <Header className="menu-section-title">{entry.title}</Header>
                 {entry.items.map(renderItem)}

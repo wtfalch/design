@@ -1,0 +1,34 @@
+/* The trigger is the chip itself, not a button wrapped around one.
+   `Identity`'s `chip` kind already draws the disc, the name, the border and
+   the pill radius -- everything the control needs to look like a control. A
+   `Button` around it drew a second box: ghost's own rounded rectangle, sized
+   by its own padding, wider and squarer than the pill inside it, so a hover
+   filled an area the chip's own edges did not reach and the whole thing read
+   as two shapes rather than one. This button carries no box of its own -- no
+   padding, no border, no radius, no background at rest -- so the only shape
+   on screen is the chip, and the only thing a hover or a focus ring can trace
+   is that shape. */
+.account-trigger {
+  display: inline-flex;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: var(--radius-pill);
+}
+
+/* Recolours the chip's own border, the same `border-color: var(--accent)`
+   every plain control in the package answers a hover with -- not a fill,
+   which would be the widening block this exists to avoid. `data-hovered`
+   over `:hover`: React Aria does not set it for a touch press, so a tap does
+   not leave the chip looking hovered after the finger lifts. */
+.account-trigger[data-hovered] .ident {
+  border-color: var(--accent);
+}
+
+/* The ring hugs the button's own box, which has no padding beyond the chip's
+   -- so it traces the chip's pill, not a wider rectangle around it. */
+.account-trigger[data-focus-visible] {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}

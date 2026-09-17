@@ -13,11 +13,13 @@
  * one-row `nav` was built for -- Manage's Home, Accounts, Teams, Roles,
  * Activity, Settings, and a "Tools" and "Platform" group under those.
  *
- * `SideList.Group` names a run of `SideList.Item`s, and a group at the top of
- * the list may skip the name -- the same "groups are headings, not tabs"
- * shape `Tabs`' vertical rail already has, one level up: there the group is
- * decoration over a strip that is still one control; here every item is its
- * own link and the group is nothing but the heading.
+ * `SideList.Group` names a run of `SideList.Item`s, and every group is named
+ * -- the same "groups are headings, not tabs" shape `Tabs`' vertical rail
+ * already has, one level up: there the group is decoration over a strip that
+ * is still one control; here every item is its own link and the group is
+ * nothing but the heading. `heading` stays optional in the type for a caller
+ * mid-migration, but a headingless top group is what left a later "Tools"
+ * heading looking orphaned -- name the first group too.
  *
  * **Every item is a real anchor, not a button that calls a router.** `asChild`
  * puts this component's styling on the caller's own element -- a Next.js
@@ -45,6 +47,22 @@
  * `aria-current="page"` on the slotted anchor, merged the way `Button` merges
  * `aria-disabled` onto a disabled link -- a colour alone tells a mouse where
  * it is and tells a screen reader nothing.
+ *
+ * **`SideList.Tool` is a disclosure, not a destination.** A tool with more
+ * than one place under it -- Storage's Buckets and Backups, say -- opens its
+ * own run of `SideList.Item`s in place, indented `--space-3` (12px) beneath
+ * it: William's number, chosen so the rail still reads as one instrument from
+ * a single tool to fifteen or more. Collapsed by default; open only when the
+ * caller passes `defaultOpen`, the same way `SideList.Item`'s `current` is
+ * the caller's own computation from its own route rather than this component
+ * reading a pathname -- pass it for the one tool that contains the current
+ * place. Its trigger is a real `<button>`, never an anchor: unlike
+ * `SideList.Item` there is nothing here for `asChild` to put a link's own
+ * styling on, since a tool has no page of its own to link to. `aria-expanded`
+ * and `aria-controls` (paired by React's own `useId`, one pair per instance)
+ * say what it does to a screen reader, and a `<button>` gets Enter/Space
+ * activation from the browser for free where a `<div onClick>` would not --
+ * the same reasoning `SideList.Item` already applies to its own anchor.
  *
  * **The phone sheet is controlled, and `SideList.Trigger` is the button that
  * opens it.** The trigger has to live in `Shell`'s header -- that is the
@@ -77,7 +95,7 @@
  */
 
 import { Slot } from '@radix-ui/react-slot'
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useId, useState } from 'react'
 
 import Button from './Button'
 import Icon from './Icon'
@@ -203,9 +221,13 @@ function SideListTrigger({ label = 'Open places', onOpenChange, className }: Sid
 }
 
 export interface SideListGroupProps {
-  /** The small heading above this group's places. Omit it for the group at
-   *  the top of the list that needs no name -- Home, Accounts, Teams... --
-   *  and give the run after it "Tools" or "Platform". */
+  /** The small heading above this group's places. Name every group,
+   *  including the one at the top of the list -- Home, Accounts, Teams...
+   *  gets a heading exactly like "Tools" or "Platform" after it does. Still
+   *  optional in the type, not required: a headingless top group was the
+   *  previous intended use, so making this required would break an existing
+   *  caller who built one that way. Nothing enforces the recommendation past
+   *  this comment. */
   heading?: string
   children: React.ReactNode
   className?: string
@@ -252,8 +274,84 @@ function SideListItem({ children, icon, current, className }: SideListItemProps)
   )
 }
 
+export interface SideListToolProps {
+  /** The button's own label -- the tool's name, not a destination. A string
+   *  rather than `SideList.Item`'s `children`, because there is no anchor
+   *  here for `asChild` to put this row's styling on: the tool has nothing to
+   *  link to, only a list to open. */
+  label: string
+  /** Drawn over the row at a fixed inset exactly like `SideList.Item`'s --
+   *  see that prop's docblock for why this is a prop the component draws
+   *  rather than markup a caller supplies. */
+  icon?: IconName
+  /** `SideList.Item`s, rendered beneath the button and indented one step
+   *  under it while this tool is open. */
+  children: React.ReactNode
+  /** Open when this instance first renders. The tool has no route of its own
+   *  to read a pathname from, so -- the same way `SideList.Item`'s `current`
+   *  is the caller's own computation rather than this component reading one
+   *  -- pass `true` for the one tool that contains the current place and
+   *  leave every other tool to its default: collapsed. Uncontrolled, and
+   *  deliberately so: the rail and the sheet mount this tool as two separate
+   *  instances (see `SideList`'s own docblock), and nothing needs their open
+   *  state to agree with each other any more than their scroll positions
+   *  do. */
+  defaultOpen?: boolean
+  className?: string
+}
+
+function SideListTool({
+  label,
+  icon,
+  children,
+  defaultOpen = false,
+  className,
+}: SideListToolProps) {
+  const [open, setOpen] = useState(defaultOpen)
+  const sectionsId = useId()
+  return (
+    <div className="side-list-item">
+      {icon && <Icon name={icon} size={16} className="side-list-item-icon" />}
+      <button
+        type="button"
+        className={`side-list-link side-list-tool-trigger${className ? ` ${className}` : ''}`}
+        aria-expanded={open}
+        aria-controls={sectionsId}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        {label}
+        {/* Inline, not a name from `Icon`/`IconName` -- the same call
+            `Select`'s own caret already made: a chevron used in exactly one
+            place is not worth adding to a forty-two-glyph shared set, and
+            Pepicons' `expand` glyph is a fullscreen arrow, the wrong shape
+            for "opens a list beneath it." */}
+        <svg
+          className="side-list-tool-caret"
+          viewBox="0 0 24 24"
+          width="14"
+          height="14"
+          aria-hidden="true"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m6 9 6 6 6-6"
+          />
+        </svg>
+      </button>
+      <div id={sectionsId} className="side-list-tool-sections" hidden={!open}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 SideList.Group = SideListGroup
 SideList.Item = SideListItem
+SideList.Tool = SideListTool
 SideList.Trigger = SideListTrigger
 
 export default SideList

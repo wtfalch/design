@@ -31,45 +31,18 @@
  * own docblock explains why the button has to live in `who` rather than in
  * `side` itself.
  *
- * **`context` is a third slot in the header's own row, fixed between `brand`
- * and `who`.** It exists so an app can answer "where am I" up there --
- * Manage's version of it is which organisation the signed-in person is
- * currently in, a plain name or a switcher depending on how many there are --
- * but `Shell` takes only a node here and never learns what an organisation
- * is; that word belongs to the app, not the package. Optional and additive
- * like `side`: leave it out and the row renders exactly as it did before this
- * existed, `brand` and `who` do not move when it appears, and it takes
- * whichever space they leave rather than any of its own, so a long value
- * ellipses instead of wrapping the band or pushing `who` off the edge.
- *
- * **`who` stops shrinking the moment `context` exists to shrink instead.**
- * `who`'s own box already carried `min-w-0` -- harmless with only `brand`
- * beside it, because two ordinary flex children only shrink once their
- * combined width overflows, and that never happened in practice. `context`
- * changes the arithmetic: it is a flex item too, sized to its own content
- * before anything shrinks, so a long value can overflow the row on its own
- * and the browser then shrinks every flexible sibling to fit -- `who`
- * included, which is how a live "Sign out" button ended up a few pixels
- * short and clipped rather than fully visible. `.shell-head-who` in
- * `shell.css` pins `who` to its content width so `.shell-head-context` -- the
- * one box built to give ground -- absorbs the deficit alone; the class is
- * applied only when `context` is present, so a `Shell` call without it keeps
- * the exact `who` markup it always rendered.
- *
  * **The header knows about the rail too, at the same breakpoint.** Below
  * `md` it is the one band it always was. At `md` and up, with `side`
  * present, it splits into a brand zone the rail's own width and padding --
  * so `brand` sits directly above the docked column instead of inside
  * `band`'s independently-centred measure -- and a second band, sharing
- * `main`'s, for `context`, `who` and `nav`. Two static copies switched by
- * breakpoint, the way `SideList` itself is a rail and a sheet rather than one
- * thing that moves. `context` sits in both copies the same way `who` does --
- * next to `brand` below `md`, in the second band beside `who` at `md` and up.
+ * `main`'s, for `who` and `nav`. Two static copies switched by breakpoint,
+ * the way `SideList` itself is a rail and a sheet rather than one thing
+ * that moves.
  */
 
 export default function Shell({
   brand,
-  context,
   who,
   nav,
   side,
@@ -79,14 +52,6 @@ export default function Shell({
 }: {
   /** Top left: the product's name or mark, usually a link home. */
   brand?: React.ReactNode
-  /** Between `brand` and `who`: whatever answers "where am I" for this app --
-   *  Manage's is which organisation the signed-in person is in, a name or a
-   *  switcher depending on how many there are. `Shell` only renders the node
-   *  it is given here and never learns the word "organisation" itself.
-   *  Omit it and the header renders exactly as it did before this existed;
-   *  supply it and `brand`/`who` hold their positions while it takes the
-   *  space between them, truncating rather than wrapping the band. */
-  context?: React.ReactNode
   /** Top right: who is signed in, the theme, whatever else is chrome. */
   who?: React.ReactNode
   /** A row under the header, for an app whose pages hang off a context --
@@ -108,11 +73,6 @@ export default function Shell({
      classes and had to remember both. */
   const measure = wide ? 'max-w-(--measure-wide)' : 'max-w-(--measure)'
   const band = `w-full mx-auto px-4 ${measure}`
-  /* `shell-head-who` only when `context` is there to need it -- see the
-     docblock above. Appending it conditionally, rather than shipping it on
-     `who`'s box unconditionally, is what keeps a `Shell` call with no
-     `context` rendering the exact markup it always has. */
-  const whoBox = `flex items-center gap-3 min-w-0${context ? ' shell-head-who' : ''}`
 
   return (
     <div
@@ -130,8 +90,7 @@ export default function Shell({
             <div className="shell-head-phone">
               <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
                 {brand}
-                {context && <div className="shell-head-context">{context}</div>}
-                {who && <div className={whoBox}>{who}</div>}
+                {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
               </div>
               {nav && <div className={`${band} pb-2`}>{nav}</div>}
             </div>
@@ -164,8 +123,7 @@ export default function Shell({
                   {brand}
                 </div>
                 <div className={`${band} flex items-center justify-end gap-4 py-3 min-w-0`}>
-                  {context && <div className="shell-head-context">{context}</div>}
-                  {who && <div className={whoBox}>{who}</div>}
+                  {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
                 </div>
               </div>
               {nav && (
@@ -179,8 +137,7 @@ export default function Shell({
         ) : (
           <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
             {brand}
-            {context && <div className="shell-head-context">{context}</div>}
-            {who && <div className={whoBox}>{who}</div>}
+            {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
           </div>
         )}
         {!side && nav && <div className={`${band} pb-2`}>{nav}</div>}
