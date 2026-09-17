@@ -24,9 +24,7 @@
   },
   "license": "MIT",
   "type": "module",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "publishConfig": {
     "access": "public"
   },
@@ -50,9 +48,7 @@
       "default": "./dist/rich-text.js"
     }
   },
-  "sideEffects": [
-    "*.css"
-  ],
+  "sideEffects": ["*.css"],
   "engines": {
     "node": ">=22.0.0"
   },
