@@ -732,6 +732,37 @@ function FilterToggles() {
   )
 }
 
+const VOICES = [
+  { id: 'aria', label: 'Aria' },
+  { id: 'juniper', label: 'Juniper' },
+]
+
+/** A demo holds its own state -- picking a row moves the readout, and so does
+ *  its settings gear, which is the point of the specimen: two independent
+ *  actions on one row. */
+function VoicePicker() {
+  const [status, setStatus] = useState('No voice chosen')
+  return (
+    <div className="demo-stack">
+      <Menu
+        label="Choose a voice"
+        trigger={<Button>Voice</Button>}
+        items={VOICES.map((v) => ({
+          id: v.id,
+          label: v.label,
+          onAction: () => setStatus(`Reading with ${v.label}`),
+          secondaryAction: {
+            icon: 'settings' as const,
+            label: `${v.label} settings`,
+            onAction: () => setStatus(`Configuring ${v.label}`),
+          },
+        }))}
+      />
+      <span className="g-hint">{status}</span>
+    </div>
+  )
+}
+
 function CommandDemo() {
   const [open, setOpen] = useState(false)
   const [ran, setRan] = useState<string | null>(null)
@@ -2606,6 +2637,46 @@ export const COMPONENTS: Component[] = [
                   { id: 'rename', label: 'Rename…', icon: 'settings' },
                   { id: 'empty', label: 'Empty mailbox', danger: true },
                 ],
+              },
+            ]}
+          />
+        ),
+      },
+      {
+        name: 'A row with a settings action',
+        note:
+          'A `<button>` nested in a `menuitem` is invalid ARIA — `menuitem` children are ' +
+          'presentational, so a nested focusable element is either unreachable by Tab or ' +
+          'breaks the arrow-key contract every other row relies on. `secondaryAction` ' +
+          'renders as a second `MenuItem` instead, one more press of the down arrow away, ' +
+          'seated beside the row by CSS Grid rather than inside it. Always visible, not ' +
+          'hover-revealed: a touch screen has no hover.',
+        render: () => <VoicePicker />,
+      },
+      {
+        name: 'A notice inside the menu',
+        note:
+          'Not a choice, so it is not a `menuitem` — a `Notice` renders as a `Section` with ' +
+          'no items, which is `role="group"` and carries no `menuitem` descendants, so ' +
+          'arrow-key navigation skips it exactly the way it skips an empty group.',
+        render: () => (
+          <Menu
+            label="Choose a voice"
+            trigger={<Button>Voice</Button>}
+            items={[
+              { id: 'aria', label: 'Aria', onAction: () => {} },
+              { id: 'juniper', label: 'Juniper', onAction: () => {} },
+              {
+                tone: 'warn',
+                title: 'Local voices unavailable',
+                description: (
+                  <>
+                    The offline engine is not running, so nothing at <code>localhost:8811</code> can
+                    be listed.
+                    <br />
+                    <code>voiced --serve</code>
+                  </>
+                ),
               },
             ]}
           />

@@ -197,6 +197,14 @@
   },
   {
     "c": "menu",
+    "v": "A notice inside the menu"
+  },
+  {
+    "c": "menu",
+    "v": "A row with a settings action"
+  },
+  {
+    "c": "menu",
     "v": "Grouped, with a description"
   },
   {

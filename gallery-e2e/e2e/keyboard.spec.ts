@@ -1466,3 +1466,73 @@ test.describe('ThemeSwitch', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
   })
 })
+
+/**
+ * `Item.secondaryAction` and `Notice`, added for otf's model picker.
+ *
+ * A separate `describe` from the general `Menu` keyboard coverage above (a
+ * different branch, merged first) on purpose: two changes that touch none of
+ * the same rows share no block, so there is nothing here for either to
+ * conflict with.
+ */
+test.describe('Menu rows', () => {
+  const WITH_ACTION = { c: 'menu', v: 'A row with a settings action' }
+  const WITH_NOTICE = { c: 'menu', v: 'A notice inside the menu' }
+
+  test('a row and its settings action are two separate stops, each firing its own handler', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(WITH_ACTION, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toBeVisible()
+
+    /* The row and its gear are two `menuitem`s in collection order, so one
+       more press of the down arrow is what reaches the second. */
+    await expect(page.locator(':focus')).toHaveAccessibleName('Aria')
+    await page.keyboard.press('ArrowDown')
+    await expect(page.locator(':focus')).toHaveAccessibleName('Aria settings')
+
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+    /* The gear's own handler ran, not the row's -- proof the two are
+       independent rather than one activating both. */
+    await expect(page.locator('.g-hint')).toHaveText('Configuring Aria')
+  })
+
+  test('the row itself still chooses, unaffected by its action existing', async ({ page }) => {
+    await page.goto(specimenUrl(WITH_ACTION, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await expect(page.locator(':focus')).toHaveAccessibleName('Aria')
+
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+    await expect(page.locator('.g-hint')).toHaveText('Reading with Aria')
+  })
+
+  test('a Notice is never a stop arrow-key navigation reaches', async ({ page }) => {
+    await page.goto(specimenUrl(WITH_NOTICE, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toBeVisible()
+
+    /* Two real rows, then the Notice last in `items` order (see
+       `specimens.tsx`). Three presses over a two-item menu wraps back to the
+       first row on the second -- if the Notice were a stop between the last
+       row and the wrap, one of these three would land on it instead. */
+    const roles: (string | null)[] = []
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press('ArrowDown')
+      roles.push(await page.locator(':focus').getAttribute('role'))
+    }
+    expect(roles).toEqual(['menuitem', 'menuitem', 'menuitem'])
+
+    /* Present, just not a stop: the group renders and can be found by role,
+       proof this is "skipped by navigation" and not "never rendered". */
+    await expect(page.getByRole('group', { name: /local voices unavailable/i })).toBeVisible()
+  })
+})

@@ -4,6 +4,40 @@
    `box-shadow` stays on the sheet too -- `--shadow-2` is a token, and a
    utility would have to inline it. */
 
+/* Two grid tracks exist on every list (`Menu.tsx`'s `grid-cols-[1fr_auto]`),
+   but only a row with `secondaryAction` ever puts anything in the second one.
+   Everything else -- a plain row, a section, a rule -- spans both, and a
+   spanning item's box is the sum of both tracks regardless of how they split
+   internally. That is what keeps this a no-op for every menu that does not
+   use the feature: no baseline taken before it existed can move. */
+.menu-item,
+.menu-section,
+.menu-rule {
+  grid-column: 1 / -1;
+}
+
+/* The pair that breaks the rule on purpose: the row keeps the first track,
+   its action takes the second, so the two sit in one row instead of two.
+   `min-width: 0` is what lets the row's own label keep truncating instead of
+   forcing the column wide enough for the longest name. */
+.menu-item--with-action {
+  grid-column: auto;
+  min-width: 0;
+}
+
+.menu-action {
+  grid-column: auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  outline: none;
+}
+
+.menu-action[data-focused] { background: var(--panel-2); color: var(--text); }
+.menu-action[data-disabled] { color: var(--muted); opacity: 0.6; }
+
 /* A list of verbs, on the same sheet as every other anchored surface. */
 .menu-item {
   display: flex;
@@ -77,3 +111,50 @@
 }
 
 .menu-sheet { box-shadow: var(--shadow-2); }
+
+/* A notice: not a choice, so it does not borrow `.menu-item`'s pointer or its
+   focus ring, and its tone mixes into `--panel` at the same 10%/30% split
+   `Callout` measures its tones against -- one box, one set of rules, rather
+   than a second place a tone could drift from the one `contrast.test.ts`
+   checks. `<Header>` renders `role="presentation"`, so this box is prose
+   inside a labelled `group`, never a `menuitem`. */
+.menu-notice {
+  display: block;
+  padding: var(--space-2) var(--space-2);
+  margin: var(--space-1) 2px 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--text);
+  cursor: default;
+}
+
+.menu-notice-title { font-weight: 550; }
+
+.menu-notice-desc {
+  margin-top: var(--space-1);
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.menu-notice-desc code { font-family: var(--font-mono); font-size: var(--text-xs); }
+
+.menu-notice-info {
+  background: color-mix(in srgb, var(--info) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--info) 30%, var(--border));
+}
+
+.menu-notice-good {
+  background: color-mix(in srgb, var(--good) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--good) 30%, var(--border));
+}
+
+.menu-notice-warn {
+  background: color-mix(in srgb, var(--warn) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--warn) 30%, var(--border));
+}
+
+.menu-notice-bad {
+  background: color-mix(in srgb, var(--bad) 10%, var(--panel));
+  border-color: color-mix(in srgb, var(--bad) 30%, var(--border));
+}

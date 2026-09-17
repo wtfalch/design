@@ -67,7 +67,11 @@ export { default as RichText } from './components/RichText'
 export type { BlockNode, RichTextMark, RichTextValue } from './rich-text/schema'
 export { emptyRichText, isEmptyRichText, richTextToPlain } from './rich-text/value'
 export { default as Menu } from './components/Menu'
-export type { Item as MenuItem, Section as MenuSection } from './components/Menu'
+export type {
+  Item as MenuItem,
+  Notice as MenuNotice,
+  Section as MenuSection,
+} from './components/Menu'
 export { default as Modal } from './components/Modal'
 /** The page's own `<h1>`, once. `as="p"` for a name under a page that already
  *  has its own. */
