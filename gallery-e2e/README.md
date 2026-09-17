@@ -1,14 +1,14 @@
 # gallery-e2e
 
-Four hundred and eighty checks over the design system's gallery: what every
+Checks over the design system's gallery: what every
 component looks like, whether axe can fault it, and whether motion actually
 stops when the OS asks.
 
 ```bash
-# the gallery still lives in otf until the components move (phase 3)
-cd ../../tf/dashboard && npm run build
+pnpm --filter @wtfalch/design build
+pnpm --filter @wtfalch/design-gallery build
 
-cd ../../design/gallery-e2e
+cd gallery-e2e
 pnpm e2e:docker                          # check
 pnpm e2e:docker --update-snapshots        # re-baseline
 pnpm e2e:docker --grep toggle             # one component
@@ -19,7 +19,7 @@ pnpm a11y:record                          # re-record the known violations
 
 | | |
 |---|---|
-| `visual.spec.ts` | 68 specimens × 3 themes = 204 images |
+| `visual.spec.ts` | every specimen in `manifest.json`, in every theme in `THEMES`, one image each |
 | `a11y.spec.ts` | axe per specimen (structure once, contrast per theme) |
 | `reduced-motion.spec.ts` | the durations actually collapse in the browser |
 | `manifest.spec.ts` | the committed work list still matches the gallery |

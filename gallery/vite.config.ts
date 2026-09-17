@@ -6,7 +6,7 @@ import { defineConfig } from 'vite'
  *
  * `design.html` in otf was a second Vite entry beside the app. Here it is the
  * only page, so it is `index.html` -- but the built file keeps the name
- * `design.html` as well, because 204 screenshot baselines address it by that
+ * `design.html` as well, because every screenshot baseline addresses it by that
  * path and renaming the page would fail all of them for a reason that has
  * nothing to do with a component.
  */
