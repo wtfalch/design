@@ -111,7 +111,7 @@ allowed to, once, explained in the commit.
 ## The vocabulary
 
 - **Three kinds of token, and `tokens.test.ts` holds all three lists to
-  `tokens.css` in both directions.** 47 themeable, 16 derived, 3 fixed. A token
+  `tokens.css` in both directions.** 47 themeable, 16 derived, 11 fixed. A token
   added to the stylesheet and to no list fails the suite rather than becoming a
   fourth, undocumented category. The split is what turned "twenty tokens no
   theme can name" from an omission into a decision: `--text-*` and `--space-*`
