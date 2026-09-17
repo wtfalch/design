@@ -2,7 +2,18 @@
    `data-focused`, `data-pressed` and danger states React Aria stamps on
    them, and the rules that reach from a row into what it holds. The
    `box-shadow` stays on the sheet too -- `--shadow-2` is a token, and a
-   utility would have to inline it. */
+   utility would have to inline it.
+
+   **`.menu-sheet`'s surface lives here too, and used to live nowhere.** The
+   submenu's own popover carried `surface-panel border border-border
+   rounded-md` inline, on top of this class; the top-level popover carried
+   only `menu-sheet`, and this file gave `menu-sheet` nothing but the shadow
+   and the open/close animation. So the top-level sheet computed a
+   transparent background, no border and no radius -- invisible against a
+   near-white page, and the menu's own rows sat directly on whatever was
+   behind them the moment that page was not near-white. Fixed here, once, so
+   the two popovers cannot disagree again: `Menu.tsx` no longer restates the
+   surface on the submenu at all. */
 
 /* A list of verbs, on the same sheet as every other anchored surface. */
 .menu-item {
@@ -76,7 +87,12 @@
   .menu-sheet[data-exiting] { animation: none; }
 }
 
-.menu-sheet { box-shadow: var(--shadow-2); }
+.menu-sheet {
+  background: var(--panel);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-2);
+}
 
 /* Context above the actions -- a sibling of the list, never a row in it. One
    rule underneath, the same weight the schematic world draws every divider

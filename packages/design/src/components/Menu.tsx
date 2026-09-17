@@ -157,7 +157,12 @@ function renderItem(item: Item): React.ReactNode {
   const body = item.items ? (
     <SubmenuTrigger key={item.id}>
       {row}
-      <AriaPopover className="menu-sheet surface-panel border border-border rounded-md min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-[60]">
+      {/* The surface -- background, border, radius -- lives on `.menu-sheet`
+          itself now, in `menu.css`, so it is not restated here as
+          utilities: two copies of the same surface is how the top-level
+          popover ended up with none at all. What stays inline is this
+          popover's own sizing, which the top-level one does not share. */}
+      <AriaPopover className="menu-sheet min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-[60]">
         <AriaMenu className="p-1 outline-none grid gap-[var(--border-width)]">
           {item.items.map(renderItem)}
         </AriaMenu>
