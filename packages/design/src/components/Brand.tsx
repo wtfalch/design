@@ -1,11 +1,12 @@
-import { BRAND_MARKS, BRAND_NAMES, type BrandName } from './brandMarks'
+import type { Mark } from './brandMarks'
 
 /**
  * A product's mark, at header size.
  *
- * One component for every wtfalch product: `name` picks the mark out of
- * `brandMarks.ts`, and adding a product is adding a row there. The default is
- * `otf` because it is the first, not because it is special.
+ * One component for every wtfalch product: `mark` is the path, which the
+ * product declares beside its themes. Until 0.17.0 `name` picked the mark out
+ * of a table in this package, which made every new product's logo a release
+ * here.
  *
  * `currentColor`, so the stylesheet decides the colour and a theme can move
  * it; the mark itself knows nothing about green. No `width` or `height`
@@ -26,33 +27,30 @@ import { BRAND_MARKS, BRAND_NAMES, type BrandName } from './brandMarks'
  * can still move it -- a second colour would be the one thing a theme could
  * not reach.
  *
- * A product's entry, `@wtfalch/design/<product>`, exports this with the
- * product's name as the default, so a header there writes `<Brand />` and
- * gets its own mark. Here the default is the first row.
+ * `bindProduct` returns this with the product's mark and name as the
+ * defaults, so a header there writes `<Brand />` and gets its own mark.
  */
 export default function Brand({
-  name = BRAND_NAMES[0],
+  mark,
   title,
   className,
 }: {
-  /** Which product's mark. */
-  name?: BrandName
+  /** The product's mark. */
+  mark: Mark
   /** The product's name, which is what a screen reader should say the header
    *  starts with. There is no text beside this to repeat it. */
-  title?: string
+  title: string
   className?: string
 }) {
-  const mark = BRAND_MARKS[name]
-  const said = title ?? name
   return (
     <svg
       className={`brand${className ? ` ${className}` : ''}`}
       viewBox={mark.view}
       fill="none"
       role="img"
-      aria-label={said}
+      aria-label={title}
     >
-      <title>{said}</title>
+      <title>{title}</title>
       {'fill' in mark ? (
         <path d={mark.d} fill="currentColor" fillRule={mark.fill} />
       ) : (

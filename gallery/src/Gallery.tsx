@@ -20,6 +20,7 @@
 import { useEffect, useState } from 'react'
 
 import { Brand, Select, TOKEN_KEYS } from '@wtfalch/design'
+import { galleryProduct } from './product'
 import { COMPONENTS } from './specimens'
 import { applyGalleryTheme, galleryThemes } from './theme'
 
@@ -220,7 +221,7 @@ export default function Gallery() {
     <div className={`spec-app${wide ? ' spec-wide' : ''}`}>
       <aside className="spec-rail">
         <div className="spec-brand">
-          <Brand className="g-brand" />
+          <Brand mark={galleryProduct.mark} title="@wtfalch/design" className="g-brand" />
           <span className="g-hint">components</span>
         </div>
 

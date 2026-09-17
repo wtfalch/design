@@ -1,9 +1,11 @@
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { BRAND_NAMES } from '../src/components/brandMarks'
-import { PRODUCTS, bindProduct, defineProduct, productTheme } from '../src/products'
-import { productStylesheet, themeId } from '../src/themes/css'
+import Brand from '../src/components/Brand'
+import { bindProduct, defineProduct, productTheme } from '../src/products'
+import { THEMES } from '../src/themes'
+import { productCss, themeId } from '../src/themes/css'
+import { sample } from './fixtures/product'
 
 /** A root element `applyTheme` can write to, in Node. */
 function fakeRoot() {
@@ -19,46 +21,31 @@ function fakeRoot() {
   return { el: el as unknown as HTMLElement, props, dataset: el.dataset }
 }
 
-describe('the products', () => {
-  it('one per mark, under the same name', () => {
-    expect(Object.keys(PRODUCTS)).toEqual(BRAND_NAMES)
-    for (const [name, p] of Object.entries(PRODUCTS)) expect(p.name).toBe(name)
+describe('a product, declared outside the package', () => {
+  it('defaults to one of its own themes, keyed as applyTheme would', () => {
+    expect(() => defineProduct({ ...sample, defaultTheme: 'paper' })).toThrow(/defaults to "paper"/)
+    expect(() =>
+      defineProduct({ ...sample, themes: { ...sample.themes, wrong: sample.themes.sample } }),
+    ).toThrow(/keyed "wrong"/)
   })
 
-  it('each defaults to one of its own themes, keyed as applyTheme would', () => {
-    for (const p of Object.values(PRODUCTS)) expect(defineProduct(p)).toBe(p)
-    expect(() => defineProduct({ ...PRODUCTS.valet, defaultTheme: 'paper' })).toThrow(
-      /defaults to "paper"/,
+  it("refuses a palette that restates the product's identity", () => {
+    // The identity is the layer under the palettes. valet's two each carried
+    // the same font and corner block once, and a theme shared between products
+    // would have shown the base font on valet wherever it kept quiet.
+    const loud = { ...sample.themes.sample, tokens: { '--radius': '20px' } }
+    expect(() => defineProduct({ ...sample, themes: { ...sample.themes, sample: loud } })).toThrow(
+      /restates --radius/,
     )
   })
 
-  it("a palette does not restate its product's identity", () => {
-    // The identity is the layer under the palettes. valet's two each carried
-    // the same font and corner block once, and a theme shared between products
-    // would have shown otf's font on valet wherever it kept quiet.
-    for (const p of Object.values(PRODUCTS)) {
-      const identity = Object.keys(p.identity)
-      for (const [id, t] of Object.entries(p.themes)) {
-        for (const key of Object.keys(t.tokens)) {
-          expect(identity, `${id} restates ${key}`).not.toContain(key)
-        }
-      }
-    }
-  })
-
-  it("otf's identity is the base values, and valet's is Plex and sharper corners", () => {
-    expect(PRODUCTS.otf.identity).toEqual({})
-    expect(PRODUCTS.valet.identity['--radius']).toBe('4px')
-    expect(PRODUCTS.valet.identity['--font']).toContain('IBM Plex Sans')
-  })
-
   it('a theme as the product wears it is the palette over the identity', () => {
-    const t = productTheme(PRODUCTS.valet, 'valet-night')
-    expect(themeId(t)).toBe('valet-night')
+    const t = productTheme(sample, 'sample-night')
+    expect(themeId(t)).toBe('sample-night')
     expect(t.tokens['--radius']).toBe('4px')
     expect(t.tokens['--accent']).toBe('#8f88ff')
     // a theme may still change the identity on purpose
-    const loud = productTheme(PRODUCTS.valet, {
+    const loud = productTheme(sample, {
       name: 'Loud',
       note: '',
       scheme: 'light',
@@ -67,54 +54,77 @@ describe('the products', () => {
     expect(loud.tokens['--radius']).toBe('20px')
     expect(loud.tokens['--font']).toContain('IBM Plex Sans')
     // an id the product dropped comes up as the product's default, not the package's
-    expect(productTheme(PRODUCTS.valet, 'nope').name).toBe('valet')
+    expect(productTheme(sample, 'nope').name).toBe('Sample')
   })
 
   it("a bound applyTheme writes the identity under the palette, so it holds without the product's CSS", () => {
-    const valet = bindProduct(PRODUCTS.valet)
+    const bound = bindProduct(sample)
     const { el, props, dataset } = fakeRoot()
-    valet.applyTheme(undefined, el)
-    expect(dataset.theme).toBe('valet')
+    bound.applyTheme(undefined, el)
+    expect(dataset.theme).toBe('sample')
     expect(props.get('--radius')).toBe('4px')
     expect(props.get('--accent')).toBe('#4f46e5')
-    valet.applyTheme('valet-night', el)
-    expect(dataset.theme).toBe('valet-night')
+    bound.applyTheme('sample-night', el)
+    expect(dataset.theme).toBe('sample-night')
     expect(props.get('--radius')).toBe('4px')
     expect(props.get('--accent')).toBe('#8f88ff')
-    expect(valet.DEFAULT_THEME).toBe('valet')
-    expect(Object.keys(valet.THEMES)).toEqual(['valet', 'valet-night'])
+    expect(bound.DEFAULT_THEME).toBe('sample')
+    expect(Object.keys(bound.THEMES)).toEqual(['system', 'sample', 'sample-night'])
   })
 
-  it("a bound Brand is the product's mark, and still takes a name", () => {
-    const { Brand } = bindProduct(PRODUCTS.valet)
-    const own = renderToStaticMarkup(createElement(Brand))
+  it("a bound Brand is the product's mark and name, and still takes either", () => {
+    const { Brand: Bound } = bindProduct(sample)
+    const own = renderToStaticMarkup(createElement(Bound))
     expect(own).toContain('fill-rule="evenodd"')
-    expect(own).toContain('aria-label="valet"')
-    expect(renderToStaticMarkup(createElement(Brand, { name: 'otf' }))).toContain(
-      'stroke-width="96"',
-    )
+    expect(own).toContain('aria-label="sample"')
+    const stroked = { view: '0 0 10 10', d: 'M1 1L9 9', stroke: 2 }
+    const other = renderToStaticMarkup(createElement(Bound, { mark: stroked, title: 'other' }))
+    expect(other).toContain('stroke-width="2"')
+    expect(other).toContain('aria-label="other"')
   })
 
-  it("a product's stylesheet is tokens, identity, default, components, themes, in that order", () => {
-    const css = productStylesheet(PRODUCTS.valet, ':root{--x:1}', '.card{}')
+  it('Brand draws the mark it is handed, stroked or filled', () => {
+    const html = renderToStaticMarkup(
+      createElement(Brand, { mark: { view: '0 0 10 10', d: 'M1 1L9 9', stroke: 3 }, title: 'x' }),
+    )
+    expect(html).toContain('viewBox="0 0 10 10"')
+    expect(html).toContain('stroke-width="3"')
+    expect(html).toContain('<title>x</title>')
+  })
+})
+
+describe('productCss', () => {
+  it('writes the identity, then the default, then one rule per theme', () => {
+    const css = productCss(sample)
     const at = (s: string) => {
       const i = css.indexOf(s)
       expect(i, s).toBeGreaterThan(-1)
       return i
     }
-    expect(at(':root{--x:1}')).toBeLessThan(at(':root{--font:'))
-    expect(at(':root{--font:')).toBeLessThan(at(':root:not([data-theme]){--bg:#f4f5f8;'))
-    expect(at(':root:not([data-theme])')).toBeLessThan(at('.card{}'))
-    expect(at('.card{}')).toBeLessThan(at(":root[data-theme='valet']{"))
-    expect(css).toContain(":root[data-theme='valet-night']{")
+    expect(at('html:root{--font:')).toBeLessThan(at(':root:not([data-theme]){--bg:#f4f5f8;'))
+    expect(at(':root:not([data-theme])')).toBeLessThan(at(":root[data-theme='sample']{"))
+    expect(css).toContain(":root[data-theme='sample-night']{")
     expect(css).toContain('color-scheme:light}')
+    for (const [key, value] of Object.entries(sample.themes['sample-night'].tokens)) {
+      expect(css).toContain(`${key}:${value}`)
+    }
   })
 
-  it("otf's stylesheet writes no identity and no default, because the base is otf and system is a media query", () => {
-    const css = productStylesheet(PRODUCTS.otf, ':root{--x:1}', '.card{}')
-    expect(css).not.toContain(':root{--font')
-    expect(css).not.toContain(':root:not([data-theme])')
-    expect(css).toContain(":root[data-theme='night']{")
-    expect(css).toContain(":root[data-theme='paper']{")
+  it('beats tokens.css with the identity and loses to a theme, wherever the app puts it', () => {
+    // Specificity, not order: `html:root` is (0,1,1), the base `:root` is
+    // (0,1,0) and a theme's `:root[data-theme]` is (0,2,0). The package used
+    // to write the identity as `:root` and win by coming second in one file
+    // it built; an app placing a string cannot promise second.
+    expect(productCss(sample)).not.toMatch(/(^|\n):root\{/)
+  })
+
+  it('writes no identity, no default and no rule for system when there is nothing to say', () => {
+    const plain = defineProduct({
+      ...sample,
+      identity: {},
+      themes: { system: THEMES.system },
+      defaultTheme: 'system',
+    })
+    expect(productCss(plain)).toBe('')
   })
 })

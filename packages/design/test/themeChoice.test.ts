@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { PRODUCTS } from '../src/products'
 import { THEME_STORAGE_KEY, themeChoiceScript, themeChoices } from '../src/themes/choice'
+import { sample } from './fixtures/product'
 
 /**
  * The script is a string that runs before anything else on the page, so it
@@ -11,36 +11,37 @@ import { THEME_STORAGE_KEY, themeChoiceScript, themeChoices } from '../src/theme
  */
 describe('themeChoiceScript', () => {
   it('offers every theme the product declares, in order', () => {
-    expect(themeChoices('otf').map((c) => c.id)).toEqual(Object.keys(PRODUCTS.otf.themes))
-    expect(themeChoices('valet').map((c) => c.id)).toEqual(Object.keys(PRODUCTS.valet.themes))
+    expect(themeChoices(sample).map((c) => c.id)).toEqual(['system', 'sample', 'sample-night'])
   })
 
   it('labels a choice with the theme’s own name, rather than a second copy', () => {
-    for (const c of themeChoices('otf')) {
-      expect(c.label).toBe(PRODUCTS.otf.themes[c.id].name)
+    for (const c of themeChoices(sample)) {
+      expect(c.label).toBe(sample.themes[c.id].name)
     }
   })
 
   it('drops an id the product does not have, rather than throwing at first paint', () => {
-    expect(themeChoices('otf', ['night', 'sepia']).map((c) => c.id)).toEqual(['night'])
+    expect(themeChoices(sample, ['sample-night', 'sepia']).map((c) => c.id)).toEqual([
+      'sample-night',
+    ])
   })
 
   it('falls back to an id it actually offers', () => {
     /* The bug worth keeping from the hand-written copies: a browser holding
        `sepia` from a palette the app dropped must not render unthemed. */
-    const script = themeChoiceScript('otf', { only: ['night'] })
-    expect(script).toContain('["night"]')
-    expect(script).toContain('"night"')
+    const script = themeChoiceScript(sample, { only: ['sample-night'] })
+    expect(script).toContain('["sample-night"]')
     expect(script).not.toContain('"system"')
+    expect(script).not.toContain('"sample"')
   })
 
   it('names the shared key by default and takes an override', () => {
-    expect(themeChoiceScript('otf')).toContain(JSON.stringify(THEME_STORAGE_KEY))
-    expect(themeChoiceScript('otf', { storageKey: 'valet-theme' })).toContain('"valet-theme"')
+    expect(themeChoiceScript(sample)).toContain(JSON.stringify(THEME_STORAGE_KEY))
+    expect(themeChoiceScript(sample, { storageKey: 'app-theme' })).toContain('"app-theme"')
   })
 
   it('survives a browser that throws on localStorage', () => {
-    const script = themeChoiceScript('otf')
+    const script = themeChoiceScript(sample)
     expect(script).toContain('try{')
     expect(script).toContain('catch(e){}')
   })
@@ -49,21 +50,21 @@ describe('themeChoiceScript', () => {
     const run = (stored: string | null) => {
       const el = { dataset: {} as Record<string, string> }
       const localStorage = { getItem: () => stored }
-      new Function('document', 'localStorage', themeChoiceScript('otf'))(
+      new Function('document', 'localStorage', themeChoiceScript(sample))(
         { documentElement: el },
         localStorage,
       )
       return el.dataset.theme
     }
-    expect(run('night')).toBe('night')
-    expect(run('paper')).toBe('paper')
-    expect(run('sepia')).toBe(PRODUCTS.otf.defaultTheme)
-    expect(run(null)).toBe(PRODUCTS.otf.defaultTheme)
+    expect(run('sample-night')).toBe('sample-night')
+    expect(run('system')).toBe('system')
+    expect(run('sepia')).toBe(sample.defaultTheme)
+    expect(run(null)).toBe(sample.defaultTheme)
   })
 
   it('runs to the default when localStorage throws', () => {
     const el = { dataset: {} as Record<string, string> }
-    new Function('document', 'localStorage', themeChoiceScript('valet'))(
+    new Function('document', 'localStorage', themeChoiceScript(sample))(
       { documentElement: el },
       {
         getItem() {

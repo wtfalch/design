@@ -38,9 +38,6 @@
  * becoming a fourth, undocumented category.
  */
 
-import { OTF_THEMES } from '../products/otf'
-import { VALET_THEMES } from '../products/valet'
-
 /** Every token a theme may set. */
 export interface ThemeTokens {
   /* ---- colour ------------------------------------------------------- */
@@ -271,19 +268,37 @@ export function defineTheme(theme: Theme): Theme {
 }
 
 /**
+ * `system` is a theme, not a mode. A `prefers-color-scheme` block that
+ * overrides `:root` unconditionally means choosing a dark theme on a
+ * light-mode laptop gets silently repainted; that media query is scoped to
+ * this theme in `_system-light.css`, so following the OS is a choice among the
+ * others rather than a rule above them.
+ *
+ * It is the one theme the package keeps. Its palette is the base and its light
+ * half is a rule in the package's stylesheet, so it cannot live anywhere else;
+ * a product offers it by putting `THEMES.system` among its own.
+ */
+const system: Theme = {
+  name: 'System',
+  note: 'Follows your OS between light and dark',
+  scheme: 'dark',
+  // Empty on purpose: this is the one theme that must *not* state a palette,
+  // because the `prefers-color-scheme` block is scoped to it and needs the
+  // base values to fall through. Its swatch is a special case.
+  tokens: {},
+}
+
+/**
  * Every theme the package knows, keyed by the name a consumer applies.
  *
- * Per product since 0.3.0. A theme is part of a product's identity the way its
- * mark is, and 0.2.0 already made `Brand` the home of every product's mark by
- * name; keeping each product's palette in its own repo meant each repo
- * re-deriving first paint, the contrast measurement and a page to look at it
- * on. So `products/otf.ts` holds otf's three and `products/valet.ts` valet's two,
- * this is the union, and the contrast test and the gallery read the union.
- *
- * A consumer that wants only its own imports the product module, or the CSS
- * `build-products.mjs` generates from it, and bundles nobody else's.
+ * From 0.3.0 to 0.16.2 this was the union of every product's themes: otf's
+ * three and valet's two, declared in `src/products/`. A theme is part of a
+ * product's identity the way its mark is, and the surfaces multiplied until
+ * every new palette was a release here and a pin bump in every app. The
+ * products and their themes live in their own repos now, and this is the
+ * package's own: `system`.
  */
-export const THEMES: Record<string, Theme> = { ...OTF_THEMES, ...VALET_THEMES }
+export const THEMES: Record<string, Theme> = { system }
 
 export const DEFAULT_THEME = 'system'
 
@@ -310,9 +325,9 @@ export function applyTheme(
   el: HTMLElement = document.documentElement,
 ): void {
   /* A registered name, or a `Theme` object straight from `defineTheme`.
-     The second is how an app that is not otf applies its own palette without
-     first pushing it into a registry it does not own -- `THEMES` is the
-     built-ins, and a consumer's theme is theirs. */
+     The second is how an app applies its own palette without first pushing
+     it into a registry it does not own -- `THEMES` is the package's, and a
+     consumer's theme is theirs. */
   const resolved = typeof theme === 'string' ? (THEMES[theme] ?? THEMES[DEFAULT_THEME]) : theme
   const name = typeof theme === 'string' ? theme : resolved.name.toLowerCase().replace(/\s+/g, '-')
   for (const key of TOKEN_KEYS) {

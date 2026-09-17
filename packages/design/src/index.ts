@@ -18,10 +18,8 @@
  */
 
 export { default as Brand } from './components/Brand'
-/** Every product's mark by name, and the path itself for an icon cut from
- *  the same drawing. */
-export { BRAND_MARKS, BRAND_NAMES } from './components/brandMarks'
-export type { BrandName, FillMark, Mark, StrokeMark } from './components/brandMarks'
+/** The shape of a mark. A product declares its own beside its themes. */
+export type { FillMark, Mark, StrokeMark } from './components/brandMarks'
 export { default as Button } from './components/Button'
 /** The union: the button's props, or the DOM's when `asChild` hands the
  *  element to the caller. `ButtonOwnProps` is the button-only half, for a
@@ -162,14 +160,15 @@ export {
 } from './themes'
 export type { Theme, ThemeTokens } from './themes'
 /** A theme as the rule a consumer ships for first paint, generated so it
- *  cannot drift from the object; and a product's whole stylesheet the same way. */
-export { productCss, productStylesheet, themeCss, themeId } from './themes/css'
+ *  cannot drift from the object; and a product's rules the same way. */
+export { productCss, themeCss, themeId } from './themes/css'
 
 /** The measurement behind the contrast rule, for a theme that is yours. */
-export { luminance, ratio } from './contrast'
+export { BASE_PALETTE, CONTRAST_PAIRS, contrastFailures, luminance, ratio } from './contrast'
+export type { ContrastPair } from './contrast'
 
-/** The products: the layer between the system and a theme. Each also ships
- *  as its own entry, `@wtfalch/design/<name>` and `<name>.css`, where `Brand`,
- *  `THEMES` and `applyTheme` are that product's. */
-export { PRODUCTS, bindProduct, defineProduct, productTheme } from './products'
+/** The products: the layer between the system and a theme. A product lives in
+ *  the app that wears it, declared with `defineProduct` and bound once with
+ *  `bindProduct`, whose `Brand`, `THEMES` and `applyTheme` are that product's. */
+export { bindProduct, defineProduct, productTheme } from './products'
 export type { Product } from './products'

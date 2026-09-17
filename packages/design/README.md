@@ -56,68 +56,83 @@ is always ours.
 
 ## Products
 
-A site is one product, so it imports its product and everything it touches is
-its own:
+A product is declared in the app that wears it. The package supplies the shape
+and the machinery; the mark, the identity and the themes are the app's.
 
 ```ts
-import '@wtfalch/design/valet.css'   // the vocabulary, valet's identity, the components, valet's themes
-import { Brand, Button, applyTheme } from '@wtfalch/design/valet'
-// the same components; Brand is valet's badge, applyTheme knows valet's themes
+// src/design.ts, in the app
+import { THEMES, bindProduct, defineProduct } from '@wtfalch/design'
+
+export const product = defineProduct({
+  name: 'acme',
+  mark: { view: '0 0 24 24', d: 'M4 4H20V20H4Z', stroke: 2 },
+  identity: { '--radius': '4px' },
+  themes: { system: THEMES.system, dusk: { name: 'Dusk', note: 'Dark', scheme: 'dark', tokens: { /* ... */ } } },
+  defaultTheme: 'system',
+})
+
+export const { Brand, THEMES: APP_THEMES, applyTheme } = bindProduct(product)
+```
+
+```tsx
+// the stylesheet, and the product's rules beside it
+import '@wtfalch/design/tokens.css'
+import '@wtfalch/design/styles.css'
+import { productCss } from '@wtfalch/design'
+
+<style dangerouslySetInnerHTML={{ __html: productCss(product) }} />   // in <head>
 ```
 
 Three layers, each falling back to the one under it:
 
 | | |
 |---|---|
-| **the system** | The components, the base values in `tokens.css`, the shared icons and illustrations. |
-| **the product** | Its mark, and its identity: the tokens that make it itself under every theme — font, shape, density. On `:root` in the product's stylesheet, so a theme that is silent on them gets the product, not otf. `src/products/<name>.ts`. |
+| **the system** | The components, the base values in `tokens.css`, the shared icons and illustrations, and one theme: `system`. |
+| **the product** | Its mark, and its identity: the tokens that make it itself under every theme — font, shape, density. Written under `html:root` by `productCss`, so it beats the base values wherever the app puts the string. |
 | **the theme** | A palette and a colour scheme, plus anything it deliberately changes. One `:root[data-theme='<id>']` rule each, generated from the object. |
 
 The middle layer is what lets a theme be shared between products: it names its
 colours and inherits the identity of whichever product wears it. Before it
 existed, valet's two palettes each restated valet's font and corners, and a
-palette written for two products would have shown otf's font on valet wherever
-it kept quiet.
+palette written for two products would have shown the base font on valet
+wherever it kept quiet.
 
 The product's default theme is also written on `:root` when no `data-theme` is
 set, so the first paint is right with no attribute at all; set the attribute
 before the bundle loads only to restore a theme somebody picked (see First
-paint). otf's default is `system`, a `prefers-color-scheme` rule rather than a
-palette, so otf still sets the attribute.
+paint). A product whose default is `system`, a `prefers-color-scheme` rule
+rather than a palette, still sets the attribute.
 
-The main entry is the neutral view of all of it: `PRODUCTS` by name, `THEMES`
-as the union every product's picker and the contrast test read,
-`productTheme(product, id)` for a theme as a product wears it, `bindProduct`
-for a product defined outside this package, and `productStylesheet` for its
-CSS.
+**Why the products left.** From 0.3.0 to 0.16.2 otf and valet were declared in
+this package, each with an entry (`@wtfalch/design/otf`) and a stylesheet
+(`otf.css`). Every new surface brought its own palette, and every palette was a
+release here and a pin bump in every app. 0.17.0 removed both entries, the
+`PRODUCTS` registry and the table of marks. `THEMES` is `system` alone.
 
 ```ts
-import { PRODUCTS, applyTheme, productTheme } from '@wtfalch/design'
+import { applyTheme, productTheme } from '@wtfalch/design'
 
-applyTheme(productTheme(PRODUCTS.valet, 'valet-night'))   // valet night, on valet's identity
-applyTheme('valet-night')                                  // the palette alone, over the base
-applyTheme(productTheme(PRODUCTS.valet), myEl)             // valet's default, on a subtree
+applyTheme(productTheme(product, 'dusk'))          // dusk, on the product's identity
+applyTheme(productTheme(product), myEl)            // the product's default, on a subtree
 ```
 
 ### Writing a theme
 
 A theme is a `Partial<ThemeTokens>` with a name, a note and a scheme: name the
 tokens you change, the rest inherit from the product's identity and then from
-`tokens.css`. A theme naming three tokens is valid. A product's themes go in
-`src/products/<name>.ts` beside its identity, keyed by the id `applyTheme`
-derives from the name (lowercased, spaces to hyphens); `products.test.ts`
-refuses a key that disagrees, a palette that restates its product's identity,
-and a default that is not one of the product's themes. `build-products.mjs`
-writes `dist/<name>.css` from the objects at build time.
+`tokens.css`. A theme naming three tokens is valid. A product's themes are
+keyed by the id `applyTheme` derives from the name (lowercased, spaces to
+hyphens); `defineProduct` throws on a key that disagrees, a palette that
+restates its product's identity, and a default that is not one of the
+product's themes.
 
 **A typo is a compile error.** `tokens` is a `Partial<ThemeTokens>`, so
 `'--densty'` fails to build rather than silently doing nothing — which is the
 failure a string-keyed map produces at run time, invisibly.
 
-**A product names its font and does not ship it.** valet's identity sets
+**A product names its font and does not ship it.** An identity can set
 `--font` to read a `--font-sans` variable the app defines with whatever loads
-its fonts, and falls back to the family by name. The gallery vendors the two
-families valet names so the specimens are photographed in them.
+its fonts, and fall back to the family by name.
 
 ## The three kinds of token
 
@@ -134,16 +149,21 @@ becoming a fourth, undocumented category.
 ## The measurement ships
 
 ```ts
-import { ratio } from '@wtfalch/design'
+import { contrastFailures, productTheme, ratio } from '@wtfalch/design'
 ratio('#6d28d9', '#ffffff') // 6.30 -- the label on your primary button
+
+// in the app's test suite, once per theme
+expect(contrastFailures(productTheme(product, 'dusk').tokens)).toEqual([])
 ```
 
-`test/contrast.test.ts` measures every built-in theme, pair by pair, with the
-WCAG 2 formula: text on the page and on both panels, hints, the label on the
-primary button, all four status colours, and the two boundaries that want
-3:1. On its first run it found the built-in information blue at 3.96:1 on
-white. `ratio` and `luminance` are exported so the theme you write -- the one
-nobody here will ever look at -- can be held to the same numbers.
+`contrastFailures` measures a palette, pair by pair, with the WCAG 2 formula:
+text on the page and on both panels, hints, the label on the primary button,
+all four status colours, and the two boundaries that want 3:1
+(`CONTRAST_PAIRS`). A sparse theme is laid over `BASE_PALETTE`, the colours
+`tokens.css` states, the way the page lays it over the stylesheet. On its first
+run the measurement found the built-in information blue at 3.96:1 on white.
+The package measures `system` in both schemes; every other theme is written in
+an app, and that app's tests are the only place it will be measured.
 
 ## Two rules that outrank any theme
 
@@ -178,16 +198,15 @@ Your server stays the source of truth. `localStorage` only beats the paint.
 
 ## Marks
 
-Every product's mark, by name, in `brandMarks.ts`. otf's is one stroke. valet's
-is a filled badge: the jacket with the shirt cut out of it and a bow tie in the
-cut, one path under `evenodd` so the surface shows through the shirt. Both are
-`currentColor`, so the stylesheet decides the colour and a theme can move it.
+A product's mark is a `Mark`: one path in its own ink box, stroked (`stroke`,
+the weight it was drawn at) or filled (`fill`, the rule that decides which
+subpaths are holes). `Brand` draws it in `currentColor`, so the stylesheet
+decides the colour and a theme can move it.
 
 ```tsx
-import { BRAND_MARKS, Brand } from '@wtfalch/design'
+import { Brand } from '@wtfalch/design'
 
-<Brand name="valet" />   // anywhere; a product entry's Brand defaults to its own
-BRAND_MARKS.valet.d      // the path, for a favicon or an app icon cut from the same drawing
+<Brand mark={product.mark} title="acme" />   // anywhere; a bound Brand defaults to both
 ```
 
 Icons and illustrations are the system's, shared by every product the way
@@ -230,9 +249,8 @@ is the difference from `Markdown`, which parses and must sanitise.
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
 It came out of [otf](https://github.com/wtfalch/otf), which is its first consumer;
-valet is the second. A product is a layer: otf and valet each ship as one
-stylesheet and one entry, with their identity under their themes and their
-mark in the table.
+valet is the second. A product is a layer, declared in the app that wears it:
+its mark, its identity under its themes, and the rules `productCss` writes.
 
 Requires React 19. Behaviour comes from
 [React Aria Components](https://react-spectrum.adobe.com/react-aria/); every

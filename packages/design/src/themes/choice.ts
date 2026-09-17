@@ -26,8 +26,7 @@
  * for that check.
  */
 
-import type { BrandName } from '../components/brandMarks'
-import { PRODUCTS, type Product } from '../products'
+import type { Product } from '../products'
 
 /** Where the choice lives. One key across the estate, so a person who picked
  *  Night on one app is not asked again on the next one under the same
@@ -42,10 +41,6 @@ export interface ThemeChoice {
   note: string
 }
 
-function resolve(product: BrandName | Product): Product {
-  return typeof product === 'string' ? PRODUCTS[product] : product
-}
-
 /**
  * What this product offers, in the order it declared them.
  *
@@ -54,11 +49,8 @@ function resolve(product: BrandName | Product): Product {
  * rather than thrown on: the list is presentation, and a picker missing a row
  * is better than a page that will not render.
  */
-export function themeChoices(
-  product: BrandName | Product,
-  only?: readonly string[],
-): ThemeChoice[] {
-  const p = resolve(product)
+export function themeChoices(product: Product, only?: readonly string[]): ThemeChoice[] {
+  const p = product
   const ids = only ? only.filter((id) => id in p.themes) : Object.keys(p.themes)
   return ids.map((id) => ({ id, label: p.themes[id].name, note: p.themes[id].note }))
 }
@@ -66,7 +58,7 @@ export function themeChoices(
 /**
  * The blocking script, as a string to put in a `<script>` in `<head>`.
  *
- * `dangerouslySetInnerHTML={{ __html: themeChoiceScript('otf') }}` in a Next
+ * `dangerouslySetInnerHTML={{ __html: themeChoiceScript(product) }}` in a Next
  * root layout, above everything. It reads the stored id, checks it against
  * what this app offers, and writes `data-theme` on `<html>`.
  *
@@ -76,10 +68,10 @@ export function themeChoices(
  * to render at all.
  */
 export function themeChoiceScript(
-  product: BrandName | Product,
+  product: Product,
   options: { only?: readonly string[]; storageKey?: string } = {},
 ): string {
-  const p = resolve(product)
+  const p = product
   const ids = themeChoices(product, options.only).map((c) => c.id)
   const key = JSON.stringify(options.storageKey ?? THEME_STORAGE_KEY)
   const fallback = JSON.stringify(
@@ -91,10 +83,10 @@ export function themeChoiceScript(
 /** What the script would have written, for code that needs the same answer
  *  after hydration. Reads the same key and applies the same fallback. */
 export function storedTheme(
-  product: BrandName | Product,
+  product: Product,
   options: { only?: readonly string[]; storageKey?: string } = {},
 ): string {
-  const p = resolve(product)
+  const p = product
   const ids = themeChoices(product, options.only).map((c) => c.id)
   const fallback = ids.includes(p.defaultTheme) ? p.defaultTheme : (ids[0] ?? p.defaultTheme)
   try {
