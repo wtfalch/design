@@ -1013,3 +1013,456 @@ test.describe('Toggle · async', () => {
     expect(t.easing.startsWith('linear(')).toBe(true)
   })
 })
+
+test.describe('Menu', () => {
+  const ACTIONS = { c: 'menu', v: 'On a message' }
+
+  test('Enter, Space and ArrowDown all open it, on the first item', async ({ page }) => {
+    for (const key of ['Enter', 'Space', 'ArrowDown']) {
+      await page.goto(specimenUrl(ACTIONS, 'system'))
+      await themeApplied(page, 'system')
+      const trigger = page.getByRole('button', { name: 'Actions' })
+      await trigger.focus()
+      await page.keyboard.press(key)
+
+      await expect(page.getByRole('menu'), `${key} did not open the menu`).toBeVisible()
+      await expect(page.getByRole('menuitem').first()).toBeFocused()
+    }
+  })
+
+  test('the arrows move between items, skipping the rule', async ({ page }) => {
+    await page.goto(specimenUrl(ACTIONS, 'system'))
+    await themeApplied(page, 'system')
+    await page.getByRole('button', { name: 'Actions' }).focus()
+    await page.keyboard.press('ArrowDown')
+
+    const items = ['Reply', 'Forward', 'Move to', 'Delete']
+    await expect(page.getByRole('menuitem', { name: items[0] })).toBeFocused()
+    for (const name of items.slice(1)) {
+      await page.keyboard.press('ArrowDown')
+      // `Delete` is `separated` -- a rule sits between it and `Move to`, and the
+      // rule is a `role="separator"`, not a stop, so the arrow must land past it
+      // in one press rather than needing two.
+      await expect(page.getByRole('menuitem', { name })).toBeFocused()
+    }
+  })
+
+  test('Enter runs the highlighted item, closing the menu and returning focus', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(ACTIONS, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Actions' })
+    await trigger.focus()
+    await page.keyboard.press('ArrowDown')
+    await expect(page.getByRole('menuitem', { name: 'Reply' })).toBeFocused()
+
+    /* MAIL_MENU's items carry no `onAction` in this specimen, so the
+       observable result of activating one is the menu closing and focus
+       coming back -- not a side effect in the page, which none of these rows
+       has. */
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
+
+  test('Escape closes it, and focus returns to the trigger', async ({ page }) => {
+    await page.goto(specimenUrl(ACTIONS, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Actions' })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
+})
+
+test.describe('Command', () => {
+  const PALETTE = { c: 'command', v: 'Open it' }
+
+  const open = async (page: import('@playwright/test').Page) => {
+    await page.goto(specimenUrl(PALETTE, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Open palette' })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('dialog')).toBeVisible()
+    return trigger
+  }
+
+  test('opens with focus already in the field', async ({ page }) => {
+    await open(page)
+    await expect(page.getByRole('searchbox')).toBeFocused()
+  })
+
+  test('typing filters by keyword, and the empty state names the query', async ({ page }) => {
+    await open(page)
+    const input = page.getByRole('searchbox')
+
+    // "trash" is a keyword on Delete, searched but never displayed.
+    await page.keyboard.type('trash')
+    await expect(page.getByRole('option')).toHaveCount(1)
+    await expect(page.getByRole('option', { name: /Delete/ })).toBeVisible()
+    await expect(input, 'the field keeps focus while filtering').toBeFocused()
+
+    for (let i = 0; i < 'trash'.length; i++) await page.keyboard.press('Backspace')
+    await page.keyboard.type('archve')
+    await expect(page.locator('.cmd-empty')).toContainText('Nothing matches')
+    await expect(page.locator('.cmd-empty strong')).toHaveText('archve')
+  })
+
+  test('the arrows move the highlighted option without moving focus off the field', async ({
+    page,
+  }) => {
+    await open(page)
+    const input = page.getByRole('searchbox')
+
+    await page.keyboard.press('ArrowDown')
+    await expect
+      .poll(() => input.getAttribute('aria-activedescendant'), {
+        message: 'the first arrow highlights something',
+      })
+      .not.toBeNull()
+    const first = await input.getAttribute('aria-activedescendant')
+    await expect(input, 'the arrows move a highlight, not real focus').toBeFocused()
+
+    await page.keyboard.press('ArrowDown')
+    await expect
+      .poll(() => input.getAttribute('aria-activedescendant'), {
+        message: 'a second arrow moves off the first row',
+      })
+      .not.toBe(first)
+    await expect(input).toBeFocused()
+  })
+
+  test('Enter runs the highlighted command and closes it, and focus returns', async ({ page }) => {
+    const trigger = await open(page)
+    await page.keyboard.type('trash')
+    await expect(page.getByRole('option', { name: /Delete/ })).toBeVisible()
+    await page.keyboard.press('Enter')
+
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.getByText('Ran: Delete')).toBeVisible()
+    await expect(trigger).toBeFocused()
+  })
+
+  test('Escape closes it without running anything, and focus returns', async ({ page }) => {
+    /* Escape while the field holds a query clears the query first -- standard
+       combobox behaviour, and a second Escape is what closes it from there.
+       This is the plain case: nothing typed, so the first Escape closes. */
+    const trigger = await open(page)
+    await page.keyboard.press('Escape')
+
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.getByText(/^Ran:/)).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
+})
+
+test.describe('Popover', () => {
+  test('Enter opens it, and focus moves inside', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'popover', v: 'A pane of controls' }, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Filter' })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toBeVisible()
+    /* Nothing in this pane declares `autoFocus`, so React Aria's own default
+       lands focus on the dialog surface itself -- still "inside" per the
+       specimen's note, and what makes Tab (below) land on the first real
+       control rather than needing a second press to enter the pane. */
+    const inside = () =>
+      page.evaluate(() =>
+        document.querySelector('[role="dialog"]')?.contains(document.activeElement),
+      )
+    expect(await inside(), 'focus moves inside on open').toBe(true)
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('switch').first(), 'Tab reaches the first control').toBeFocused()
+  })
+
+  test('Escape closes it, and focus returns to the trigger', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'popover', v: 'A pane of controls' }, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Filter' })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('dialog')).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
+
+  test('a control inside can dismiss it by keyboard, and focus returns', async ({ page }) => {
+    await page.goto(specimenUrl({ c: 'popover', v: 'Dismissed by its own control' }, 'system'))
+    await themeApplied(page, 'system')
+    const trigger = page.getByRole('button', { name: 'Move to…' })
+    await trigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('dialog')).toBeVisible()
+
+    await page.keyboard.press('Tab')
+    const archive = page.getByRole('button', { name: 'Archive' })
+    await expect(archive, 'Tab reaches the pane’s own control').toBeFocused()
+
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(trigger).toBeFocused()
+  })
+})
+
+test.describe('Tour', () => {
+  /* The gallery's own specimen has exactly one stop, so there is no second
+     step to walk `Next` to and no `Back` control to press -- the component
+     draws only `Skip` and `Next`/`Done`. What is tested is what a single-stop
+     walk actually promises: the card takes focus, Tab reaches both buttons,
+     and Enter, Space or Escape all end it. */
+  const STOP = { c: 'tour', v: 'Pointing at a control' }
+
+  test.fixme('the card takes focus on open, named by the step title', async ({ page }) => {
+    /* Defect: packages/design/src/components/Tour.tsx:109-112 -- the focus
+       effect depends on `[at]` alone, which is still 0 on the very first
+       commit, and at that point `card.current` is null because the card has
+       not yet rendered (the first render returns `null` before `box` is
+       measured). The effect never re-runs for a first stop -- only a later
+       step change re-fires it, once the ref is already attached -- so a
+       tour's opening step never receives focus and Tab, Enter and Escape
+       all miss it until something else focuses the page first. */
+    await page.goto(specimenUrl(STOP, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.getByRole('dialog', { name: 'Applets live here' })).toBeFocused()
+  })
+
+  /* The three tests below focus the card by hand first, to check the
+     keyboard handling *inside* the tour independently of the open-focus
+     defect above -- they keep covering Tab order, Next/Done and Escape once
+     the fix lands, without depending on it to do so. */
+  test('Tab reaches Skip, then the single stop’s Done', async ({ page }) => {
+    await page.goto(specimenUrl(STOP, 'system'))
+    await themeApplied(page, 'system')
+    await page.locator('.tour-card').focus()
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('button', { name: 'Skip' })).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('button', { name: 'Done' })).toBeFocused()
+  })
+
+  /* `TourDemo`'s own `onDone` bumps a `key` and remounts a fresh tour at once
+     so the specimen stays open for the next screenshot, rather than going
+     blank -- so a finished walk never actually drops the dialog count to
+     zero here. `markTourSeen` is the side effect that survives that remount
+     and is what proves the key actually ended the walk rather than doing
+     nothing. */
+  test('Enter and ArrowRight both end a one-stop tour', async ({ page }) => {
+    for (const key of ['Enter', 'ArrowRight']) {
+      await page.goto(specimenUrl(STOP, 'system'))
+      await themeApplied(page, 'system')
+      await page.evaluate(() => localStorage.removeItem('design-tour-seen'))
+      const card = page.locator('.tour-card')
+      await expect(card).toBeVisible()
+      await card.focus()
+      await page.keyboard.press(key)
+      await expect
+        .poll(() => page.evaluate(() => localStorage.getItem('design-tour-seen')), {
+          message: `${key} did not end the tour`,
+        })
+        .toBe('1')
+    }
+  })
+
+  test('Escape ends it too', async ({ page }) => {
+    await page.goto(specimenUrl(STOP, 'system'))
+    await themeApplied(page, 'system')
+    await page.evaluate(() => localStorage.removeItem('design-tour-seen'))
+    const card = page.locator('.tour-card')
+    await expect(card).toBeVisible()
+    await card.focus()
+    await page.keyboard.press('Escape')
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('design-tour-seen'))).toBe('1')
+  })
+})
+
+test.describe('Pagination', () => {
+  const WITH_TOTAL = { c: 'pagination', v: 'With a total' }
+  const NO_TOTAL = { c: 'pagination', v: 'The server would not count' }
+  // `getByRole` name matching is substring by default, and "Page 1" is a
+  // substring of "Page 17" -- every lookup here needs `exact`.
+  const pageBtn = (page: import('@playwright/test').Page, n: number) =>
+    page.getByRole('button', { name: `Page ${n}`, exact: true })
+
+  test('Tab skips the disabled Previous step and reaches the pages and the jump field', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(WITH_TOTAL, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.getByRole('button', { name: 'Previous page' })).toBeDisabled()
+
+    for (const n of [1, 2, 3, 4, 5]) {
+      await page.keyboard.press('Tab')
+      await expect(pageBtn(page, n), `Tab did not reach Page ${n}`).toBeFocused()
+    }
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('spinbutton', { name: /Go to page/ })).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(pageBtn(page, 26)).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('button', { name: 'Next page' })).toBeFocused()
+  })
+
+  test('the current page carries aria-current, and Enter moves to the one pressed', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(WITH_TOTAL, 'system'))
+    await themeApplied(page, 'system')
+    await expect(pageBtn(page, 1)).toHaveAttribute('aria-current', 'page')
+
+    const page2 = pageBtn(page, 2)
+    await page2.focus()
+    await page.keyboard.press('Enter')
+    await expect(page2).toHaveAttribute('aria-current', 'page')
+    await expect(pageBtn(page, 1)).not.toHaveAttribute('aria-current', /.*/)
+    await expect(page.locator('.pager-count')).toContainText('51–100')
+  })
+
+  test('the jump field goes to a typed page on Enter', async ({ page }) => {
+    await page.goto(specimenUrl(WITH_TOTAL, 'system'))
+    await themeApplied(page, 'system')
+    const jump = page.getByRole('spinbutton', { name: /Go to page/ })
+    await jump.focus()
+    await page.keyboard.type('17')
+    await page.keyboard.press('Enter')
+
+    await expect(pageBtn(page, 17)).toHaveAttribute('aria-current', 'page')
+  })
+
+  test('Escape abandons the jump field’s draft without navigating', async ({ page }) => {
+    await page.goto(specimenUrl(WITH_TOTAL, 'system'))
+    await themeApplied(page, 'system')
+    const jump = page.getByRole('spinbutton', { name: /Go to page/ })
+    await jump.focus()
+    await page.keyboard.type('5')
+    await page.keyboard.press('Escape')
+
+    await expect(jump).toHaveValue('')
+    await expect(pageBtn(page, 1)).toHaveAttribute('aria-current', 'page')
+  })
+
+  test('with no total, the disabled Previous step is skipped and Enter on Next moves the page', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(NO_TOTAL, 'system'))
+    await themeApplied(page, 'system')
+    await expect(page.getByRole('button', { name: 'Previous page' })).toBeDisabled()
+    await expect(page.locator('.pager-count')).toContainText('1–50')
+
+    await page.keyboard.press('Tab')
+    const next = page.getByRole('button', { name: 'Next page' })
+    await expect(next, 'Tab must not land on the disabled Previous step').toBeFocused()
+
+    await page.keyboard.press('Enter')
+    await expect(page.locator('.pager-count')).toContainText('51–100')
+    await expect(page.getByRole('button', { name: 'Previous page' })).toBeEnabled()
+  })
+})
+
+test.describe('SideList', () => {
+  const PLACES = { c: 'sidelist', v: 'Default' }
+  const ITEMS = [
+    'Home',
+    'Accounts',
+    'Teams',
+    'Roles',
+    'Activity',
+    'Settings',
+    'Email',
+    'AI',
+    'Storage',
+    'Keys',
+    'Organisations',
+    'Support sessions',
+    'Estate log',
+  ]
+
+  test('Tab walks the switcher then every place, in order', async ({ page }) => {
+    await page.goto(specimenUrl(PLACES, 'system'))
+    await themeApplied(page, 'system')
+
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('button', { name: /Organisation/ })).toBeFocused()
+
+    // `exact` matters here -- "AI" is a substring of "Email".
+    for (const name of ITEMS) {
+      await page.keyboard.press('Tab')
+      await expect(
+        page.getByRole('link', { name, exact: true }),
+        `Tab did not reach ${name}`,
+      ).toBeFocused()
+    }
+  })
+
+  test('the current place carries aria-current="page", and no other one does', async ({ page }) => {
+    await page.goto(specimenUrl(PLACES, 'system'))
+    await themeApplied(page, 'system')
+
+    await expect(page.getByRole('link', { name: 'Accounts', exact: true })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    for (const name of ITEMS.filter((n) => n !== 'Accounts')) {
+      await expect(
+        page.getByRole('link', { name, exact: true }),
+        `${name} must not carry aria-current`,
+      ).not.toHaveAttribute('aria-current', /.*/)
+    }
+  })
+})
+
+test.describe('ThemeSwitch', () => {
+  test('the select is reachable, labelled, and changing it by keyboard sets data-theme', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl({ c: 'themeswitch', v: 'Labelled' }, 'system'))
+    await themeApplied(page, 'system')
+
+    await page.keyboard.press('Tab')
+    const control = page.getByRole('button')
+    await expect(control).toBeFocused()
+    await expect(control).toHaveAccessibleName(/Appearance/)
+
+    // Opening highlights the current choice (System); one more step is Night.
+    await page.keyboard.press('ArrowDown')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await expect(page.getByRole('option')).toHaveCount(3)
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+
+    await expect(control).toHaveAccessibleName(/Night/)
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'night')
+  })
+
+  test('a hidden label still names it, and a narrowed theme set still writes data-theme', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl({ c: 'themeswitch', v: 'In a header' }, 'system'))
+    await themeApplied(page, 'system')
+
+    const control = page.getByRole('button')
+    await control.focus()
+    await expect(control).toHaveAccessibleName(/Appearance/)
+
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await expect(page.getByRole('option')).toHaveCount(2)
+    // Night is first and already the current choice; Paper is the other step.
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+
+    await expect(control).toHaveAccessibleName(/Paper/)
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
+  })
+})

@@ -12,8 +12,21 @@
  * app's test suite.
  *
  * WCAG 2 relative luminance and contrast ratio, on six-digit hex. Nothing
- * here parses `color-mix()` or `var()`: the derived tokens are computed from
- * these, so measuring the inputs is measuring them.
+ * here parses `color-mix()` or `var()` off a stylesheet: the derived tokens
+ * are computed from these, so measuring the inputs is measuring them. The one
+ * exception is `CONTRAST_TINTS`: several components tint a tone into
+ * `--panel` with `color-mix()` rather than flattening it to a token, and text
+ * sits on that tint, not on `--panel` itself -- so `mix()` below reproduces
+ * the browser's own arithmetic for every tint a component actually draws text
+ * over, and `contrastFailures` measures those surfaces too.
+ * `test/contrast.test.ts` finds every `color-mix(` in every stylesheet --
+ * balancing parentheses, not one fixed shape, because `currentColor`, a
+ * `hsl()` first colour, a `var()` percentage and `in oklab` all appear here
+ * and none of them is `color-mix(in srgb, var(--tone) N%, var(...))` -- and
+ * fails if anything is neither in `CONTRAST_TINTS` nor in `EXCLUDED_TINTS` --
+ * a new tint has to be measured or excluded on purpose, not shipped silently.
+ * `.ident-disc`'s tint is neither: its hue is a value from JS, not a fixed
+ * token, so it is swept across every hue instead, in the same file.
  */
 import type { ThemeTokens } from './themes'
 
@@ -54,6 +67,24 @@ export const BASE_PALETTE: Partial<ThemeTokens> = {
   '--border-strong': '#5f6a7a',
 }
 
+/**
+ * `color-mix(in srgb, A P%, B)`, worked out the way the browser does it: a
+ * straight per-channel average of the two colours' 8-bit sRGB components,
+ * weighted by the percentage, rounded to the nearest integer. `in srgb` means
+ * the gamma-encoded components are interpolated directly -- not degamma'd to
+ * linear light and back -- which is exactly what let `mix('#d9a65a', '#161a21', 18)`
+ * land on `#39332b` component for component: the Night theme's `.card-warn`,
+ * as `a11y-known.json` recorded it from a real browser.
+ */
+export function mix(a: string, b: string, percent: number): string {
+  const channel = (hex: string, i: number) => Number.parseInt(hex.slice(i, i + 2), 16)
+  const at = (i: number) =>
+    Math.round(channel(a, i) * (percent / 100) + channel(b, i) * (1 - percent / 100))
+      .toString(16)
+      .padStart(2, '0')
+  return `#${at(1)}${at(3)}${at(5)}`
+}
+
 export interface ContrastPair {
   fg: keyof ThemeTokens
   bg: keyof ThemeTokens
@@ -79,6 +110,521 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
   { fg: '--accent', bg: '--panel', min: 3, what: 'the focus ring' },
 ]
 
+export interface ContrastTint {
+  /** The token `color-mix()` reads as its first colour -- the tone. */
+  tone: keyof ThemeTokens
+  /** The percentage of `tone` mixed in, exactly as the CSS states it. */
+  percent: number
+  /** The token `color-mix()` reads as its second colour. Always `--panel`:
+   *  "Tint into `--panel`, not `--panel-2`." */
+  surface: keyof ThemeTokens
+  /** The token the text drawn over that tint takes its colour from. Equal to
+   *  `tone` for a pill, which colours its own label in the tone it tints
+   *  with; `--text` or `--muted` for a card or callout, whose body copy does
+   *  not change colour with the tone. */
+  text: keyof ThemeTokens
+  min: number
+  what: string
+}
+
+/**
+ * The tinted surfaces a component actually draws text on, alongside
+ * `CONTRAST_PAIRS`'s flat token pairs.
+ *
+ * `Card`, `Callout`, `Pill`, a toggle `Button`, `Checkbox`'s `.choice`,
+ * `Rows`'s picked row, `DangerZone` and `Menu`'s destructive item all mix a
+ * tone into `--panel` rather than naming a token, so a check against
+ * `--panel` alone never measured the surface a reader looks at. This is that
+ * surface, computed with `mix()`. `test/contrast.test.ts` finds every
+ * `color-mix(` in `styles/` and fails if this list and `EXCLUDED_TINTS`
+ * together disagree with what is there -- the same two-way pattern that
+ * holds `BASE_PALETTE` to `tokens.css`, widened to every file rather than the
+ * three this started with, so a new tint anywhere has to be measured or
+ * excluded on purpose. Every entry here mixes `in srgb`, the one colour
+ * space `mix()` reproduces -- a mix `in oklab` cannot be measured this way
+ * and is in `EXCLUDED_TINTS` instead, whatever it draws.
+ *
+ * Found this way: the Night theme's `.card-warn` mixes 18% of the base
+ * `--warn` into its own `--panel` and gets `#39332b`; `--muted` on that tint
+ * is 4.08:1, under the 4.5:1 minimum -- `a11y-known.json`'s
+ * `card · Warned · night`, until now caught only by an axe scan of a
+ * screenshot the visual suite happened to take, not by anything an app's own
+ * test could run on its own palette.
+ */
+export const CONTRAST_TINTS: readonly ContrastTint[] = [
+  // Card (card.css): the tones mix into the card's own `--panel`.
+  {
+    tone: '--bad',
+    percent: 6,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on a failed card',
+  },
+  {
+    tone: '--bad',
+    percent: 6,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint on a failed card',
+  },
+  {
+    tone: '--warn',
+    percent: 18,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on a warned card',
+  },
+  {
+    tone: '--warn',
+    percent: 18,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint on a warned card',
+  },
+  {
+    tone: '--accent',
+    percent: 10,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on a selected card',
+  },
+  {
+    tone: '--accent',
+    percent: 10,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint on a selected card',
+  },
+  // Callout (callout.css): all four tones mix the same way, at 10%.
+  {
+    tone: '--info',
+    percent: 10,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on an info callout',
+  },
+  {
+    tone: '--bad',
+    percent: 10,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on a failing callout',
+  },
+  {
+    tone: '--good',
+    percent: 10,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on a good callout',
+  },
+  {
+    tone: '--warn',
+    percent: 10,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'body text on a warning callout',
+  },
+  // Pill (base.css): the tone colours its own label, over its own tint. Note
+  // `.pill-info` mixes `--accent`, not `--info` -- an info pill and an info
+  // callout are not drawn in the same colour.
+  {
+    tone: '--accent',
+    percent: 10,
+    surface: '--panel',
+    text: '--accent',
+    min: 4.5,
+    what: "an info pill's own tint",
+  },
+  {
+    tone: '--good',
+    percent: 10,
+    surface: '--panel',
+    text: '--good',
+    min: 4.5,
+    what: "a good pill's own tint",
+  },
+  {
+    tone: '--warn',
+    percent: 10,
+    surface: '--panel',
+    text: '--warn',
+    min: 4.5,
+    what: "a warning pill's own tint",
+  },
+  {
+    tone: '--bad',
+    percent: 10,
+    surface: '--panel',
+    text: '--bad',
+    min: 4.5,
+    what: "a failing pill's own tint",
+  },
+  // A toggle button (base.css): pressed, and pressed while held.
+  {
+    tone: '--accent',
+    percent: 10,
+    surface: '--panel',
+    text: '--accent',
+    min: 4.5,
+    what: 'a pressed toggle button',
+  },
+  {
+    tone: '--accent',
+    percent: 18,
+    surface: '--panel',
+    text: '--accent',
+    min: 4.5,
+    what: 'a pressed, held toggle button',
+  },
+  // Checkbox (checkbox.css): `.choice[data-selected]`, and its own hover.
+  {
+    tone: '--accent',
+    percent: 8,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'a name in a selected choice',
+  },
+  {
+    tone: '--accent',
+    percent: 8,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint in a selected choice',
+  },
+  {
+    tone: '--accent',
+    percent: 13,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'a name in a selected, hovered choice',
+  },
+  {
+    tone: '--accent',
+    percent: 13,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint in a selected, hovered choice',
+  },
+  // Rows (rows.css): the picked row, drawn the same as a selected choice, and
+  // its own hover.
+  {
+    tone: '--accent',
+    percent: 8,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'a name in a picked row',
+  },
+  {
+    tone: '--accent',
+    percent: 8,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint in a picked row',
+  },
+  {
+    tone: '--accent',
+    percent: 13,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: 'a name in a picked, hovered row',
+  },
+  {
+    tone: '--accent',
+    percent: 13,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: 'a hint in a picked, hovered row',
+  },
+  // DangerZone (dangerzone.css): the destructive button's own two states,
+  // and the zone itself, which carries three different text tokens.
+  {
+    tone: '--bad',
+    percent: 12,
+    surface: '--panel',
+    text: '--bad',
+    min: 4.5,
+    what: 'a hovered danger button',
+  },
+  {
+    tone: '--bad',
+    percent: 20,
+    surface: '--panel',
+    text: '--bad',
+    min: 4.5,
+    what: 'a pressed danger button',
+  },
+  {
+    tone: '--bad',
+    percent: 5,
+    surface: '--panel',
+    text: '--bad',
+    min: 4.5,
+    what: "a danger zone's own heading",
+  },
+  {
+    tone: '--bad',
+    percent: 5,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: "a danger zone's own hint",
+  },
+  {
+    tone: '--bad',
+    percent: 5,
+    surface: '--panel',
+    text: '--text',
+    min: 4.5,
+    what: "a danger zone's own plain heading",
+  },
+  // Menu (menu.css): a destructive item, focused, with its own label and its
+  // optional description.
+  {
+    tone: '--bad',
+    percent: 10,
+    surface: '--panel',
+    text: '--bad',
+    min: 4.5,
+    what: 'a focused destructive menu item',
+  },
+  {
+    tone: '--bad',
+    percent: 10,
+    surface: '--panel',
+    text: '--muted',
+    min: 4.5,
+    what: "a focused destructive menu item's description",
+  },
+]
+
+interface ExcludedTint {
+  /** The mix's first colour, exactly as the CSS states it: `--tone` for
+   *  `var(--tone)`, or a literal expression -- `currentColor`, or
+   *  `hsl(var(--ident-hue) 60% 50%)` -- for anything else. */
+  tone: string
+  /** The percentage, exactly as the CSS states it: a number for `N%`, or the
+   *  literal expression -- `var(--press-ink)` -- when it is not one. */
+  percent: number | string
+  surface: string
+  /** `color-mix`'s colour-interpolation method. Omitted means `srgb`; the
+   *  three that read `oklab` are the only mixes in these stylesheets that do,
+   *  and none is measurable by `mix()`, which reproduces `srgb` arithmetic
+   *  only. */
+  space?: string
+  because: string
+}
+
+/**
+ * Every `color-mix(` in the stylesheets that is not a `CONTRAST_TINTS`
+ * entry, and why. `test/contrast.test.ts` enforces this list the same way it
+ * enforces `CONTRAST_TINTS`: a tint that is in neither fails the suite, so a
+ * new one has to be measured or excluded on purpose.
+ *
+ * Several shapes recur. A **border-colour** mix (`--border`,
+ * `--border-strong`) has no `text` token sitting on it -- nothing renders
+ * text in a `border-color` -- so it cannot be written as a `ContrastTint`,
+ * whose `text` field means exactly that. Its own WCAG 1.4.11 requirement
+ * (3:1 against the surface on either side of it) is a different pair than
+ * "text on a tint", and this measurement does not attempt it; `CONTRAST_PAIRS`
+ * already measures the flat case, `--border-strong` on `--panel`. A mix into
+ * **`transparent`** is not a literal palette colour at all: the result stays
+ * translucent, so what actually renders depends on whatever sits behind the
+ * element -- not a token this measurement can look up per theme.
+ * **`currentColor`** is the same problem from the other side: it is always
+ * well-defined (the element's own `color`), but every one of these mixes it
+ * *into* `transparent`, so the same translucency applies. A **`--press-ink`
+ * (or `--slider-risk`)** percentage is a CSS custom property, not a literal
+ * this scan can read off the declaration -- `mix()` takes a number. And a mix
+ * **`in oklab`** is not what `mix()` computes: it reproduces the browser's
+ * `srgb` interpolation only, so an `oklab` mix cannot be measured here
+ * whatever it draws.
+ */
+export const EXCLUDED_TINTS: readonly ExcludedTint[] = [
+  // Border-colour mixes: a border, not text.
+  { tone: '--good', percent: 45, surface: '--border', because: "a pill's border, not text" },
+  { tone: '--warn', percent: 45, surface: '--border', because: "a pill's border, not text" },
+  { tone: '--bad', percent: 45, surface: '--border', because: "a pill's border, not text" },
+  { tone: '--info', percent: 30, surface: '--border', because: "a callout's border, not text" },
+  { tone: '--bad', percent: 30, surface: '--border', because: "a callout's border, not text" },
+  { tone: '--good', percent: 30, surface: '--border', because: "a callout's border, not text" },
+  { tone: '--warn', percent: 30, surface: '--border', because: "a callout's border, not text" },
+  {
+    tone: '--bad',
+    percent: 35,
+    surface: '--border',
+    because: "a card's or a danger zone's border, not text",
+  },
+  { tone: '--warn', percent: 40, surface: '--border', because: "a card's border, not text" },
+  {
+    tone: '--bad',
+    percent: 18,
+    surface: '--border',
+    because: "a danger zone's own divider, not text",
+  },
+  {
+    tone: '--bad',
+    percent: 45,
+    surface: '--border-strong',
+    because: "a danger button's border, not text",
+  },
+  {
+    tone: '--muted',
+    percent: 50,
+    surface: '--border',
+    because: "a toggle track's own colour on a card, not text",
+  },
+  // Mixed into `transparent`: not a literal palette colour, and translucent
+  // rather than opaque -- what renders depends on whatever sits behind it.
+  { tone: '--muted', percent: 30, surface: 'transparent', because: "a toggle's own focus ring" },
+  {
+    tone: '--bad',
+    percent: 30,
+    surface: 'transparent',
+    because: "an invalid field's own focus ring",
+  },
+  {
+    tone: '--accent',
+    percent: 45,
+    surface: 'transparent',
+    because: 'a size-picker swatch 18×14px with no text, only an aria-label',
+  },
+  {
+    tone: '--accent',
+    percent: 12,
+    surface: 'transparent',
+    because: 'a vertical tab: translucent, so the rendered colour depends on what sits behind it',
+  },
+  // Neither side is a theme palette token: `--slider-ink` is itself a
+  // `color-mix` of `--bad` and `--accent`, and `--control` is one of the three
+  // derived tokens re-derived under `[data-theme]` -- neither is a hex value
+  // this measurement can look up per theme.
+  {
+    tone: '--slider-ink',
+    percent: 28,
+    surface: '--control',
+    because: 'neither side is a literal palette token',
+  },
+  {
+    tone: '--bad',
+    percent: 'var(--slider-risk)',
+    surface: '--accent',
+    because:
+      "the slider fill's own base colour: --slider-risk is a variable, and the fill carries no text",
+  },
+  // `currentColor`, mixed into `transparent`: always well-defined, but the
+  // result is translucent regardless, so what renders still depends on
+  // whatever sits behind the element -- the same reason a mix into
+  // `transparent` above is excluded.
+  {
+    tone: 'currentColor',
+    percent: 22,
+    surface: 'transparent',
+    because: "a pill's own border: translucent into transparent, not a literal pair",
+  },
+  {
+    tone: 'currentColor',
+    percent: 10,
+    surface: 'transparent',
+    because:
+      "a pill's or the danger name's own fill: translucent into transparent, not a literal pair",
+  },
+  {
+    tone: 'currentColor',
+    percent: 13,
+    surface: 'transparent',
+    because: 'a skeleton draws no text at all, and is translucent into transparent besides',
+  },
+  {
+    tone: 'currentColor',
+    percent: 20,
+    surface: 'transparent',
+    because: 'a skeleton draws no text at all, and is translucent into transparent besides',
+  },
+  // `--press-ink`: a pressed control's overlay, the same rule everywhere --
+  // `background: color-mix(in srgb, var(--text) var(--press-ink), <hover
+  // colour>)`. The percentage is a variable, not a literal this scan can read
+  // off the declaration, so it cannot be written as a `ContrastTint` either.
+  {
+    tone: '--text',
+    percent: 'var(--press-ink)',
+    surface: '--control',
+    because: "a pressed control's overlay: --press-ink is a variable, not a literal percentage",
+  },
+  {
+    tone: '--text',
+    percent: 'var(--press-ink)',
+    surface: '--accent',
+    because:
+      "a pressed primary button's overlay: --press-ink is a variable, not a literal percentage",
+  },
+  {
+    tone: '--text',
+    percent: 'var(--press-ink)',
+    surface: '--panel-2',
+    because: "a pressed control's overlay: --press-ink is a variable, not a literal percentage",
+  },
+  // The identity disc's own tint (`identity.css`): `--ident-hue` is set
+  // inline per person, from JS, not one of this measurement's palettes --
+  // swept across every hue instead, in `test/contrast.test.ts`'s "the
+  // identity disc, across every hue".
+  {
+    tone: 'hsl(var(--ident-hue) 60% 50%)',
+    percent: 22,
+    surface: '--panel',
+    because: 'the hue is any value from JS, not a fixed pair -- swept across every hue instead',
+  },
+  {
+    tone: 'hsl(var(--ident-hue) 60% 50%)',
+    percent: 45,
+    surface: 'transparent',
+    because:
+      "the disc's own border: the hue is per-identity, and it is translucent into transparent besides",
+  },
+  // `in oklab`: not what `mix()` computes, so unmeasurable here whatever they
+  // draw -- a border, and a decorative spinner that draws no text at all.
+  {
+    tone: '--bad',
+    percent: 45,
+    surface: '--border',
+    space: 'oklab',
+    because: 'a dialog border, not text -- and mixed in oklab, which mix() does not compute',
+  },
+  {
+    tone: '--accent',
+    percent: 70,
+    surface: 'transparent',
+    space: 'oklab',
+    because:
+      "the pending sweep's own arc: decorative, and mixed in oklab, which mix() does not compute",
+  },
+  {
+    tone: '--accent',
+    percent: 45,
+    surface: 'transparent',
+    space: 'oklab',
+    because:
+      "the pending sweep's reduced-motion band: decorative, and mixed in oklab, which mix() does not compute",
+  },
+]
+
 /**
  * Every pair a palette fails, one line each; empty when it passes.
  *
@@ -87,6 +633,10 @@ export const CONTRAST_PAIRS: readonly ContrastPair[] = [
  * ones it inherits. Pass `productTheme(product, id).tokens` to measure a theme
  * as the product wears it. A colour that is not six-digit hex -- a `var()`,
  * a `color-mix()` -- is reported rather than guessed at.
+ *
+ * Also measures `CONTRAST_TINTS`: the same components tint a tone into
+ * `--panel` rather than reaching for a flat token, so a status card or a
+ * pill is measured on the surface it actually draws, not the panel under it.
  *
  *   expect(contrastFailures(productTheme(product, 'night').tokens)).toEqual([])
  */
@@ -102,6 +652,29 @@ export function contrastFailures(tokens: Partial<ThemeTokens>): string[] {
     }
     const r = ratio(a, b)
     if (r < min) out.push(`${what}: ${fg} ${a} on ${bg} ${b} is ${r.toFixed(2)}:1, under ${min}:1`)
+  }
+  for (const { tone, percent, surface, text, min, what } of CONTRAST_TINTS) {
+    const [toneHex, surfaceHex, textHex] = [palette[tone], palette[surface], palette[text]]
+    if (
+      !toneHex ||
+      !hex.test(toneHex) ||
+      !surfaceHex ||
+      !hex.test(surfaceHex) ||
+      !textHex ||
+      !hex.test(textHex)
+    ) {
+      out.push(
+        `${what}: ${text} on ${tone} ${percent}% into ${surface} is not two six-digit hex colours (${textHex} on ${toneHex}/${surfaceHex})`,
+      )
+      continue
+    }
+    const bg = mix(toneHex, surfaceHex, percent)
+    const r = ratio(textHex, bg)
+    if (r < min) {
+      out.push(
+        `${what}: ${text} ${textHex} on ${tone} ${percent}% into ${surface} (${bg}) is ${r.toFixed(2)}:1, under ${min}:1`,
+      )
+    }
   }
   return out
 }
