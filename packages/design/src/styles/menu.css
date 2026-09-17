@@ -135,12 +135,15 @@
    holding a `Callout` rather than a menu concept of its own -- see the
    `Menu.tsx` docblock -- and needs nothing extra here: `Callout` carries its
    own padding, border and tint, already measured in `contrast.ts`.
-   `max-width` is what makes that prose wrap: without it a sentence-long
-   warning set the whole sheet 733px wide to keep itself on one line. */
+   The cap on what it holds is what makes that prose wrap: without it a
+   sentence-long warning set the whole sheet 733px wide to keep itself on one
+   line. It sits on the content, not on `.menu-info`, so the divider still
+   runs the full width of a sheet that wide rows made wider. */
 .menu-info {
-  max-width: var(--measure-narrow);
   padding: var(--space-2);
   border-bottom: var(--border-width) solid var(--border);
   color: var(--text);
   font-size: var(--text-sm);
 }
+
+.menu-info > * { max-width: var(--measure-narrow); }

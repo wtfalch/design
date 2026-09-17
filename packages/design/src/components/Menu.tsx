@@ -166,7 +166,7 @@ function renderItem(item: Item): React.ReactNode {
     <MenuItem
       key={item.id}
       id={item.id}
-      className={`menu-item${item.danger ? ' danger' : ''}${item.secondaryAction ? ' menu-item--with-action' : ''}`}
+      className={`menu-item${item.danger ? ' danger' : ''}${item.secondaryAction && !item.items ? ' menu-item--with-action' : ''}`}
       isDisabled={item.disabled}
       onAction={item.onAction}
       /* Typeahead needs a string, and `label` may be a node. Without this,
