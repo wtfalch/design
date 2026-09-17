@@ -71,7 +71,7 @@ export default function Shell({
      on the frame rather than a literal repeated in three class lists, which
      is how manage ended up with `head-inner-wide` and `main-wide` as separate
      classes and had to remember both. */
-  const measure = wide ? 'max-w-[var(--shell-measure-wide)]' : 'max-w-[var(--shell-measure)]'
+  const measure = wide ? 'max-w-(--measure-wide)' : 'max-w-(--measure)'
   const band = `w-full mx-auto px-4 ${measure}`
 
   return (

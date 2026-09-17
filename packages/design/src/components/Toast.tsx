@@ -160,7 +160,7 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
       <ToastRegion queue={queue} className="toasts">
         {({ toast }) => (
           <AriaToast toast={toast} className={`toast toast-${toast.content.tone}`}>
-            <Icon name={MARK[toast.content.tone]} size={16} className="toast-mark" />
+            <Icon name={MARK[toast.content.tone]} size="md" className="toast-mark" />
             <ToastContent className="ctl-grow">
               <Text slot="title">{toast.content.text}</Text>
             </ToastContent>
@@ -174,7 +174,7 @@ export function ToastHost({ children }: { children: React.ReactNode }) {
                 look asks for the component, or says what it wants; this one
                 says what it wants, in `toast.css`. */}
             <Button slot="close" className="toast-close" aria-label="Dismiss">
-              <Icon name="close" size={14} />
+              <Icon name="close" size="sm" />
             </Button>
           </AriaToast>
         )}
