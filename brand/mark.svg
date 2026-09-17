@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="wtfalch design">
+  <!-- The sheet, its datum, and one module snapped into the cell the datum
+       makes.
+
+       Two attempts before this one. The first drew the datum as an origin
+       corner with graduations climbing off it, and rendered as a bar chart --
+       ticks rising from a baseline is that picture whatever it was drawn to
+       mean. The second put the rules through the sheet, which is what a datum
+       is, but hung the module 4 units clear of the frame and grew four tabs
+       where the registration marks met it. A gap that size reads as a mistake,
+       and the tabs made the silhouette lumpy at 16px.
+
+       So: the datum rules run the full height and width and overshoot the
+       frame, which is how a datum is actually drawn, and the module sits flush
+       to the frame on two sides and to the rules on the other two. Nothing
+       floats.
+
+       Every rule is 4 units, one device pixel at 16px. No radius, no shadow,
+       no curve. -->
+
+  <!-- The module first, so the rules draw over it and the sheet stays one
+       plane rather than a stack. -->
+  <rect x="30" y="8" width="26" height="30" fill="var(--accent, #00845f)"/>
+
+  <g fill="currentColor">
+    <!-- The sheet. -->
+    <rect x="4" y="4" width="56" height="4"/>
+    <rect x="4" y="56" width="56" height="4"/>
+    <rect x="4" y="8" width="4" height="48"/>
+    <rect x="56" y="8" width="4" height="48"/>
+
+    <!-- The datum, crossing at 2/5 and 3/5 so the sheet is divided the way a
+         title block divides one, not quartered. Both rules overshoot. -->
+    <rect x="26" y="0" width="4" height="64"/>
+    <rect x="0" y="38" width="64" height="4"/>
+  </g>
+</svg>
