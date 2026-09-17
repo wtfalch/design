@@ -29,3 +29,34 @@
   font-size: var(--text-sm);
   white-space: nowrap;
 }
+
+/* The two header copies, switched by breakpoint.
+ *
+ * Their display lives here rather than on `md:hidden` and `hidden md:block`
+ * because those are Tailwind utilities, and a utility only exists if the app
+ * using this package generated it. The classes appear nowhere but `Shell.tsx`,
+ * inside `node_modules`, which no app's content scan reads -- so both copies
+ * came out `display:none` and the header rendered as an empty bar. `manage`
+ * already carries a hand-written `@media` block restoring `.shell-side` and
+ * `.side-list-rail` after the same trap; a package that ships its own
+ * stylesheet should not need the app to patch it a third time.
+ *
+ * 48rem is `md`, the one breakpoint `Shell` and `SideList` already agree on
+ * for whether the rail is docked. */
+.shell-head-phone {
+  display: block;
+}
+
+.shell-head-wide {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .shell-head-phone {
+    display: none;
+  }
+
+  .shell-head-wide {
+    display: block;
+  }
+}
