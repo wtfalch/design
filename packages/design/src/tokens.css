@@ -225,6 +225,37 @@
      is pinned so a head without a cog — the studio's preview — is the same
      height as one with, and the applet gets the same remainder in both. */
   --tile-control: 34px;
+
+  /* One stacking scale, not five separate guesses at clearance. The tooltip,
+     the modal backdrop, the popover, the command palette and the toast stack
+     were bare numbers in five different stylesheets -- 45, 50, 60, 80, 90 --
+     with no way to tell whether the forty-unit gaps between them were a plan
+     or luck, and no way to add a sixth overlay without reading all five
+     first. Fixed, not themeable: which overlay sits on top of which is a
+     structural decision, not a colour a theme should get to relitigate.
+     Named for the layer rather than the number, so a new overlay is a new
+     name instead of a renumbering of the others. Values are today's,
+     exactly -- this token added nothing new, it named what was already
+     there. */
+  --z-tooltip: 45;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-command: 80;
+  --z-toast: 90;
+
+  /* How wide a block of content gets before a line stops being readable.
+     `Shell` carried its own `--shell-measure` / `--shell-measure-wide`
+     because nothing else needed them, and every consumer that wanted
+     something narrower picked its own number with nothing to point at: 26rem
+     in offline-tf, 28rem in valet, 320-460px across the gallery's forms,
+     48rem in wtfalch-manage -- four guesses, never one decision. Fixed, not
+     themeable: a measure is arithmetic on a font's line length, not a palette
+     choice. `--measure` and `--measure-wide` are Shell's own two numbers,
+     renamed rather than changed; `--measure-narrow` takes valet's 28rem as
+     the vocabulary's single narrow step. */
+  --measure: 64rem;
+  --measure-wide: 90rem;
+  --measure-narrow: 28rem;
 }
 
 /* Motion is an accessibility setting before it is a style, so this outranks
