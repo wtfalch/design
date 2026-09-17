@@ -49,6 +49,18 @@ import type { IconName } from './iconNames'
  * submenu that closes the instant the pointer leaves its parent row is
  * unusable with a mouse, because the diagonal path to it passes over the row
  * below.
+ *
+ * **`info` is context, not a choice, and it is not a menu item.** A caller
+ * that wants a line above the actions -- who is signed in, what plan an
+ * account is on -- cannot get there through `items`: a `disabled` entry is
+ * still a stop on the arrow-key path, and a screen reader still announces
+ * "dimmed" or "unavailable" for something that was never a choice to begin
+ * with, only ever a fact. `info` renders as a plain sibling of the menu's own
+ * list instead, inside the popover but outside `role="menu"`, so it takes no
+ * keyboard focus, gets no roving tabindex, and is read as ordinary text if a
+ * screen reader's browse cursor passes over it. Nothing here knows what the
+ * content *is* -- an email, a role, a plan -- only that it goes above the
+ * verbs and is never one of them.
  */
 
 export interface Item {
@@ -86,6 +98,11 @@ export interface Props {
   /** Names the menu for a screen reader. */
   label: string
   className?: string
+  /** Static context above the actions -- who is signed in, what plan an
+   *  account is on, anything worth reading before the verbs are offered. Not
+   *  a menu item: see the docblock above for why it renders outside the
+   *  list rather than as a disabled entry inside it. */
+  info?: React.ReactNode
 }
 
 function isSection(entry: Item | Section): entry is Section {
@@ -160,6 +177,7 @@ export default function Menu({
   placement = 'bottom start',
   label,
   className,
+  info,
 }: Props) {
   return (
     <MenuTrigger>
@@ -169,6 +187,11 @@ export default function Menu({
         placement={placement}
         offset={6}
       >
+        {/* Outside `AriaMenu` on purpose -- see the docblock's `info`
+            paragraph. A sibling here never enters the listbox React Aria
+            builds from `AriaMenu`'s children, so it is invisible to arrow
+            keys, roving tabindex and the menu's own accessible name. */}
+        {info && <div className="menu-info">{info}</div>}
         <AriaMenu className="p-1 outline-none grid gap-[var(--border-width)]" aria-label={label}>
           {items.map((entry) =>
             isSection(entry) ? (

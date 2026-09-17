@@ -22,6 +22,7 @@ import { RichTextEditor } from '@wtfalch/design/editor'
 import { useState } from 'react'
 
 import {
+  AccountMenu,
   Brand,
   Button,
   Callout,
@@ -2531,6 +2532,80 @@ export const COMPONENTS: Component[] = [
                 ],
               },
             ]}
+          />
+        ),
+      },
+      {
+        name: 'With an info box above the actions',
+        note:
+          'A generic slot, not a menu item — it renders outside the list, so it ' +
+          'takes no keyboard focus and a screen reader never treats it as a ' +
+          'choice. The package supplies the box; the app supplies what goes in it.',
+        render: () => (
+          <Menu
+            label="Your account"
+            trigger={<Button>Account</Button>}
+            info={
+              <div className="demo-stack" style={{ gap: 'var(--space-1)' }}>
+                <div>ada@example.com</div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--text-xs)' }}>Owner</div>
+              </div>
+            }
+            items={[
+              { id: 'account', label: 'Your account', icon: 'settings' },
+              { id: 'sign-out', label: 'Sign out', separated: true },
+            ]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    id: 'accountmenu',
+    name: 'AccountMenu',
+    blurb:
+      'Who is signed in, at the end of the title block — `Menu` with a fixed ' +
+      'trigger rather than a caller-supplied one. Wrapping the identity chip in ' +
+      'a ghost `Button` used to draw a second, squarer box around it, so a ' +
+      'hover filled a wider area than the pill it was supposed to be a hover ' +
+      'for. Here the interactive element is the chip: a hover or a focus ring ' +
+      'can only trace the one shape actually on screen. `info` is `Menu`’s own ' +
+      'slot, forwarded — the package does not know the second line is a role, ' +
+      'only that the app wants it read before the verbs.',
+    variants: [
+      {
+        name: 'In the title block',
+        note:
+          'The disc, the name, and — opened — an address and a role above ' +
+          '“Your account” and “Sign out”. Hover the chip itself: the accent ' +
+          'shows up on its own border, not on a rectangle around it.',
+        render: () => (
+          <AccountMenu
+            name="Ada Lovelace"
+            address="ada@example.com"
+            label="Your account"
+            info={
+              <div className="demo-stack" style={{ gap: 'var(--space-1)' }}>
+                <div>ada@example.com</div>
+                <div style={{ color: 'var(--muted)', fontSize: 'var(--text-xs)' }}>Owner</div>
+              </div>
+            }
+            items={[
+              { id: 'account', label: 'Your account', icon: 'settings' },
+              { id: 'sign-out', label: 'Sign out', separated: true },
+            ]}
+          />
+        ),
+      },
+      {
+        name: 'No display name',
+        note: 'Falls through to the address, the same rule `Identity` uses everywhere else.',
+        render: () => (
+          <AccountMenu
+            address="noreply@notifications.example.org"
+            label="Your account"
+            info={<div>noreply@notifications.example.org</div>}
+            items={[{ id: 'sign-out', label: 'Sign out' }]}
           />
         ),
       },

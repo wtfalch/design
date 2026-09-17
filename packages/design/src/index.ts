@@ -17,6 +17,12 @@
  * that shipped. They are worth more than the code around them.
  */
 
+/** Who is signed in, at the end of the title block -- a fixed `Identity`
+ *  chip as `Menu`'s trigger, so the hover it draws can only ever trace that
+ *  one shape, plus the generic `info` slot for whatever the app wants read
+ *  above the actions. */
+export { default as AccountMenu } from './components/AccountMenu'
+export type { Props as AccountMenuProps } from './components/AccountMenu'
 export { default as Brand } from './components/Brand'
 /** The shape of a mark. A product declares its own beside its themes. */
 export type { FillMark, Mark, StrokeMark } from './components/brandMarks'

@@ -77,3 +77,14 @@
 }
 
 .menu-sheet { box-shadow: var(--shadow-2); }
+
+/* Context above the actions -- a sibling of the list, never a row in it. One
+   rule underneath, the same weight the schematic world draws every divider
+   at, is what separates it from the verbs below; no radius, no card, no
+   shadow of its own; the sheet already carries those. */
+.menu-info {
+  padding: var(--space-2);
+  border-bottom: var(--border-width) solid var(--border);
+  color: var(--text);
+  font-size: var(--text-sm);
+}
