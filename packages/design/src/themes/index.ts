@@ -31,7 +31,7 @@
  *   `--density`, so overriding one step with a literal is how you get a type
  *   scale that no longer scales. Move the input, not the output.
  * - **fixed** — not themeable at all. Geometry other things are measured
- *   against, and one glyph.
+ *   against, a stacking order, a scale of readable widths, and one glyph.
  *
  * `tokens.test.ts` holds all three to `tokens.css` in both directions, so a
  * token added to the stylesheet and to no list fails the suite rather than
@@ -164,8 +164,31 @@ export const DERIVED_TOKENS = [
  * supplies its own colour. It stays fixed because an arbitrary SVG data URI
  * from a theme is a theme shipping markup, which is the one thing the whole
  * design refuses.
+ *
+ * `--z-tooltip`, `--z-modal`, `--z-popover`, `--z-command` and `--z-toast`
+ * are a stacking order, not a colour: which overlay sits on top of which is a
+ * decision about the app's structure, and a theme that could move it could
+ * put a toast under its own modal. Named for the layer rather than the
+ * number, so a new overlay is a new name instead of a renumbering of the
+ * others.
+ *
+ * `--measure`, `--measure-wide` and `--measure-narrow` are how wide a block
+ * of content gets before a line stops being readable — arithmetic on a
+ * font's line length, not a palette a theme should pick.
  */
-export const FIXED_TOKENS = ['--tile-control', '--nudge', '--tick-mask'] as const
+export const FIXED_TOKENS = [
+  '--tile-control',
+  '--nudge',
+  '--tick-mask',
+  '--z-tooltip',
+  '--z-modal',
+  '--z-popover',
+  '--z-command',
+  '--z-toast',
+  '--measure',
+  '--measure-wide',
+  '--measure-narrow',
+] as const
 
 /**
  * The themeable vocabulary, at run time.

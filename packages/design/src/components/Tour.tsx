@@ -129,7 +129,7 @@ export default function Tour({
       /* Over everything and catching nothing: the scrim is painted by the
          hole's own shadow, so there is no full-screen element here to swallow
          a click meant for the page underneath. */
-      className="fixed inset-0 z-[60] pointer-events-none"
+      className="fixed inset-0 z-(--z-popover) pointer-events-none"
       onKeyDown={(e) => {
         if (e.key === 'Escape') finish()
         if (e.key === 'Enter' || e.key === 'ArrowRight') next()
