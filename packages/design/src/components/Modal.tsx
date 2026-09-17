@@ -193,7 +193,7 @@ export default function Modal({
                   isDisabled={closeDisabled}
                   onPress={() => onClose()}
                 >
-                  <Icon name="close" size={16} />
+                  <Icon name="close" size="md" />
                 </Button>
               )}
             </header>

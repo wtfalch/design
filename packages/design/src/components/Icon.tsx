@@ -70,6 +70,16 @@ import { ICONS } from './icons'
 
 export type { IconName }
 
+/** The three named steps, in pixels rather than `rem`, so choosing one moves
+ *  no icon under any theme's font size. `sm`/`md`/`lg` are 14/16/20 — the
+ *  sizes this package's own call sites already drew at before they had names
+ *  for them (Toast's close cross, Modal's, Callout's mark; Card's and Empty's
+ *  figure). The default stays the bare number 18: it predates the steps and
+ *  none of the three lands on it, so naming the default would move it. */
+export type IconSize = 'sm' | 'md' | 'lg'
+
+const SIZES: Record<IconSize, number> = { sm: 14, md: 16, lg: 20 }
+
 export default function Icon({
   name,
   size = 18,
@@ -77,8 +87,11 @@ export default function Icon({
   title,
 }: {
   name: IconName
-  /** One number, because these are square and always have been. */
-  size?: number
+  /** One number, because these are square and always have been. A named step
+   *  — `sm` / `md` / `lg`, 14 / 16 / 20 — reads better at a call site than the
+   *  literal it stands for; a number still works, for a size none of the
+   *  three names. */
+  size?: number | IconSize
   className?: string
   /** Given only when the icon is the whole message. An icon beside a label it
    *  repeats is decoration, and decoration announced twice is noise. */
@@ -87,11 +100,12 @@ export default function Icon({
   /* The table with its measured views is `icons.ts`, beside this file. */
   const g = ICONS[name]
   if (!g) return null
+  const px = typeof size === 'number' ? size : SIZES[size]
   return (
     <svg
       className={className}
-      width={size}
-      height={size}
+      width={px}
+      height={px}
       viewBox={g.view}
       fill="currentColor"
       /* Pepicons paths are self-intersecting outlines; without evenodd the

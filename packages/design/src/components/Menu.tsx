@@ -140,7 +140,7 @@ function renderItem(item: Item): React.ReactNode {
   const body = item.items ? (
     <SubmenuTrigger key={item.id}>
       {row}
-      <AriaPopover className="menu-sheet surface-panel border border-border rounded-md min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-[60]">
+      <AriaPopover className="menu-sheet surface-panel border border-border rounded-md min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-(--z-popover)">
         <AriaMenu className="p-1 outline-none grid gap-[var(--border-width)]">
           {item.items.map(renderItem)}
         </AriaMenu>
