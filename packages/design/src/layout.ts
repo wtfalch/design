@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react'
 
 /**
- * The widths at which a compact layout becomes more than one column.
+ * The widths at which a layout changes, and they are Tailwind's.
  *
  * One source, shared by whatever draws the breakpoint and whatever asks
- * about it: a stylesheet's `@media` rule and a `matchMedia` caller read the
- * same query string in `MEDIA_QUERIES`, and that string is built off the same
- * pixel value in `BREAKPOINTS` rather than a second copy that can drift from
- * it.
+ * about it: a stylesheet's `@media` rule, a Tailwind `md:` utility and a
+ * `matchMedia` caller all mean the same width. `Shell` and `SideList` switch
+ * at `md:` and `shell.css` at `48rem`, which are Tailwind's defaults, because
+ * the package's Tailwind never overrode them. The first version of this
+ * module (0.16.0) exported `medium: 860` and `wide: 1150` instead, copied
+ * from `@wtfalch/email`'s mailbox shell (`usePanes`), so the package shipped
+ * two sets of widths that agreed on nothing and no component used the
+ * exported one. `layout.test.ts` now holds these to Tailwind's own
+ * `theme.css`, so they cannot drift apart again.
  *
- * The values are `@wtfalch/email`'s mailbox shell's (`usePanes`,
- * `packages/email/src/mailbox/react/layout.ts`), promoted here so a shell
- * built from this package's `SplitPane` and `Shell` can collapse at the same
- * widths without a second, uncoordinated set of numbers: below `medium` is
- * one column, `medium` and up fits two, `wide` and up fits three. What each
- * width is *for* is the consumer's decision -- `usePanes` keeps its own
- * three-state read of them -- this module only owns the numbers.
+ * Pixels at the default 16px root, for arithmetic. The queries are in `rem`,
+ * as Tailwind writes them, so a person who raised their browser's font size
+ * gets the same layout from a `matchMedia` caller as from a `md:` utility.
  *
  * No CSS custom properties for these: a `@media` condition cannot read a
  * custom property (`@media (min-width: var(--x))` is not valid CSS), which is
@@ -27,16 +28,24 @@ import { useEffect, useState } from 'react'
  * vary with which theme is on.
  */
 export const BREAKPOINTS = {
-  medium: 860,
-  wide: 1150,
+  sm: 640,
+  md: 768,
+  lg: 1024,
+  xl: 1280,
+  '2xl': 1536,
 } as const
 
 export type Breakpoint = keyof typeof BREAKPOINTS
 
+const query = (px: number) => `(min-width: ${px / 16}rem)`
+
 /** `BREAKPOINTS`, each as the `min-width` query that turns it on. */
 export const MEDIA_QUERIES: Record<Breakpoint, string> = {
-  medium: `(min-width: ${BREAKPOINTS.medium}px)`,
-  wide: `(min-width: ${BREAKPOINTS.wide}px)`,
+  sm: query(BREAKPOINTS.sm),
+  md: query(BREAKPOINTS.md),
+  lg: query(BREAKPOINTS.lg),
+  xl: query(BREAKPOINTS.xl),
+  '2xl': query(BREAKPOINTS['2xl']),
 }
 
 function hasMatchMedia(): boolean {
