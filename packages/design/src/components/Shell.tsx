@@ -30,6 +30,15 @@
  * hides itself, so an app never writes the breakpoint by hand; `SideList`'s
  * own docblock explains why the button has to live in `who` rather than in
  * `side` itself.
+ *
+ * **The header knows about the rail too, at the same breakpoint.** Below
+ * `md` it is the one band it always was. At `md` and up, with `side`
+ * present, it splits into a brand zone the rail's own width and padding --
+ * so `brand` sits directly above the docked column instead of inside
+ * `band`'s independently-centred measure -- and a second band, sharing
+ * `main`'s, for `who` and `nav`. Two static copies switched by breakpoint,
+ * the way `SideList` itself is a rail and a sheet rather than one thing
+ * that moves.
  */
 
 export default function Shell({
@@ -73,11 +82,55 @@ export default function Shell({
     >
       {/* `flex-none`, so a long page does not squeeze the header. */}
       <header className="flex-none border-b border-border surface-panel">
-        <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
-          {brand}
-          {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
-        </div>
-        {nav && <div className={`${band} pb-2`}>{nav}</div>}
+        {side ? (
+          <>
+            {/* Below `md` there is no docked rail -- `SideList.Trigger` in
+                `who` is the only way to the places, and the header is the
+                same band-centred markup a `Shell` with no `side` renders. */}
+            <div className="md:hidden">
+              <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
+                {brand}
+                {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
+              </div>
+              {nav && <div className={`${band} pb-2`}>{nav}</div>}
+            </div>
+            {/* `md` and up: the rail is docked, so the header splits to sit
+                above it -- a brand zone exactly `--shell-side-width` wide,
+                padded the way `.side-list-switcher` and
+                `.side-list-groups-inner` pad their own content (`px-3`,
+                `var(--space-3)`), so the brand lines up with the rail rather
+                than with `band`'s independently-centred measure. The rest of
+                the header -- `who`, and `nav` if present -- shares `band`
+                with `main`, so the header's right edge lines up with
+                `main`'s the same way the rail's left edge lines up with the
+                brand's. Two copies of the same content, hidden by breakpoint
+                rather than switched by script, the way `SideList` itself
+                renders its rail and its sheet -- `Shell` stays server-
+                renderable, with no hook deciding which one drew. */}
+            <div className="hidden md:block">
+              <div className="flex items-center min-w-0">
+                <div className="flex-none w-[var(--shell-side-width)] px-3 py-3 flex items-center min-w-0">
+                  {brand}
+                </div>
+                <div className={`${band} flex items-center justify-end gap-4 py-3 min-w-0`}>
+                  {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
+                </div>
+              </div>
+              {nav && (
+                <div className="flex min-w-0">
+                  <div className="flex-none w-[var(--shell-side-width)]" />
+                  <div className={`${band} pb-2`}>{nav}</div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
+            {brand}
+            {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
+          </div>
+        )}
+        {!side && nav && <div className={`${band} pb-2`}>{nav}</div>}
       </header>
       {/* `min-w-0` because a flex child will not shrink below its content, and
           one wide table inside then pushes the whole page sideways. */}

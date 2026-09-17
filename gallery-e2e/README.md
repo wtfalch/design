@@ -66,6 +66,15 @@ worth keeping:
   on one run in four, against a background it only holds for 120ms. The scans
   inject `transition: none`.
 
+## The stage is pinned to 720px, and overriding it takes matching specificity
+
+`gallery.css` fixes every specimen's box with `.spec-solo .spec-stage { width:
+720px; max-width: 100% }` -- a two-class descendant selector. A test that needs
+a real viewport width (`shell-side-align.spec.ts`, for a defect invisible under
+720px) has to inject a rule of at least the same specificity; a plain
+`.spec-stage { width: ... }` override loses the cascade and the box silently
+stays 720px, passing or failing on the wrong rendering with no error.
+
 ## `a11y-known.json`
 
 Seven entries: three components missing a `label` (all of them the hand-written
