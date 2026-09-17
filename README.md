@@ -17,8 +17,10 @@ pnpm build && pnpm lint && pnpm typecheck && pnpm test
 Behaviour — roles, keyboard, focus management, touch, dismissal — comes from
 [React Aria Components](https://react-spectrum.adobe.com/react-aria/). Every
 pixel is ours, styled off the token vocabulary through `data-*` attributes.
-There is no Tailwind here and no utility layer; a theme is a set of values, not
-a set of classes.
+A component draws itself with Tailwind utilities, bound to that vocabulary and
+compiled into the shipped stylesheet at build, so a consumer installs no
+Tailwind and inherits no defaults. A theme is still a set of values, not a set
+of classes, and a class in this package is private.
 
 Read `packages/design/README.md` for the vocabulary and how to write a theme.
 
