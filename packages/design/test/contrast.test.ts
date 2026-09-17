@@ -18,19 +18,25 @@
  * is light. Both are measured; the light one is the one that had the 1.67:1
  * running pill.
  *
- * `contrastFailures` also measures `CONTRAST_TINTS`: `Card`, `Callout` and
- * `Pill` tint a tone into `--panel` with `color-mix()` and draw text over the
- * result, not over `--panel` itself. Two of the four palettes below fail a
- * tinted pair -- real, shipped defects the flat check never saw, listed
- * explicitly rather than fixed, because changing a colour or a percentage
- * here would move a pixel.
+ * `contrastFailures` also measures `CONTRAST_TINTS`: several components tint
+ * a tone into `--panel` with `color-mix()` and draw text over the result, not
+ * over `--panel` itself. Two of the four palettes below fail a tinted pair --
+ * real, shipped defects the flat check never saw, listed explicitly rather
+ * than fixed, because changing a colour or a percentage here would move a
+ * pixel.
  */
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { BASE_PALETTE, CONTRAST_PAIRS, CONTRAST_TINTS, contrastFailures } from '../src/contrast'
+import {
+  BASE_PALETTE,
+  CONTRAST_PAIRS,
+  CONTRAST_TINTS,
+  EXCLUDED_TINTS,
+  contrastFailures,
+} from '../src/contrast'
 import { productTheme } from '../src/products'
 import type { ThemeTokens } from '../src/themes'
 import { sample } from './fixtures/product'
@@ -89,20 +95,22 @@ describe('every palette is measured', () => {
    *  base when the OS is dark and the scoped block when it is light. The
    *  fixture's two stand for an app's, measured the way an app measures.
    *
-   *  Two of these fail a tinted pair once `CONTRAST_TINTS` is added to the
-   *  measurement. Both are real: `system (light)`'s toggle button holds
-   *  `--accent` text over its own colour at 18% into a white panel, and the
-   *  sample fixture's good pill does the same at 10%. Neither is fixed here
-   *  -- a colour or a percentage change moves a pixel, and this task's job is
-   *  the measurement, not the palette. The expected list is explicit so a
-   *  future fix has to delete a line on purpose, and a new failure cannot
-   *  join it silently. */
+   *  Three tinted pairs fail, across two of these four, once `CONTRAST_TINTS`
+   *  is added to the measurement. All real: `system (light)`'s toggle button
+   *  holds `--accent` text over its own colour at 18% into a white panel; the
+   *  sample fixture's good pill does the same at 10%, and its danger button
+   *  does it at 20% while pressed. None is fixed here -- a colour or a
+   *  percentage change moves a pixel, and this task's job is the
+   *  measurement, not the palette. The expected list is explicit so a future
+   *  fix has to delete a line on purpose, and a new failure cannot join it
+   *  silently. */
   const knownTintFailures: Record<string, string[]> = {
     'system (light)': [
       'a pressed, held toggle button: --accent #0e7872 on --accent 18% into --panel (#d4e7e6) is 4.15:1, under 4.5:1',
     ],
     'a product, light': [
       "a good pill's own tint: --good #1b7f4b on --good 10% into --panel (#e8f2ed) is 4.39:1, under 4.5:1",
+      'a pressed danger button: --bad #bf3a31 on --bad 20% into --panel (#f2d8d6) is 4.03:1, under 4.5:1',
     ],
   }
   const palettes: Record<string, Partial<ThemeTokens>> = {
@@ -148,18 +156,35 @@ describe('tinted surfaces', () => {
 })
 
 describe('the tint percentages match the CSS', () => {
-  it('CONTRAST_TINTS is exactly the color-mix(..., var(--panel)) rules in card.css, callout.css and base.css', () => {
-    // The same two-way pattern as `BASE_PALETTE` against `tokens.css`: the
-    // list and the stylesheet are two copies of the same fact, and only a
-    // test running against both catches the day they disagree.
-    const css = read('styles/card.css') + read('styles/callout.css') + read('styles/base.css')
+  /** Every stylesheet but the Tailwind build, which is generated and holds no
+   *  hand-written `color-mix()`. */
+  const styleFiles = readdirSync(resolve(here, '../src/styles')).filter(
+    (f) => f.endsWith('.css') && f !== '_tailwind.built.css',
+  )
+
+  it('CONTRAST_TINTS plus EXCLUDED_TINTS is exactly every color-mix(in srgb, var(--tone) N%, ...) in styles/', () => {
+    // The same two-way pattern as `BASE_PALETTE` against `tokens.css`, over
+    // every stylesheet rather than the three this measurement started with:
+    // a new tint anywhere fails this test until it is measured or excluded
+    // on purpose, so it cannot ship silently.
+    const css = styleFiles.map((f) => read(`styles/${f}`)).join('\n')
     const found = new Set<string>()
     for (const m of css.matchAll(
-      /color-mix\(in srgb, var\((--[a-z-]+)\) (\d+)%, var\(--panel\)\)/g,
+      /color-mix\(in srgb, var\((--[a-z-]+)\) (\d+)%, (var\(--[a-z-]+\)|transparent)\)/g,
     )) {
-      found.add(`${m[1]}|${m[2]}`)
+      const surface = m[3].startsWith('var(') ? m[3].slice(4, -1) : 'transparent'
+      found.add(`${m[1]}|${m[2]}|${surface}`)
     }
-    const listed = new Set(CONTRAST_TINTS.map((t) => `${t.tone}|${t.percent}`))
+    const listed = new Set([
+      ...CONTRAST_TINTS.map((t) => `${t.tone}|${t.percent}|${t.surface}`),
+      ...EXCLUDED_TINTS.map((t) => `${t.tone}|${t.percent}|${t.surface}`),
+    ])
     expect([...listed].sort()).toEqual([...found].sort())
+  })
+
+  it('CONTRAST_TINTS and EXCLUDED_TINTS do not name the same tint twice', () => {
+    const listedTints = CONTRAST_TINTS.map((t) => `${t.tone}|${t.percent}|${t.surface}`)
+    const excludedTints = new Set(EXCLUDED_TINTS.map((t) => `${t.tone}|${t.percent}|${t.surface}`))
+    for (const key of listedTints) expect(excludedTints.has(key), key).toBe(false)
   })
 })
