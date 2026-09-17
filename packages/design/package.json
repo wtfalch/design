@@ -75,6 +75,7 @@
     "react-aria-components": "^1.21.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.62.1",
     "@tailwindcss/cli": "^4.3.3",
     "@tiptap/extension-link": "^3.31.3",
     "@tiptap/extensions": "^3.31.3",
