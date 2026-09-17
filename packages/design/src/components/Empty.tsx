@@ -87,7 +87,7 @@ export default function Empty({
       ) : (
         icon && (
           <span className="text-muted leading-[0]" aria-hidden="true">
-            <Icon name={icon} size={20} />
+            <Icon name={icon} size="lg" />
           </span>
         )
       )}
