@@ -87,7 +87,7 @@ export default function Shell({
             {/* Below `md` there is no docked rail -- `SideList.Trigger` in
                 `who` is the only way to the places, and the header is the
                 same band-centred markup a `Shell` with no `side` renders. */}
-            <div className="md:hidden">
+            <div className="shell-head-phone">
               <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
                 {brand}
                 {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
@@ -106,8 +106,18 @@ export default function Shell({
                 brand's. Two copies of the same content, hidden by breakpoint
                 rather than switched by script, the way `SideList` itself
                 renders its rail and its sheet -- `Shell` stays server-
-                renderable, with no hook deciding which one drew. */}
-            <div className="hidden md:block">
+                renderable, with no hook deciding which one drew.
+
+                **`shell-head-phone`/`shell-head-wide`, not `md:hidden` and
+                `hidden md:block`.** Those two utilities have to be generated
+                by the consuming app's own Tailwind build, and the app never
+                writes them -- they live only in this file, which its content
+                scan does not read. `manage` already carries a hand-written
+                `@media` block restoring `.shell-side` and `.side-list-rail`
+                for exactly this reason. These two get the display rule from
+                `shell.css`, which ships with the package, so there is nothing
+                for a consumer to restore. */}
+            <div className="shell-head-wide">
               <div className="flex items-center min-w-0">
                 <div className="flex-none w-[var(--shell-side-width)] px-3 py-3 flex items-center min-w-0">
                   {brand}
