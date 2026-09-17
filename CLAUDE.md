@@ -156,7 +156,7 @@ allowed to, once, explained in the commit.
   `html:root`, the default theme until one is picked, one rule per theme);
   `bindProduct` returns the `Brand`, `THEMES` and `applyTheme` that are the
   product's; `contrastFailures` is the measurement its tests run. From 0.3.0
-  to 0.16.1 otf's and valet's products lived in `src/products/` and shipped as
+  to 0.16.2 otf's and valet's products lived in `src/products/` and shipped as
   entries and stylesheets. Every new surface brought its own palette, and each
   palette became a release here and a pin bump in every app, so 0.17.0 moved
   them out. The package keeps one theme, `system`, because its light half is

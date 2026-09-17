@@ -20,7 +20,7 @@ import { themeId } from '../themes/css'
  * product. Before this layer valet's two palettes each restated valet's font
  * and corners, because there was nowhere else to put them.
  *
- * **A product lives in its own repo.** From 0.3.0 to 0.16.1 otf and valet were
+ * **A product lives in its own repo.** From 0.3.0 to 0.16.2 otf and valet were
  * declared here, and each shipped as a package entry and a stylesheet. Every
  * new surface brought its own palette, and every palette became a release of
  * this package and a pin bump in every app. An app now declares its product

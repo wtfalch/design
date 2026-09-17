@@ -291,7 +291,7 @@ const system: Theme = {
 /**
  * Every theme the package knows, keyed by the name a consumer applies.
  *
- * From 0.3.0 to 0.16.1 this was the union of every product's themes: otf's
+ * From 0.3.0 to 0.16.2 this was the union of every product's themes: otf's
  * three and valet's two, declared in `src/products/`. A theme is part of a
  * product's identity the way its mark is, and the surfaces multiplied until
  * every new palette was a release here and a pin bump in every app. The

@@ -103,7 +103,7 @@ before the bundle loads only to restore a theme somebody picked (see First
 paint). A product whose default is `system`, a `prefers-color-scheme` rule
 rather than a palette, still sets the attribute.
 
-**Why the products left.** From 0.3.0 to 0.16.1 otf and valet were declared in
+**Why the products left.** From 0.3.0 to 0.16.2 otf and valet were declared in
 this package, each with an entry (`@wtfalch/design/otf`) and a stylesheet
 (`otf.css`). Every new surface brought its own palette, and every palette was a
 release here and a pin bump in every app. 0.17.0 removed both entries, the
