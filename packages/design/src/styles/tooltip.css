@@ -48,7 +48,7 @@
   visibility: hidden;
   transform: translateY(-3px);
   transition: opacity var(--dur-fast), transform var(--dur-fast), visibility var(--dur-fast);
-  z-index: 45;
+  z-index: var(--z-tooltip);
 }
 
 /* Which way it grows is `placement` on the component now -- `bottom start`

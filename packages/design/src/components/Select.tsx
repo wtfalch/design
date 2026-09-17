@@ -232,7 +232,7 @@ export default function Select({
           decision: a list taller than that is a list you scroll, not one that
           runs to the bottom of the screen. */}
       <Popover
-        className="sel-list z-[60] max-h-[280px] overflow-y-auto m-0 p-1 list-none border border-border-strong rounded-md surface-panel"
+        className="sel-list z-(--z-popover) max-h-[280px] overflow-y-auto m-0 p-1 list-none border border-border-strong rounded-md surface-panel"
         placement="bottom start"
         offset={4}
         maxHeight={280}

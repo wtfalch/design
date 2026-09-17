@@ -49,6 +49,7 @@ export { default as Field } from './components/Field'
 export { useFieldWiring } from './components/fieldWiring'
 export type { FieldWiring } from './components/fieldWiring'
 export { default as Icon } from './components/Icon'
+export type { IconSize } from './components/Icon'
 /** A person in one line -- initials, name, address -- and the two pure
  *  functions behind the disc, exported so a caller colouring something else
  *  by sender agrees with it. */

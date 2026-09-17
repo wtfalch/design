@@ -161,8 +161,9 @@ function renderItem(item: Item): React.ReactNode {
           itself now, in `menu.css`, so it is not restated here as
           utilities: two copies of the same surface is how the top-level
           popover ended up with none at all. What stays inline is this
-          popover's own sizing, which the top-level one does not share. */}
-      <AriaPopover className="menu-sheet min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-[60]">
+          popover's own sizing, which the top-level one does not share, plus
+          `z-(--z-popover)` from the named layering scale. */}
+      <AriaPopover className="menu-sheet min-w-[12rem] max-w-[min(20rem,calc(100vw-var(--space-6)))] max-h-[24rem] overflow-auto overscroll-contain z-(--z-popover)">
         <AriaMenu className="p-1 outline-none grid gap-[var(--border-width)]">
           {item.items.map(renderItem)}
         </AriaMenu>

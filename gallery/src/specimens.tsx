@@ -2347,7 +2347,10 @@ export const COMPONENTS: Component[] = [
       },
       {
         name: 'Sizes',
-        note: 'One number, because they are square and always have been.',
+        note:
+          'One number, because they are square and always have been. `sm` / `md` / ' +
+          '`lg` name three of these — 14, 16 and 20 — for a call site that wants a ' +
+          'word instead of a literal; a number, like every size below, still works.',
         render: () => (
           <Row>
             {[14, 16, 18, 22, 28].map((n) => (
