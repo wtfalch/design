@@ -13,9 +13,15 @@
  * things a screenshot cannot explain: the head is the height it was laid out
  * for, and a dialog is dialog-sized.
  */
+import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
 
 import { THEMES, specimenUrl, themeApplied } from './specimens'
+
+/** Same list `a11y.spec.ts` fails on: the legal floor, `best-practice` left
+ *  out. Duplicated rather than imported, because that file is a test module
+ *  and not something worth wiring an import boundary around for one array. */
+const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
 const WINDOWS = [
   { c: 'modal', v: 'Default', trigger: /open a window/i, width: null },
@@ -284,6 +290,50 @@ for (const o of OPENED) {
       await expect(surface).toBeVisible()
       await page.evaluate(() => document.fonts.ready)
       await expect(surface).toHaveScreenshot(`${o.c}--open--${theme}.png`)
+    })
+  }
+}
+
+/**
+ * The two Menu variants added for otf's model picker, open.
+ *
+ * A row's `secondaryAction` and a warning composed onto `info` both only
+ * exist while the menu is open, and `visual.spec.ts`'s stage shot is the
+ * closed trigger -- the same gap `OPENED` above closes for the menu's first
+ * variant. This is a block of its own rather than two more rows in `OPENED`,
+ * because that array's screenshot name is keyed on `c` alone
+ * (`menu--open--*`): a second and third `menu` entry would collide with it
+ * and with each other. Named past the variant instead.
+ *
+ * It is also the only place either surface is ever scanned by axe:
+ * `a11y.spec.ts` scans `.spec-stage` as the page loads, before either portals
+ * out of it, in every theme -- a `running` pill once sat at 1.67:1 on Paper
+ * for weeks while every dark theme looked correct, so a single-theme scan is
+ * exactly the one that would miss a tone-tinted box doing the same.
+ */
+const MENU_ROWS = [
+  { v: 'A row with a settings action', slug: 'menu-row-action' },
+  { v: 'A warning above the actions', slug: 'menu-row-warning' },
+] as const
+
+for (const m of MENU_ROWS) {
+  for (const theme of THEMES) {
+    test(`menu · ${m.v} · open · ${theme}`, async ({ page }) => {
+      await page.clock.install({ time: new Date('2026-01-01T00:00:00Z') })
+      await page.goto(specimenUrl({ c: 'menu', v: m.v }, theme))
+      await themeApplied(page, theme)
+      await page.getByRole('button', { name: /voice/i }).click()
+
+      const surface = page.locator('.menu-sheet').first()
+      await expect(surface).toBeVisible()
+      await page.evaluate(() => document.fonts.ready)
+      await expect(surface).toHaveScreenshot(`${m.slug}--open--${theme}.png`)
+
+      const results = await new AxeBuilder({ page }).include('.menu-sheet').withTags(TAGS).analyze()
+      expect(
+        results.violations.map((v) => v.id),
+        `new accessibility violations in menu / ${m.v} / ${theme}`,
+      ).toEqual([])
     })
   }
 }

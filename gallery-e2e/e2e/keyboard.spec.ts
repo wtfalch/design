@@ -1501,3 +1501,76 @@ test.describe('ThemeSwitch', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'paper')
   })
 })
+
+/**
+ * `Item.secondaryAction`, and a warning composed onto `info` rather than a
+ * dedicated notice type, both added for otf's model picker.
+ *
+ * A separate `describe` from the general `Menu` keyboard coverage above (a
+ * different branch, merged first) on purpose: two changes that touch none of
+ * the same rows share no block, so there is nothing here for either to
+ * conflict with.
+ */
+test.describe('Menu rows', () => {
+  const WITH_ACTION = { c: 'menu', v: 'A row with a settings action' }
+  const WITH_WARNING = { c: 'menu', v: 'A warning above the actions' }
+
+  test('a row and its settings action are two separate stops, each firing its own handler', async ({
+    page,
+  }) => {
+    await page.goto(specimenUrl(WITH_ACTION, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toBeVisible()
+
+    /* The row and its gear are two `menuitem`s in collection order, so one
+       more press of the down arrow is what reaches the second. */
+    await expect(page.locator(':focus')).toHaveAccessibleName('Aria')
+    await page.keyboard.press('ArrowDown')
+    await expect(page.locator(':focus')).toHaveAccessibleName('Aria settings')
+
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+    /* The gear's own handler ran, not the row's -- proof the two are
+       independent rather than one activating both. */
+    await expect(page.locator('.g-hint')).toHaveText('Configuring Aria')
+  })
+
+  test('the row itself still chooses, unaffected by its action existing', async ({ page }) => {
+    await page.goto(specimenUrl(WITH_ACTION, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await expect(page.locator(':focus')).toHaveAccessibleName('Aria')
+
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+    await expect(page.locator('.g-hint')).toHaveText('Reading with Aria')
+  })
+
+  test('a warning in `info` is never a stop arrow-key navigation reaches', async ({ page }) => {
+    await page.goto(specimenUrl(WITH_WARNING, 'system'))
+    await themeApplied(page, 'system')
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('menu')).toBeVisible()
+
+    /* Two real rows. Three presses over a two-item menu wraps back to the
+       first row on the second -- if the warning were a stop between the last
+       row and the wrap, one of these three would land on it instead. `info`
+       is not part of `AriaMenu`'s children at all (see `Menu.tsx`'s
+       docblock), so this is really testing the same guarantee
+       `menuInfo.test.ts` does, against the real DOM a browser builds. */
+    const roles: (string | null)[] = []
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press('ArrowDown')
+      roles.push(await page.locator(':focus').getAttribute('role'))
+    }
+    expect(roles).toEqual(['menuitem', 'menuitem', 'menuitem'])
+
+    /* Present, just not a stop: the Callout renders and can be found by its
+       own text, proof this is composition, not a gap. */
+    await expect(page.getByText(/local voices unavailable/i)).toBeVisible()
+  })
+})

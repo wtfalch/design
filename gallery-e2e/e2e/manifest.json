@@ -205,6 +205,14 @@
   },
   {
     "c": "menu",
+    "v": "A row with a settings action"
+  },
+  {
+    "c": "menu",
+    "v": "A warning above the actions"
+  },
+  {
+    "c": "menu",
     "v": "Grouped, with a description"
   },
   {
