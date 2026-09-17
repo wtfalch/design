@@ -184,12 +184,14 @@ input[type='radio']:active:not(:disabled) {
   transition: none;
 }
 
-/* Held on the knob itself. React Aria's `data-pressed` never arrives for a
-   press the track kept to itself, so the track says so with `data-held` and the
-   knob widens the same 16px it does under the label's press. */
-.switch-row .toggle[data-held]:not([data-dragging])::after { width: 16px; transition: width var(--dur-fast); }
-
-.switch-row[data-selected] .toggle[data-held]:not([data-dragging])::after { left: calc(100% - 18px); }
+/* A press on the track used to say so at once, with `data-held` widening the
+   knob the same 16px `data-pressed` does for a label press -- React Aria's
+   `data-pressed` never arrives for a press the track kept to itself. But a
+   plain tap never becomes anything else, so it was "held" for its whole
+   length: widen on down, snap back on up, on every click, before `Toggle.tsx`
+   even knew whether a drag was starting. That read as the switch flickering.
+   `data-held` is gone (2026-09-17); a tap is silent now, and only a press
+   that crosses `SLOP` renders anything, as `data-dragging` above. */
 
 /* Pending: chef-monorepo's sweep, in this vocabulary.
    `PendingSweep` from chef's `Toggle.tsx`, copied 2026-09-05 at William's
