@@ -19,10 +19,14 @@
  * sits on that tint, not on `--panel` itself -- so `mix()` below reproduces
  * the browser's own arithmetic for every tint a component actually draws text
  * over, and `contrastFailures` measures those surfaces too.
- * `test/contrast.test.ts` scans every stylesheet for the shape
- * `color-mix(in srgb, var(--tone) N%, ...)` and fails if anything is neither
- * in `CONTRAST_TINTS` nor in `EXCLUDED_TINTS` -- a new tint has to be measured
- * or excluded on purpose, not shipped silently.
+ * `test/contrast.test.ts` finds every `color-mix(` in every stylesheet --
+ * balancing parentheses, not one fixed shape, because `currentColor`, a
+ * `hsl()` first colour, a `var()` percentage and `in oklab` all appear here
+ * and none of them is `color-mix(in srgb, var(--tone) N%, var(...))` -- and
+ * fails if anything is neither in `CONTRAST_TINTS` nor in `EXCLUDED_TINTS` --
+ * a new tint has to be measured or excluded on purpose, not shipped silently.
+ * `.ident-disc`'s tint is neither: its hue is a value from JS, not a fixed
+ * token, so it is swept across every hue instead, in the same file.
  */
 import type { ThemeTokens } from './themes'
 
@@ -131,12 +135,14 @@ export interface ContrastTint {
  * `Rows`'s picked row, `DangerZone` and `Menu`'s destructive item all mix a
  * tone into `--panel` rather than naming a token, so a check against
  * `--panel` alone never measured the surface a reader looks at. This is that
- * surface, computed with `mix()`. `test/contrast.test.ts` scans every
- * stylesheet in `styles/` for `color-mix(in srgb, var(--tone) N%, ...)` and
- * fails if this list and `EXCLUDED_TINTS` together disagree with what is
- * there -- the same two-way pattern that holds `BASE_PALETTE` to
- * `tokens.css`, widened to every file rather than the three this started
- * with, so a new tint anywhere has to be measured or excluded on purpose.
+ * surface, computed with `mix()`. `test/contrast.test.ts` finds every
+ * `color-mix(` in `styles/` and fails if this list and `EXCLUDED_TINTS`
+ * together disagree with what is there -- the same two-way pattern that
+ * holds `BASE_PALETTE` to `tokens.css`, widened to every file rather than the
+ * three this started with, so a new tint anywhere has to be measured or
+ * excluded on purpose. Every entry here mixes `in srgb`, the one colour
+ * space `mix()` reproduces -- a mix `in oklab` cannot be measured this way
+ * and is in `EXCLUDED_TINTS` instead, whatever it draws.
  *
  * Found this way: the Night theme's `.card-warn` mixes 18% of the base
  * `--warn` into its own `--panel` and gets `#39332b`; `--muted` on that tint
@@ -410,29 +416,46 @@ export const CONTRAST_TINTS: readonly ContrastTint[] = [
 ]
 
 interface ExcludedTint {
+  /** The mix's first colour, exactly as the CSS states it: `--tone` for
+   *  `var(--tone)`, or a literal expression -- `currentColor`, or
+   *  `hsl(var(--ident-hue) 60% 50%)` -- for anything else. */
   tone: string
-  percent: number
+  /** The percentage, exactly as the CSS states it: a number for `N%`, or the
+   *  literal expression -- `var(--press-ink)` -- when it is not one. */
+  percent: number | string
   surface: string
+  /** `color-mix`'s colour-interpolation method. Omitted means `srgb`; the
+   *  three that read `oklab` are the only mixes in these stylesheets that do,
+   *  and none is measurable by `mix()`, which reproduces `srgb` arithmetic
+   *  only. */
+  space?: string
   because: string
 }
 
 /**
- * Every `color-mix(in srgb, var(--tone) N%, ...)` in the stylesheets that is
- * not a `CONTRAST_TINTS` entry, and why. `test/contrast.test.ts` enforces
- * this list the same way it enforces `CONTRAST_TINTS`: a tint that is in
- * neither fails the suite, so a new one has to be measured or excluded on
- * purpose.
+ * Every `color-mix(` in the stylesheets that is not a `CONTRAST_TINTS`
+ * entry, and why. `test/contrast.test.ts` enforces this list the same way it
+ * enforces `CONTRAST_TINTS`: a tint that is in neither fails the suite, so a
+ * new one has to be measured or excluded on purpose.
  *
- * Two shapes recur. A **border-colour** mix (`--border`, `--border-strong`)
- * has no `text` token sitting on it -- nothing renders text in a
- * `border-color` -- so it cannot be written as a `ContrastTint`, whose `text`
- * field means exactly that. Its own WCAG 1.4.11 requirement (3:1 against the
- * surface on either side of it) is a different pair than "text on a tint",
- * and this measurement does not attempt it; `CONTRAST_PAIRS` already measures
- * the flat case, `--border-strong` on `--panel`. A mix into **`transparent`**
- * is not a literal palette colour at all: the result stays translucent, so
- * what actually renders depends on whatever sits behind the element -- not a
- * token this measurement can look up per theme.
+ * Several shapes recur. A **border-colour** mix (`--border`,
+ * `--border-strong`) has no `text` token sitting on it -- nothing renders
+ * text in a `border-color` -- so it cannot be written as a `ContrastTint`,
+ * whose `text` field means exactly that. Its own WCAG 1.4.11 requirement
+ * (3:1 against the surface on either side of it) is a different pair than
+ * "text on a tint", and this measurement does not attempt it; `CONTRAST_PAIRS`
+ * already measures the flat case, `--border-strong` on `--panel`. A mix into
+ * **`transparent`** is not a literal palette colour at all: the result stays
+ * translucent, so what actually renders depends on whatever sits behind the
+ * element -- not a token this measurement can look up per theme.
+ * **`currentColor`** is the same problem from the other side: it is always
+ * well-defined (the element's own `color`), but every one of these mixes it
+ * *into* `transparent`, so the same translucency applies. A **`--press-ink`
+ * (or `--slider-risk`)** percentage is a CSS custom property, not a literal
+ * this scan can read off the declaration -- `mix()` takes a number. And a mix
+ * **`in oklab`** is not what `mix()` computes: it reproduces the browser's
+ * `srgb` interpolation only, so an `oklab` mix cannot be measured here
+ * whatever it draws.
  */
 export const EXCLUDED_TINTS: readonly ExcludedTint[] = [
   // Border-colour mixes: a border, not text.
@@ -498,6 +521,107 @@ export const EXCLUDED_TINTS: readonly ExcludedTint[] = [
     percent: 28,
     surface: '--control',
     because: 'neither side is a literal palette token',
+  },
+  {
+    tone: '--bad',
+    percent: 'var(--slider-risk)',
+    surface: '--accent',
+    because:
+      "the slider fill's own base colour: --slider-risk is a variable, and the fill carries no text",
+  },
+  // `currentColor`, mixed into `transparent`: always well-defined, but the
+  // result is translucent regardless, so what renders still depends on
+  // whatever sits behind the element -- the same reason a mix into
+  // `transparent` above is excluded.
+  {
+    tone: 'currentColor',
+    percent: 22,
+    surface: 'transparent',
+    because: "a pill's own border: translucent into transparent, not a literal pair",
+  },
+  {
+    tone: 'currentColor',
+    percent: 10,
+    surface: 'transparent',
+    because:
+      "a pill's or the danger name's own fill: translucent into transparent, not a literal pair",
+  },
+  {
+    tone: 'currentColor',
+    percent: 13,
+    surface: 'transparent',
+    because: 'a skeleton draws no text at all, and is translucent into transparent besides',
+  },
+  {
+    tone: 'currentColor',
+    percent: 20,
+    surface: 'transparent',
+    because: 'a skeleton draws no text at all, and is translucent into transparent besides',
+  },
+  // `--press-ink`: a pressed control's overlay, the same rule everywhere --
+  // `background: color-mix(in srgb, var(--text) var(--press-ink), <hover
+  // colour>)`. The percentage is a variable, not a literal this scan can read
+  // off the declaration, so it cannot be written as a `ContrastTint` either.
+  {
+    tone: '--text',
+    percent: 'var(--press-ink)',
+    surface: '--control',
+    because: "a pressed control's overlay: --press-ink is a variable, not a literal percentage",
+  },
+  {
+    tone: '--text',
+    percent: 'var(--press-ink)',
+    surface: '--accent',
+    because:
+      "a pressed primary button's overlay: --press-ink is a variable, not a literal percentage",
+  },
+  {
+    tone: '--text',
+    percent: 'var(--press-ink)',
+    surface: '--panel-2',
+    because: "a pressed control's overlay: --press-ink is a variable, not a literal percentage",
+  },
+  // The identity disc's own tint (`identity.css`): `--ident-hue` is set
+  // inline per person, from JS, not one of this measurement's palettes --
+  // swept across every hue instead, in `test/contrast.test.ts`'s "the
+  // identity disc, across every hue".
+  {
+    tone: 'hsl(var(--ident-hue) 60% 50%)',
+    percent: 22,
+    surface: '--panel',
+    because: 'the hue is any value from JS, not a fixed pair -- swept across every hue instead',
+  },
+  {
+    tone: 'hsl(var(--ident-hue) 60% 50%)',
+    percent: 45,
+    surface: 'transparent',
+    because:
+      "the disc's own border: the hue is per-identity, and it is translucent into transparent besides",
+  },
+  // `in oklab`: not what `mix()` computes, so unmeasurable here whatever they
+  // draw -- a border, and a decorative spinner that draws no text at all.
+  {
+    tone: '--bad',
+    percent: 45,
+    surface: '--border',
+    space: 'oklab',
+    because: 'a dialog border, not text -- and mixed in oklab, which mix() does not compute',
+  },
+  {
+    tone: '--accent',
+    percent: 70,
+    surface: 'transparent',
+    space: 'oklab',
+    because:
+      "the pending sweep's own arc: decorative, and mixed in oklab, which mix() does not compute",
+  },
+  {
+    tone: '--accent',
+    percent: 45,
+    surface: 'transparent',
+    space: 'oklab',
+    because:
+      "the pending sweep's reduced-motion band: decorative, and mixed in oklab, which mix() does not compute",
   },
 ]
 
