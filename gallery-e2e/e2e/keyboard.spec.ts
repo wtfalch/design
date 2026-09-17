@@ -1372,21 +1372,30 @@ test.describe('Pagination', () => {
 
 test.describe('SideList', () => {
   const PLACES = { c: 'sidelist', v: 'Default' }
-  const ITEMS = [
-    'Home',
-    'Accounts',
-    'Teams',
-    'Roles',
-    'Activity',
-    'Settings',
-    'Email',
-    'AI',
-    'Storage',
-    'Keys',
-    'Organisations',
-    'Support sessions',
-    'Estate log',
+  /** Every row in tab order, with the role it draws.
+   *
+   *  `Storage` is a `SideList.Tool` -- a tool that opens its own sections in
+   *  place -- so it is a `button`, not a link. A place you navigate to has to
+   *  be an anchor; a disclosure that opens something on the page you are
+   *  already on has nothing to link to, and `SideList.Tool`'s docblock says
+   *  so. Its sections are collapsed by default and therefore out of the tab
+   *  order, which the disclosure test below covers. */
+  const ITEMS: readonly { name: string; role: 'link' | 'button' }[] = [
+    { name: 'Home', role: 'link' },
+    { name: 'Accounts', role: 'link' },
+    { name: 'Teams', role: 'link' },
+    { name: 'Roles', role: 'link' },
+    { name: 'Activity', role: 'link' },
+    { name: 'Settings', role: 'link' },
+    { name: 'Email', role: 'link' },
+    { name: 'AI', role: 'link' },
+    { name: 'Storage', role: 'button' },
+    { name: 'Keys', role: 'link' },
+    { name: 'Organisations', role: 'link' },
+    { name: 'Support sessions', role: 'link' },
+    { name: 'Estate log', role: 'link' },
   ]
+  const PLACE_LINKS = ITEMS.filter((i) => i.role === 'link').map((i) => i.name)
 
   test('Tab walks the switcher then every place, in order', async ({ page }) => {
     await page.goto(specimenUrl(PLACES, 'system'))
@@ -1396,13 +1405,34 @@ test.describe('SideList', () => {
     await expect(page.getByRole('button', { name: /Organisation/ })).toBeFocused()
 
     // `exact` matters here -- "AI" is a substring of "Email".
-    for (const name of ITEMS) {
+    for (const { name, role } of ITEMS) {
       await page.keyboard.press('Tab')
       await expect(
-        page.getByRole('link', { name, exact: true }),
+        page.getByRole(role, { name, exact: true }),
         `Tab did not reach ${name}`,
       ).toBeFocused()
     }
+  })
+
+  test('a collapsed tool keeps its own sections out of the tab order', async ({ page }) => {
+    await page.goto(specimenUrl(PLACES, 'system'))
+    await themeApplied(page, 'system')
+
+    const storage = page.getByRole('button', { name: 'Storage', exact: true })
+    await expect(storage).toHaveAttribute('aria-expanded', 'false')
+
+    // Collapsed, the next Tab leaves the tool for the next place rather than
+    // descending into sections nobody can see.
+    await storage.focus()
+    await page.keyboard.press('Tab')
+    await expect(page.getByRole('link', { name: 'Keys', exact: true })).toBeFocused()
+
+    // Opened from the keyboard, the sections become reachable in place.
+    await storage.focus()
+    await page.keyboard.press('Enter')
+    await expect(storage).toHaveAttribute('aria-expanded', 'true')
+    await page.keyboard.press('Tab')
+    await expect(page.locator('.side-list-tool-sections a').first()).toBeFocused()
   })
 
   test('the current place carries aria-current="page", and no other one does', async ({ page }) => {
@@ -1413,12 +1443,17 @@ test.describe('SideList', () => {
       'aria-current',
       'page',
     )
-    for (const name of ITEMS.filter((n) => n !== 'Accounts')) {
+    for (const name of PLACE_LINKS.filter((n) => n !== 'Accounts')) {
       await expect(
         page.getByRole('link', { name, exact: true }),
         `${name} must not carry aria-current`,
       ).not.toHaveAttribute('aria-current', /.*/)
     }
+    // A tool is not a place, so it never claims to be the current one.
+    await expect(
+      page.getByRole('button', { name: 'Storage', exact: true }),
+      'a tool must not carry aria-current',
+    ).not.toHaveAttribute('aria-current', /.*/)
   })
 })
 
