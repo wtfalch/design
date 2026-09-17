@@ -169,8 +169,15 @@ export type { Theme, ThemeTokens } from './themes'
 export { productCss, themeCss, themeId } from './themes/css'
 
 /** The measurement behind the contrast rule, for a theme that is yours. */
-export { BASE_PALETTE, CONTRAST_PAIRS, contrastFailures, luminance, ratio } from './contrast'
-export type { ContrastPair } from './contrast'
+export {
+  BASE_PALETTE,
+  CONTRAST_PAIRS,
+  CONTRAST_TINTS,
+  contrastFailures,
+  luminance,
+  ratio,
+} from './contrast'
+export type { ContrastPair, ContrastTint } from './contrast'
 
 /** The products: the layer between the system and a theme. A product lives in
  *  the app that wears it, declared with `defineProduct` and bound once with
