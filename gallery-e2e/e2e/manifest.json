@@ -108,6 +108,26 @@
     "v": "In a card"
   },
   {
+    "c": "field",
+    "v": "Hidden label"
+  },
+  {
+    "c": "field",
+    "v": "In error"
+  },
+  {
+    "c": "field",
+    "v": "Label and hint"
+  },
+  {
+    "c": "field",
+    "v": "Required"
+  },
+  {
+    "c": "field",
+    "v": "Row layout"
+  },
+  {
     "c": "icon",
     "v": "In a button"
   },
@@ -186,6 +206,18 @@
   {
     "c": "modal",
     "v": "Default"
+  },
+  {
+    "c": "pageheading",
+    "v": "as=\"p\""
+  },
+  {
+    "c": "pageheading",
+    "v": "Default"
+  },
+  {
+    "c": "pageheading",
+    "v": "With a Pill beside it"
   },
   {
     "c": "pagination",
@@ -438,5 +470,9 @@
   {
     "c": "tour",
     "v": "Pointing at a control"
+  },
+  {
+    "c": "visuallyhidden",
+    "v": "An icon button’s name"
   }
 ]
