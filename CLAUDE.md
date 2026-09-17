@@ -111,7 +111,7 @@ allowed to, once, explained in the commit.
 ## The vocabulary
 
 - **Three kinds of token, and `tokens.test.ts` holds all three lists to
-  `tokens.css` in both directions.** 47 themeable, 16 derived, 11 fixed. A token
+  `tokens.css` in both directions.** 49 themeable, 16 derived, 11 fixed. A token
   added to the stylesheet and to no list fails the suite rather than becoming a
   fourth, undocumented category. The split is what turned "twenty tokens no
   theme can name" from an omission into a decision: `--text-*` and `--space-*`
@@ -126,7 +126,7 @@ allowed to, once, explained in the commit.
   time — no error, no fallback, no border. `.think-body` sat on exactly that
   for weeks. `tools/audit-css.mjs` finds the three shapes: undefined with no
   fallback (a bug); a slot used with a fallback and declared nowhere (themeable
-  in appearance only — `--illo-paper` and `--shadow-lg` were this); and a token
+  in appearance only — `--illo-paper` was this); and a token
   declared on `:root` outside `tokens.css` (`--control` was this, used seven
   times and reachable by no theme). The last two are now in the vocabulary.
 - **Contrast is measured, not judged.** 4.5:1 for text, 3:1 for a control
@@ -316,8 +316,10 @@ because a rename after it is a breaking change for everyone.
 
 ## Publishing
 
-`release.yml` publishes on a `v*` tag, with provenance, after the same gates CI
-runs, and stops if the tag disagrees with `package.json`. A markup change after
+`release.yml` publishes on a `v*` tag through OIDC trusted publishing, after the
+same gates CI runs, and stops if the tag disagrees with `package.json`. No
+`--provenance`: npm refuses a provenance attestation against a private source
+repository, and every repo here is one. A markup change after
 publication is breaking for anyone who styled against the first version.
 `files: ["dist"]`; `pnpm pack` in `packages/design` makes the tarball a consumer
 can install by path, which is how otf runs until `0.1.0` is on npm.

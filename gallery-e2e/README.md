@@ -19,7 +19,7 @@ pnpm a11y:record                          # re-record the known violations
 
 | | |
 |---|---|
-| `visual.spec.ts` | 68 specimens × 3 themes = 204 images |
+| `visual.spec.ts` | every specimen in `manifest.json`, in every theme in `THEMES`, one image each |
 | `a11y.spec.ts` | axe per specimen (structure once, contrast per theme) |
 | `reduced-motion.spec.ts` | the durations actually collapse in the browser |
 | `manifest.spec.ts` | the committed work list still matches the gallery |

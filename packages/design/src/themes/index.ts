@@ -2,7 +2,7 @@
  * The themes, and the vocabulary they are allowed to speak.
  *
  * A theme is a `Partial<ThemeTokens>`: name the tokens you change, inherit the
- * rest from `tokens.css`. Without that, every theme is a forty-six line chore
+ * rest from `tokens.css`. Without that, every theme is a forty-nine line chore
  * and every token added later means editing all of them.
  *
  * The type is the enforcement. A typo in a token name is a compile error rather
@@ -25,7 +25,7 @@
  *
  * Splitting the list is what makes that a decision rather than an omission:
  *
- * - **themeable** — a theme may set it. Forty-six of them.
+ * - **themeable** — a theme may set it. Forty-nine of them.
  * - **derived** — computed from a themeable token, and a theme must NOT set it.
  *   `--text-*` are `calc()` off `--font-size` and `--space-*` are `calc()` off
  *   `--density`, so overriding one step with a literal is how you get a type

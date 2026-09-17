@@ -169,3 +169,30 @@ describe('the built-in themes', () => {
     expect(Object.keys(THEMES.system.tokens)).toEqual([])
   })
 })
+
+describe('the README', () => {
+  // The counts in "## The three kinds of token" are prose, not a computed
+  // value, so they drift the moment a token moves between lists -- which is
+  // exactly how the package README said "(47)" while `TOKEN_KEYS` had grown
+  // to 49. Read the three counts back out of the file itself and hold them
+  // to the same lists `tokens.test.ts` already trusts.
+  const readme = readFileSync(resolve(here, '../README.md'), 'utf8')
+
+  function readmeCount(kind: string): number {
+    const m = readme.match(new RegExp(`\\*\\*${kind}\\*\\* \\((\\d+)\\)`))
+    if (!m) throw new Error(`README.md names no count for "${kind}"`)
+    return Number(m[1])
+  }
+
+  it('states the real themeable count', () => {
+    expect(readmeCount('themeable')).toBe(themeable.size)
+  })
+
+  it('states the real derived count', () => {
+    expect(readmeCount('derived')).toBe(derived.size)
+  })
+
+  it('states the real fixed count', () => {
+    expect(readmeCount('fixed')).toBe(fixed.size)
+  })
+})

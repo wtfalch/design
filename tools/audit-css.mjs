@@ -35,8 +35,20 @@
 import { readFileSync } from 'node:fs'
 
 /** Properties the program sets at run time. Declared in JS, so no stylesheet
- *  will ever contain them, and flagging them is noise. */
-const SET_FROM_JS = new Set(['--cols', '--row', '--rows', '--tabs'])
+ *  will ever contain them, and flagging them is noise. `--ident-hue` (Identity),
+ *  `--split` (SplitPane), `--digits` (Pagination) and `--knob-x` (Toggle) are
+ *  the same thing: each is set with `style={{ '--x': ... }}` in the component's
+ *  TSX, never in a stylesheet, so `declared` never sees it. */
+const SET_FROM_JS = new Set([
+  '--cols',
+  '--row',
+  '--rows',
+  '--tabs',
+  '--ident-hue',
+  '--split',
+  '--digits',
+  '--knob-x',
+])
 
 /**
  * Blank the comments, keeping the newlines.
@@ -47,7 +59,14 @@ const SET_FROM_JS = new Set(['--cols', '--row', '--rows', '--tabs'])
  */
 const strip = (s) => s.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
 
-const files = process.argv.slice(2)
+/* `scripts/copy-css.mjs` writes Tailwind's own compiled output to
+ * `styles/_tailwind.built.css`, which a `styles/*.css` glob picks up once a
+ * build has run. It is not this package's vocabulary -- nobody hand-declares
+ * `--color-red-50` or `--spacing` on `:root`, Tailwind does, in every project
+ * that uses it -- so auditing it reports Tailwind's own tokens as "secret"
+ * and any arbitrary-value `var(--x)` Tailwind compiled in as undefined.
+ * `contrast.test.ts` excludes the same file by name for the same reason. */
+const files = process.argv.slice(2).filter((f) => !f.endsWith('_tailwind.built.css'))
 if (files.length === 0) {
   console.error('usage: node tools/audit-css.mjs <tokens.css> <sheet.css> [...]')
   process.exit(1)

@@ -138,7 +138,7 @@ its fonts, and fall back to the family by name.
 
 | | |
 |---|---|
-| **themeable** (47) | A theme may set it. `TOKEN_KEYS`, and the keys of `ThemeTokens`. |
+| **themeable** (49) | A theme may set it. `TOKEN_KEYS`, and the keys of `ThemeTokens`. |
 | **derived** (16) | `calc()` off a themeable token, and **not** settable. `--text-*` follow `--font-size`; `--space-*` follow `--density`. Move the input, not the output — a step written as a literal is a scale that stopped scaling. |
 | **fixed** (11) | Not themeable. `--tile-control` is geometry other things are measured against, `--nudge` is optical alignment rather than spacing, `--tick-mask` is a glyph — an arbitrary SVG from a theme is a theme shipping markup — `--z-tooltip` through `--z-toast` are the stacking order the package's overlays sit in, and `--measure`, `--measure-wide` and `--measure-narrow` are how wide a line of content gets before it stops being readable. |
 
@@ -251,7 +251,7 @@ is the difference from `Markdown`, which parses and must sanitise.
 
 ## Status
 
-`0.3.1`. Twenty-eight components, every one of the 70 gallery specimens
+`0.20.0`. Forty-seven components, every one of the 125 gallery specimens
 photographed in four themes, the open windows photographed too, and the
 contrast, reduced-motion and keyboard rules are tests rather than sentences.
 It came out of [otf](https://github.com/wtfalch/otf), which is its first consumer;
