@@ -132,7 +132,17 @@ export default function Toggle({
      `onChange` is called once per gesture, or not at all if the knob was put
      back where it started -- a consumer that saves on change must not see a
      drag as two saves. The keyboard is untouched: the input is still the
-     switch. */
+     switch.
+
+     **Nothing moves before `SLOP` is crossed.** A `data-held` attribute used
+     to go on at `pointerdown`, before a tap and a drag were even different
+     things yet, so `toggle.css` could widen the knob under a thumb the way
+     `data-pressed` does for a label press. It fired on every plain click --
+     widen on down, snap back on up -- because a tap never crosses `SLOP` and
+     so never stopped being "held". That read as the switch flickering.
+     `data-held` is gone; a tap now renders nothing between down and up, and
+     only a press that actually crosses `SLOP` becomes visible at all, as
+     `data-dragging` (measured 2026-09-17). */
   /* The optimistic half, copied from chef-monorepo's `Toggle` on 2026-09-05.
 
      A switch applies as it moves, and what it applies is usually a request.
@@ -188,7 +198,6 @@ export default function Toggle({
   }, [pending])
 
   const [knob, setKnob] = useState<number | null>(null)
-  const [held, setHeld] = useState(false)
   const gesture = useRef<{
     id: number
     startX: number
@@ -229,7 +238,6 @@ export default function Toggle({
       <span
         className="toggle"
         aria-hidden="true"
-        data-held={held || undefined}
         data-dragging={knob === null ? undefined : true}
         style={knob === null ? undefined : ({ '--knob-x': knob } as React.CSSProperties)}
         onPointerDown={(e) => {
@@ -242,7 +250,6 @@ export default function Toggle({
             startY: e.clientY,
             moved: false,
           }
-          setHeld(true)
         }}
         onPointerMove={(e) => {
           const g = gesture.current
@@ -263,7 +270,6 @@ export default function Toggle({
           const g = gesture.current
           if (!g || e.pointerId !== g.id) return
           gesture.current = null
-          setHeld(false)
           setKnob(null)
           swallowClick.current = true
           const on = g.moved ? position(e.currentTarget, e.clientX) > 0.5 : !shown
@@ -271,7 +277,6 @@ export default function Toggle({
         }}
         onPointerCancel={() => {
           gesture.current = null
-          setHeld(false)
           setKnob(null)
         }}
         onClick={(e) => {
