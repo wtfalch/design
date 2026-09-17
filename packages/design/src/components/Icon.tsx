@@ -67,6 +67,7 @@
  *                             here -- see the comment on `person` in icons.ts)
  *   people    people
  *   key       key
+ *   home      house
  */
 
 import type { IconName } from './iconNames'

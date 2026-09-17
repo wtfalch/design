@@ -91,6 +91,13 @@ export const ICON_NAMES = [
   'person',
   'people',
   'key',
+  // The rail's Home row, which had no glyph of its own -- `ICON_NAMES` had
+  // no home/house/dashboard/overview word at all -- and wore `stars` instead:
+  // that name is documented above as the *generated-content* sparkle, unrelated
+  // to `star`/`star-filled`, so Home wore a symbol that means something else.
+  // Pepicons' `house`, already filled evenodd like most of the set; measured
+  // the same way as the rest, see the `Glyph` docstring in `Icon.tsx`.
+  'home',
 ] as const
 
 export type IconName = (typeof ICON_NAMES)[number]
