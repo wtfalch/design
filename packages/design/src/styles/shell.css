@@ -60,3 +60,25 @@
     display: block;
   }
 }
+
+/* The `context` slot's own box, between `brand` and `who` in both header
+ * copies -- a class here rather than utilities on the wrapping `div` in
+ * `Shell.tsx`, for the same reason `.shell-head-phone`/`.shell-head-wide`
+ * are: a Tailwind utility named only in that file never reaches a consuming
+ * app's build, and truncation depends on every one of these properties
+ * landing together, not most of them.
+ *
+ * `flex: 1 1 auto` claims whatever space `brand` and `who` leave rather than
+ * any width of its own, so the two never move when this slot appears or
+ * disappears. `min-width: 0` overrides a flex item's default `auto`, which
+ * refuses to shrink a box below its content's natural width -- without it, a
+ * long value would widen the header instead of truncating. The rest is plain
+ * single-line ellipsis, so a 60-character organisation name shortens instead
+ * of wrapping the band or pushing `who` off the edge. */
+.shell-head-context {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

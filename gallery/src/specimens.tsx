@@ -2595,6 +2595,31 @@ export const COMPONENTS: Component[] = [
           </div>
         ),
       },
+      {
+        name: 'With a context',
+        note: '`context` is the header’s third, fixed position -- between `brand` and `who`, generic all the way down. `Shell` only renders whichever node it is handed; manage’s is which organisation is current, but the package itself never learns the word. Northwind Traders International Holdings Group is 47 characters, long enough to prove it ellipses instead of pushing `who` off the edge or wrapping the band.',
+        render: () => (
+          <div style={{ height: 300, overflow: 'hidden' }}>
+            <Shell
+              brand={<strong>Management</strong>}
+              context={
+                <span className="quiet">Northwind Traders International Holdings Group</span>
+              }
+              who={
+                <>
+                  <span className="quiet">will@wtfalch.dev</span>
+                  <Button kind="ghost" size="sm">
+                    Sign out
+                  </Button>
+                </>
+              }
+            >
+              <h1 style={{ margin: 0 }}>Organisations</h1>
+              <p className="quiet">Every organisation on this estate.</p>
+            </Shell>
+          </div>
+        ),
+      },
     ],
   },
   {
