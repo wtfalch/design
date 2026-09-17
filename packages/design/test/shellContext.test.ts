@@ -1,8 +1,9 @@
 /**
  * `Shell`'s `context` slot: the title block's middle position (D3).
  *
- * Three things this guards, because the brief that added the slot called
- * each one out as the way to get it wrong:
+ * Four things this guards, because the brief that added the slot -- and a
+ * refuter who found what it missed -- called each one out as the way to get
+ * it wrong:
  *
  * 1. A `Shell` call that never passes `context` renders exactly the markup
  *    it rendered before the slot existed -- three apps already call `Shell`
@@ -15,6 +16,14 @@
  *    `shell-head-phone`/`shell-head-wide` when `side` is present.
  * 3. Nothing in the package -- not the prop name, not a class -- says
  *    "organisation". That word belongs to the app.
+ * 4. `who` gets a shrink guard, `.shell-head-who`, the moment `context`
+ *    exists -- without it, `context`'s own `flex: 1 1 auto` gives the row a
+ *    second box that can overflow on its own, and the browser then shrinks
+ *    every flexible sibling including `who`, clipping whatever sits at its
+ *    trailing edge. This suite only checks the markup carries the class in
+ *    the right condition; it cannot compute flexbox, so it cannot prove the
+ *    clipping is gone. That proof is a real layout assertion in a browser --
+ *    see `gallery-e2e/e2e/shell-context-overflow.spec.ts`.
  */
 import { readFileSync } from 'node:fs'
 import { createElement } from 'react'
@@ -75,13 +84,34 @@ describe('Shell with `context`', () => {
     }
   })
 
-  it('does not move brand or who -- their own wrapper classes are unchanged by its presence', () => {
+  it('does not move brand or who -- who keeps its own base classes plus the shrink guard', () => {
     const without = renderToStaticMarkup(createElement(Shell, { brand, who, nav, children }))
     const withCtx = renderToStaticMarkup(
       createElement(Shell, { brand, who, nav, context: longContext, children }),
     )
-    // Same band/who wrapper classes in both -- only the new slot's own div is inserted between them.
-    expect(withCtx.replace(/<div class="shell-head-context">.*?<\/div>/, '')).toBe(without)
+    // Strip the inserted `context` div and the shrink-guard class it triggers
+    // on `who`; what is left should be exactly the markup rendered with no
+    // `context` at all.
+    const stripped = withCtx
+      .replace(/<div class="shell-head-context">.*?<\/div>/, '')
+      .replace(' shell-head-who', '')
+    expect(stripped).toBe(without)
+  })
+
+  it('gives `who` the shrink guard only once `context` exists to compete with it', () => {
+    const without = renderToStaticMarkup(createElement(Shell, { brand, who, nav, children }))
+    expect(without).not.toContain('shell-head-who')
+
+    const withCtx = renderToStaticMarkup(
+      createElement(Shell, { brand, who, nav, context: longContext, children }),
+    )
+    // One `who` box with no side, two (`shell-head-phone` + `shell-head-wide`) with it.
+    expect(withCtx.split('shell-head-who').length - 1).toBe(1)
+
+    const withSideAndCtx = renderToStaticMarkup(
+      createElement(Shell, { brand, who, nav, side, context: longContext, children }),
+    )
+    expect(withSideAndCtx.split('shell-head-who').length - 1).toBe(2)
   })
 })
 
@@ -104,6 +134,12 @@ describe('shell.css owns the new slot’s layout', () => {
 
   it('is not named or hidden behind a raw md: utility the way 0.16.1 was', () => {
     expect(css).not.toMatch(/shell-head-context[^{]*\bmd:/)
+  })
+
+  it('defines .shell-head-who as a non-shrinking box, not a `shrink-0` utility in Shell.tsx', () => {
+    const match = css.match(/\.shell-head-who\s*\{([^}]*)\}/)
+    expect(match).not.toBeNull()
+    expect(match?.[1] ?? '').toMatch(/flex:\s*none/)
   })
 })
 

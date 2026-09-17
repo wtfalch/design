@@ -82,3 +82,25 @@
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+/* `who`'s own box, once `context` exists to compete with it for shrinkage --
+ * a class here rather than `flex-none`/`shrink-0` written as a utility in
+ * `Shell.tsx`, the same trap the two rules above already avoid.
+ *
+ * `who`'s box carries `min-w-0` regardless (a Tailwind utility, safe because
+ * it already appears throughout `Shell.tsx` and every app already using
+ * `Shell` renders it today), which lets it shrink below its content's width
+ * once the row overflows. With only `brand` beside it that never mattered --
+ * two ordinary flex children only shrink once their combined width overflows
+ * the row, which without a wide sibling essentially never happened. `context`
+ * changes that: it is sized to its own content before anything shrinks, so a
+ * long value can overflow the row by itself, and the browser then shrinks
+ * every flexible sibling to fit -- `who` included, clipping whatever sits at
+ * its trailing edge (a sign-out button, in the case this was caught in).
+ * `flex: none` pins `who` to its content width so `.shell-head-context` --
+ * built to give ground -- absorbs the deficit alone. `Shell.tsx` applies this
+ * class only when `context` is present, so a call without it keeps the exact
+ * `who` markup it always rendered. */
+.shell-head-who {
+  flex: none;
+}

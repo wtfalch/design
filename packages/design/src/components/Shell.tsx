@@ -42,6 +42,20 @@
  * whichever space they leave rather than any of its own, so a long value
  * ellipses instead of wrapping the band or pushing `who` off the edge.
  *
+ * **`who` stops shrinking the moment `context` exists to shrink instead.**
+ * `who`'s own box already carried `min-w-0` -- harmless with only `brand`
+ * beside it, because two ordinary flex children only shrink once their
+ * combined width overflows, and that never happened in practice. `context`
+ * changes the arithmetic: it is a flex item too, sized to its own content
+ * before anything shrinks, so a long value can overflow the row on its own
+ * and the browser then shrinks every flexible sibling to fit -- `who`
+ * included, which is how a live "Sign out" button ended up a few pixels
+ * short and clipped rather than fully visible. `.shell-head-who` in
+ * `shell.css` pins `who` to its content width so `.shell-head-context` -- the
+ * one box built to give ground -- absorbs the deficit alone; the class is
+ * applied only when `context` is present, so a `Shell` call without it keeps
+ * the exact `who` markup it always rendered.
+ *
  * **The header knows about the rail too, at the same breakpoint.** Below
  * `md` it is the one band it always was. At `md` and up, with `side`
  * present, it splits into a brand zone the rail's own width and padding --
@@ -94,6 +108,11 @@ export default function Shell({
      classes and had to remember both. */
   const measure = wide ? 'max-w-[var(--shell-measure-wide)]' : 'max-w-[var(--shell-measure)]'
   const band = `w-full mx-auto px-4 ${measure}`
+  /* `shell-head-who` only when `context` is there to need it -- see the
+     docblock above. Appending it conditionally, rather than shipping it on
+     `who`'s box unconditionally, is what keeps a `Shell` call with no
+     `context` rendering the exact markup it always has. */
+  const whoBox = `flex items-center gap-3 min-w-0${context ? ' shell-head-who' : ''}`
 
   return (
     <div
@@ -112,7 +131,7 @@ export default function Shell({
               <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
                 {brand}
                 {context && <div className="shell-head-context">{context}</div>}
-                {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
+                {who && <div className={whoBox}>{who}</div>}
               </div>
               {nav && <div className={`${band} pb-2`}>{nav}</div>}
             </div>
@@ -146,7 +165,7 @@ export default function Shell({
                 </div>
                 <div className={`${band} flex items-center justify-end gap-4 py-3 min-w-0`}>
                   {context && <div className="shell-head-context">{context}</div>}
-                  {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
+                  {who && <div className={whoBox}>{who}</div>}
                 </div>
               </div>
               {nav && (
@@ -161,7 +180,7 @@ export default function Shell({
           <div className={`${band} flex items-center justify-between gap-4 py-3 min-w-0`}>
             {brand}
             {context && <div className="shell-head-context">{context}</div>}
-            {who && <div className="flex items-center gap-3 min-w-0">{who}</div>}
+            {who && <div className={whoBox}>{who}</div>}
           </div>
         )}
         {!side && nav && <div className={`${band} pb-2`}>{nav}</div>}
