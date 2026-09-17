@@ -237,7 +237,12 @@ mark in the table.
 Requires React 19. Behaviour comes from
 [React Aria Components](https://react-spectrum.adobe.com/react-aria/); every
 pixel is the stylesheet's, styled through `data-*` attributes off the token
-vocabulary. No Tailwind, no utility layer.
+vocabulary. Components draw themselves with Tailwind utilities bound to that
+vocabulary, compiled into `@wtfalch/design/styles.css` at build: you install no
+Tailwind to use this package, and none of Tailwind's own defaults reach you. An
+app that wants utilities for its own layout binds its `@theme` to the tokens
+here and imports no preflight, because this package styles `button`, `input`,
+`select` and `textarea` by element and the reset would unstyle them.
 
 ## Source and issues
 
