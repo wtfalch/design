@@ -1,5 +1,13 @@
 [
   {
+    "c": "accountmenu",
+    "v": "In the title block"
+  },
+  {
+    "c": "accountmenu",
+    "v": "No display name"
+  },
+  {
     "c": "brand",
     "v": "In the header"
   },
@@ -184,6 +192,10 @@
     "v": "On a message"
   },
   {
+    "c": "menu",
+    "v": "With an info box above the actions"
+  },
+  {
     "c": "modal",
     "v": "Default"
   },
@@ -310,6 +322,10 @@
   {
     "c": "shell",
     "v": "Default"
+  },
+  {
+    "c": "shell",
+    "v": "With a context"
   },
   {
     "c": "shell",
