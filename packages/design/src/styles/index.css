@@ -44,6 +44,10 @@
 @import './command.css';
 @import './pagination.css';
 @import './identity.css';
+/* The account control's trigger, after `identity.css` and `menu.css`: it
+   reaches into `.ident` for its hover state and sits inside `.menu-sheet`,
+   so both rules have to exist before this one can rely on them. */
+@import './accountmenu.css';
 /* Prose and the surface it is written on, added in 0.8.0. Last, because
    `.prose` styles the elements the reset in `base.css` flattened and has to
    win over it, and because the editor's box sits over nothing. */
