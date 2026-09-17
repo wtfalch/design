@@ -2,7 +2,7 @@
 
 `@wtfalch/design` is wtfalch's design system. It came out of otf's dashboard and
 is published so every product can use it and none of them have to look alike.
-Nothing in it is one product's: a mark lives in `Brand` by name, a product's
+Nothing in it is one product's: a mark lives in the product that draws it, a product's
 animation of its mark lives in that product, and no class or keyframe carries a
 product's initials.
 Three things in one pnpm workspace:
@@ -149,21 +149,25 @@ allowed to, once, explained in the commit.
   and a control outline have different thresholds and cannot share a value.
   They did, and the value could only be right for one of them.
 
-- **A product is a layer between the system and a theme, and it ships as one
-  entry.** `src/products/<name>.ts` holds a product's identity (the tokens
-  that make it itself under every theme: font, shape, density), its themes and
-  its default; `build-products.mjs` writes `dist/<name>.css` (tokens, identity
-  on `:root`, the default theme until one is picked, the components, one rule
-  per theme) and `src/<name>.ts` is the entry whose `Brand`, `THEMES` and
-  `applyTheme` are the product's. A site imports its product and nothing of
-  anyone else's. The identity layer exists because valet's two palettes each
+- **A product is a layer between the system and a theme, and it lives in the
+  app that wears it.** `defineProduct` holds a product's mark, its identity
+  (the tokens that make it itself under every theme: font, shape, density),
+  its themes and its default; `productCss` writes its rules (identity under
+  `html:root`, the default theme until one is picked, one rule per theme);
+  `bindProduct` returns the `Brand`, `THEMES` and `applyTheme` that are the
+  product's; `contrastFailures` is the measurement its tests run. From 0.3.0
+  to 0.16.1 otf's and valet's products lived in `src/products/` and shipped as
+  entries and stylesheets. Every new surface brought its own palette, and each
+  palette became a release here and a pin bump in every app, so 0.17.0 moved
+  them out. The package keeps one theme, `system`, because its light half is
+  a rule in the package's stylesheet. The identity layer exists because valet's two palettes each
   restated valet's font and corners, and a theme shared between products would
   otherwise fall back to otf's font wherever it kept quiet: a theme is a sparse
   map, and what it is sparse *over* has to be the product, not the base.
   Nobody writes a `:root[data-theme]` rule by hand, because a copy drifts from
   the object the contrast test measured. Before 0.3.0 valet kept its theme in
   its own repo and re-derived first paint, the measurement and a review page
-  there.
+  there; that is why the machinery stayed here when the products left.
 - **Three derived tokens are re-derived under `[data-theme]`.** `--control`,
   `--illo-paper` and `--focus-ring` are `var()` expressions, and declared on
   `:root` alone they resolve against the root's palette and inherit as finished
@@ -211,20 +215,19 @@ allowed to, once, explained in the commit.
   argument for baselining first, in one paragraph.
 
 - **Icons and illustrations are the system's; the mark is the product's.**
-  `brandMarks.ts` is the table of every product's mark by name, stroked (otf,
-  one line at a weight) or filled (valet, a badge with the shirt cut out and
-  the bow inside the cut, one path under `evenodd` so the shirt is a hole the
-  surface shows through); `Brand` draws either, and a product entry's `Brand`
-  defaults to its own. otf's `brandMark.test.ts` reads otf's row out of the
-  compiled table, so the table stays where it is. The glyph table with its
-  measured views is `components/icons.ts`; `Icon.tsx` keeps the reasons. 0.3.0
-  briefly had an `ArtProvider` that put a per-product pack of icons,
-  illustrations and marks into React context so a product could swap the
-  seven icons the package draws inside Callout, Modal and the password field.
-  No product wanted that, the first real per-product art (valet's mark) did
-  not need it, and it went before the tag made it public API. If a theme ever
-  wants its own icon set, the shape is one indirection in `Icon` that
-  `applyTheme` sets, not a provider.
+  `brandMarks.ts` holds the shape of a mark, stroked (otf, one line at a
+  weight) or filled (valet, a badge with the shirt cut out and the bow inside
+  the cut, one path under `evenodd` so the shirt is a hole the surface shows
+  through); `Brand` draws whichever it is handed, and a bound `Brand` defaults
+  to the product's. Until 0.17.0 that module was the table of every product's
+  mark, and otf's `brandMark.test.ts` read otf's row out of the compiled copy;
+  otf's mark lives in otf now. 0.3.0 briefly had an `ArtProvider` that put a
+  per-product pack of icons, illustrations and marks into React context so a
+  product could swap the seven icons the package draws inside Callout, Modal
+  and the password field. No product wanted that, the first real per-product
+  art (valet's mark) did not need it, and it went before the tag made it
+  public API. If a theme ever wants its own icon set, the shape is one
+  indirection in `Icon` that `applyTheme` sets, not a provider.
 
 ## The components
 
@@ -306,6 +309,10 @@ because a rename after it is a breaking change for everyone.
   and an example proves nothing about whether the vocabulary is wide enough for
   an app that looks nothing like the one it came from. `gallery/src/brand.ts` is
   that app, in every specimen.
+- **The gallery's product is a fixture.** `gallery/src/product.ts` keeps copies
+  of night, paper and the two marks as they left the package in 0.17.0, so the
+  baselines taken before the move still answer whether a component moved a
+  pixel. The copies in the apps are the ones that change.
 
 ## Publishing
 

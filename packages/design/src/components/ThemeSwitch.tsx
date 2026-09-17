@@ -38,7 +38,6 @@ import { useEffect, useId, useState } from 'react'
 import type { Product } from '../products'
 import { THEME_STORAGE_KEY, storedTheme, themeChoices } from '../themes/choice'
 import Select from './Select'
-import type { BrandName } from './brandMarks'
 
 export default function ThemeSwitch({
   product,
@@ -50,9 +49,8 @@ export default function ThemeSwitch({
   onChange,
   className,
 }: {
-  /** Whose themes to offer. A registered name, or a `Product` from
-   *  `defineProduct` for an app with its own palette. */
-  product: BrandName | Product
+  /** Whose themes to offer: the app's `Product`, from `defineProduct`. */
+  product: Product
   /** A subset of the product's themes, in the order to show them. */
   only?: readonly string[]
   label?: string

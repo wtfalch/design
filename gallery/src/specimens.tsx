@@ -69,6 +69,7 @@ import {
   Tour,
   useToast,
 } from '@wtfalch/design'
+import { MARKS, galleryProduct } from './product'
 
 export interface Variant {
   name: string
@@ -991,12 +992,11 @@ export const COMPONENTS: Component[] = [
     id: 'brand',
     name: 'Brand',
     blurb:
-      "Every wtfalch product's mark, by name — `brandMarks.ts` is the table and " +
-      'adding a product is adding a row. otf is the first: a lowercase otf in one ' +
-      'unbroken stroke, the same path its app icon is rendered from, held to it ' +
-      "by otf's `brandMark.test.ts`. Still, on purpose: otf's cog-morph is otf's " +
-      'own component, layered over this path. valet is the second: a filled badge, ' +
-      'the jacket with the shirt cut out of it and a bow tie in the cut, one path ' +
+      "A product's mark, handed in as a path. The product declares it beside its " +
+      'themes, in its own repo. Stroked, like otf: a lowercase otf in one ' +
+      "unbroken stroke. Still, on purpose: otf's cog-morph is otf's own " +
+      'component, layered over this path. Or filled, like valet: a badge, the ' +
+      'jacket with the shirt cut out of it and a bow tie in the cut, one path ' +
       'under `evenodd`. `currentColor`, so `.brand` decides the green and a theme ' +
       'can move it through `--good`.',
     variants: [
@@ -1006,15 +1006,15 @@ export const COMPONENTS: Component[] = [
           'Sized off the type scale — 1.5 times `--text-md`, the line box the ' +
           'old wordmark occupied — so the header kept its height when the letters ' +
           'became a drawing. The width follows the viewBox.',
-        render: () => <Brand />,
+        render: () => <Brand mark={MARKS.otf} title="otf" />,
       },
       {
         name: 'valet',
         note:
-          "The second product's mark, filled where otf's is stroked. Drawn 24-first, " +
+          "A filled mark, where otf's is stroked. Drawn 24-first, " +
           'which is this size: the sliver of jacket over the bow is the pixel that ' +
           'keeps it a bow rather than a notch in the edge.',
-        render: () => <Brand name="valet" />,
+        render: () => <Brand mark={MARKS.valet} title="valet" />,
       },
     ],
   },
@@ -2575,7 +2575,7 @@ export const COMPONENTS: Component[] = [
             <Shell
               wide
               brand={<strong>Northwind</strong>}
-              who={<ThemeSwitch product="otf" labelHidden />}
+              who={<ThemeSwitch product={galleryProduct} labelHidden />}
               nav={
                 <Row>
                   <Pill quiet inRow>
@@ -2625,12 +2625,14 @@ export const COMPONENTS: Component[] = [
       {
         name: 'Labelled',
         note: 'The apps passed `aria-label="Appearance"` beside a visible “Appearance” span — the same string twice, which is the drift `Field` exists to stop. The label is rendered and pointed at, or hidden and used as the name, never both.',
-        render: () => <ThemeSwitch product="otf" />,
+        render: () => <ThemeSwitch product={galleryProduct} />,
       },
       {
         name: 'In a header',
         note: 'A subset, in the order to show them. An id the product does not offer is dropped rather than thrown on.',
-        render: () => <ThemeSwitch product="otf" only={['night', 'paper']} labelHidden />,
+        render: () => (
+          <ThemeSwitch product={galleryProduct} only={['night', 'paper']} labelHidden />
+        ),
       },
     ],
   },

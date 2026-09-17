@@ -33,16 +33,6 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./otf": {
-      "types": "./dist/otf.d.ts",
-      "default": "./dist/otf.js"
-    },
-    "./valet": {
-      "types": "./dist/valet.d.ts",
-      "default": "./dist/valet.js"
-    },
-    "./otf.css": "./dist/otf.css",
-    "./valet.css": "./dist/valet.css",
     "./themes": {
       "types": "./dist/themes/index.d.ts",
       "default": "./dist/themes/index.js"
@@ -63,7 +53,7 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/fix-extensions.mjs && node scripts/copy-css.mjs && node scripts/build-products.mjs",
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && node scripts/fix-extensions.mjs && node scripts/copy-css.mjs",
     "prepack": "pnpm build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"

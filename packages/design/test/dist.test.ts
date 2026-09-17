@@ -39,20 +39,17 @@ describe('the built package', () => {
     expect(existsSync(join(dist, 'index.js')), 'no dist: run pnpm build first').toBe(true)
   })
 
-  /* Four child Node processes, each a cold module graph, against vitest's
+  /* Three child Node processes, each a cold module graph, against vitest's
      5s default -- which this has been one busy machine away from all along,
      and tripped at 9.4s once the front door gained a component. The number
      is not a guess: a passing run is 6-8s here, so 30 is room for a slow
      one and still fails fast if the package genuinely stops loading. */
   it('loads in plain Node, with no bundler resolving its imports', { timeout: 30_000 }, () => {
-    expect(inNode('index.js', 'typeof m.Brand + " " + m.BRAND_NAMES.join(",")')).toBe(
-      'function otf,valet',
-    )
-    expect(inNode('valet.js', 'm.DEFAULT_THEME + " " + m.product.name')).toBe('valet valet')
-    expect(inNode('otf.js', 'm.DEFAULT_THEME + " " + m.product.name')).toBe('system otf')
-    expect(inNode('themes/index.js', 'Object.keys(m.THEMES).join(",")')).toBe(
-      'system,night,paper,valet,valet-night',
-    )
+    expect(
+      inNode('index.js', 'typeof m.Brand + " " + typeof m.bindProduct + " " + m.productCss.length'),
+    ).toBe('function function 1')
+    expect(inNode('index.js', 'm.contrastFailures(m.BASE_PALETTE).length')).toBe('0')
+    expect(inNode('themes/index.js', 'Object.keys(m.THEMES).join(",")')).toBe('system')
   })
 
   it('carries no extensionless relative import, in code or in declarations', () => {

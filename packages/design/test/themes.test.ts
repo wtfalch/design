@@ -1,21 +1,22 @@
 import { describe, expect, it } from 'vitest'
-import { OTF_THEMES } from '../src/products/otf'
-import { VALET_THEMES } from '../src/products/valet'
 import { THEMES, TOKEN_KEYS, applyTheme } from '../src/themes'
-import { productCss, themeId } from '../src/themes/css'
+import { themeId } from '../src/themes/css'
 
 /**
  * A theme is applied by name, and the name has to mean the same thing to
  * `applyTheme`, to the generated CSS and to the registry, or a consumer that
- * writes `data-theme="valet-night"` in its HTML and later calls
- * `applyTheme('valet-night')` is applying two different things.
+ * writes `data-theme="night"` in its HTML and later calls
+ * `applyTheme('night')` is applying two different things.
+ *
+ * The registry is the package's own since 0.17.0: `system`, and nothing that
+ * belongs to a product.
  */
-describe('the themes, per product', () => {
-  it('registers every product theme under the id applyTheme derives', () => {
+describe('the package themes', () => {
+  it('is system alone, under the id applyTheme derives', () => {
+    expect(Object.keys(THEMES)).toEqual(['system'])
     for (const [id, theme] of Object.entries(THEMES)) {
       expect(themeId(theme), theme.name).toBe(id)
     }
-    expect(Object.keys(THEMES)).toEqual([...Object.keys(OTF_THEMES), ...Object.keys(VALET_THEMES)])
   })
 
   it('names only tokens a theme may set', () => {
@@ -27,24 +28,7 @@ describe('the themes, per product', () => {
     }
   })
 
-  it('generates one rule per theme, and none for the one with no palette', () => {
-    const css = productCss(OTF_THEMES)
-    expect(css).not.toContain("[data-theme='system']")
-    expect(css).toContain(":root[data-theme='night']{")
-    expect(css).toContain(":root[data-theme='paper']{")
-    const valet = productCss(VALET_THEMES)
-    expect(valet).toContain(":root[data-theme='valet']{--bg:#f4f5f8;")
-    expect(valet).toContain('color-scheme:dark}')
-    for (const [key, value] of Object.entries(VALET_THEMES['valet-night'].tokens)) {
-      expect(valet).toContain(`${key}:${value}`)
-    }
-  })
-
-  it('refuses a product module keyed by a name applyTheme would not use', () => {
-    expect(() => productCss({ wrong: VALET_THEMES.valet })).toThrow(/keyed "wrong"/)
-  })
-
-  it('applies a registered theme by the same id', () => {
+  it('applies a theme object, clearing what the previous one set', () => {
     // The package's tests run in Node, so this is the four members of an
     // element `applyTheme` touches and nothing else.
     const props = new Map<string, string>()
@@ -56,9 +40,16 @@ describe('the themes, per product', () => {
       },
       dataset: {} as Record<string, string>,
     }
-    applyTheme('valet-night', el as unknown as HTMLElement)
-    expect(el.dataset.theme).toBe('valet-night')
+    const root = el as unknown as HTMLElement
+    applyTheme(
+      { name: 'Deep Sea', note: '', scheme: 'dark', tokens: { '--accent': '#8f88ff' } },
+      root,
+    )
+    expect(el.dataset.theme).toBe('deep-sea')
     expect(props.get('--accent')).toBe('#8f88ff')
     expect(el.style.colorScheme).toBe('dark')
+    applyTheme('system', root)
+    expect(el.dataset.theme).toBe('system')
+    expect(props.has('--accent')).toBe(false)
   })
 })

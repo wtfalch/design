@@ -1,10 +1,8 @@
 import type { ComponentProps } from 'react'
 import BrandDefault from '../components/Brand'
-import type { BrandName } from '../components/brandMarks'
+import type { Mark } from '../components/brandMarks'
 import { type Theme, type ThemeTokens, applyTheme } from '../themes'
 import { themeId } from '../themes/css'
-import { otf } from './otf'
-import { valet } from './valet'
 
 /**
  * A product: the layer between the system and a theme.
@@ -18,20 +16,27 @@ import { valet } from './valet'
  *
  * The middle layer is what lets a theme be shared between products. A theme
  * is a sparse map, and what it is sparse *over* decides what a silent token
- * shows: over the base it shows otf, over the product it shows the product.
- * Before this layer valet's two palettes each restated valet's font and
- * corners, because there was nowhere else to put them.
+ * shows: over the base it shows the base, over the product it shows the
+ * product. Before this layer valet's two palettes each restated valet's font
+ * and corners, because there was nowhere else to put them.
  *
- * A site is one product, so each ships as one entry -- `@wtfalch/design/valet`
- * and `valet.css` -- where `Brand`, `THEMES` and `applyTheme` are the
- * product's. This module is the neutral view of all of them, which is what the
- * gallery reads.
+ * **A product lives in its own repo.** From 0.3.0 to 0.16.1 otf and valet were
+ * declared here, and each shipped as a package entry and a stylesheet. Every
+ * new surface brought its own palette, and every palette became a release of
+ * this package and a pin bump in every app. An app now declares its product
+ * with `defineProduct`, binds it with `bindProduct`, puts `productCss` on the
+ * page, and measures its palettes with `contrastFailures`. The package keeps
+ * one theme of its own, `system`, because its light half is a rule in the
+ * package's stylesheet.
  */
 export interface Product {
-  /** The id: the mark's row in `brandMarks.ts` and the stem of the CSS entry. */
-  name: BrandName
-  /** On `:root` in the product's stylesheet, and under every palette when one
-   *  is applied. Empty for a product the base values already describe. */
+  /** What a screen reader calls the mark, and the name in an error. */
+  name: string
+  /** The path `Brand` draws. */
+  mark: Mark
+  /** Under every palette, whether the palette comes from `productCss` or from
+   *  a bound `applyTheme`. Empty for a product the base values already
+   *  describe. */
   identity: Partial<ThemeTokens>
   /** Keyed by the id `applyTheme` takes. */
   themes: Record<string, Theme>
@@ -39,11 +44,13 @@ export interface Product {
   defaultTheme: string
 }
 
-/** Every product, by the name of its mark. */
-export const PRODUCTS = { otf, valet } as const
-
-/** Declare a product, so a default that is not a theme or a key `applyTheme`
- *  would not use is an error where it is written. */
+/**
+ * Declare a product, so a mistake is an error where it is written: a default
+ * that is not one of its themes, a key `applyTheme` would not use, or a
+ * palette that restates the identity. The last one was a test over the
+ * products in this package; with the products elsewhere, the declaration is
+ * the only place left that sees every one.
+ */
 export function defineProduct(product: Product): Product {
   if (!(product.defaultTheme in product.themes)) {
     throw new Error(
@@ -56,6 +63,11 @@ export function defineProduct(product: Product): Product {
         `theme "${theme.name}" is keyed "${id}", but applyTheme calls it "${themeId(theme)}"`,
       )
     }
+    for (const key of Object.keys(theme.tokens)) {
+      if (key in product.identity) {
+        throw new Error(`theme "${theme.name}" restates ${key}, which is the product's identity`)
+      }
+    }
   }
   return product
 }
@@ -65,7 +77,7 @@ export function defineProduct(product: Product): Product {
  *
  * An id the product does not offer resolves to the product's default rather
  * than the package's, so a valet setting that remembers a theme valet has
- * since dropped comes up as valet, not as otf.
+ * since dropped comes up as valet, not as the base.
  */
 export function productTheme(
   product: Product,
@@ -78,19 +90,26 @@ export function productTheme(
   return { ...resolved, tokens: { ...product.identity, ...resolved.tokens } }
 }
 
-type BrandProps = ComponentProps<typeof BrandDefault>
+type BrandProps = Partial<ComponentProps<typeof BrandDefault>>
 
 /**
  * The package, as one product.
  *
- * `Brand` defaults to the product's mark and still takes a name. `applyTheme`
- * resolves against the product's themes and writes the identity under the
- * palette, so it holds even where the product's stylesheet is not the one
- * loaded. The product entries are this, exported.
+ * `Brand` defaults to the product's mark and name, and still takes either.
+ * `applyTheme` resolves against the product's themes and writes the identity
+ * under the palette, so it holds even where `productCss` is not on the page.
+ * An app binds its product once, in one module, and imports its `Brand`,
+ * `THEMES` and `applyTheme` from there.
  */
 export function bindProduct(product: Product) {
   function Brand(props: BrandProps) {
-    return <BrandDefault {...props} name={props.name ?? product.name} />
+    return (
+      <BrandDefault
+        {...props}
+        mark={props.mark ?? product.mark}
+        title={props.title ?? product.name}
+      />
+    )
   }
   return {
     product,
